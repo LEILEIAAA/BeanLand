@@ -1,0 +1,37 @@
+<view class="container">
+  <view class="hero">
+    <view class="eyebrow">第一次来请看这里</view>
+    <view class="title">新青年广场 A 座顶楼</view>
+    <view class="subtitle">{{store.routeTip}}</view>
+  </view>
+
+  <view class="section">
+    <view class="card map-card">
+      <map
+        class="route-map"
+        latitude="{{store.latitude}}"
+        longitude="{{store.longitude}}"
+        scale="{{store.scale}}"
+        markers="{{[{ id: 1, latitude: store.latitude, longitude: store.longitude, title: store.markerName, width: 32, height: 32 }]}}"
+        show-compass="true"
+        enable-3D="true"
+      />
+      <view class="card-title">门店位置预览</view>
+      <view class="card-meta">{{store.address}}</view>
+      <view class="button-row">
+        <view class="btn btn-primary" bindtap="openMap">打开微信地图导航</view>
+        <view class="btn btn-secondary" bindtap="copyAddress">复制地址</view>
+      </view>
+      <view class="button-row">
+        <view class="btn btn-secondary" bindtap="callStore">拨打电话</view>
+      </view>
+    </view>
+    <view class="card">
+      <view class="card-title">到店路线</view>
+      <view class="card-meta">1. 到达新青年广场后，找到 A 座入口。</view>
+      <view class="card-meta">2. 乘坐电梯到顶楼。</view>
+      <view class="card-meta">3. 到楼后如果找不到，联系店主或询问前台 / 保安。</view>
+      <view class="card-meta">4. 停车、公交、地铁说明后续根据实际物料补充。</view>
+    </view>
+  </view>
+</view>

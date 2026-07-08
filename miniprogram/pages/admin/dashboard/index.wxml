@@ -1,0 +1,13 @@
+<view class="container">
+  <view class="section-title">店主看板</view>
+  <view class="subtitle">快速查看开业期预约、会员、储值和座位计时压力。</view>
+
+  <view class="grid-two section">
+    <block wx:for="{{metrics}}" wx:key="label">
+      <view class="card">
+        <view class="card-meta">{{item.label}}</view>
+        <view class="price">{{item.value}}</view>
+      </view>
+    </block>
+  </view>
+</view>

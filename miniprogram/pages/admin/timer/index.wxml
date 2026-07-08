@@ -1,0 +1,19 @@
+<view class="container">
+  <view class="section-title">座位计时</view>
+  <view class="subtitle">开业关键能力：分配桌号、开始计时、续时补费、结束体验。</view>
+
+  <block wx:for="{{sessions}}" wx:key="tableCode">
+    <view class="card">
+      <view class="card-title">{{item.tableCode}} · {{item.name}}</view>
+      <view class="card-meta">{{item.packageName}} · {{item.start}}-{{item.end}}</view>
+      <view class="tag-row">
+        <view class="tag">{{item.remaining}}</view>
+        <view class="tag status-warning">{{item.status}}</view>
+      </view>
+      <view class="button-row">
+        <view class="btn btn-secondary">免费延长</view>
+        <view class="btn btn-primary">结束体验</view>
+      </view>
+    </view>
+  </block>
+</view>

@@ -1,0 +1,87 @@
+.hero-actions .btn {
+  flex: 1;
+}
+
+.custom-tabbar {
+  position: sticky;
+  bottom: 20rpx;
+  z-index: 10;
+  display: flex;
+  gap: 16rpx;
+  margin-top: 36rpx;
+  padding: 18rpx;
+  border-radius: 30rpx;
+  background: rgba(255,255,255,0.68);
+  border: 1rpx solid rgba(255,255,255,0.86);
+  backdrop-filter: blur(18px) saturate(160%);
+  box-shadow: 0 16rpx 36rpx rgba(15,23,42,0.08);
+}
+
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+  padding: 12rpx 8rpx;
+  border-radius: 22rpx;
+  transition: transform 0.2s ease;
+}
+
+.tab-item.active {
+  transform: translateY(-4rpx) scale(1.04);
+  background: rgba(17,24,39,0.04);
+}
+
+.tab-label {
+  font-size: 22rpx;
+  color: #6b7280;
+  font-weight: 700;
+}
+
+.tab-item.active .tab-label {
+  color: #111827;
+}
+
+.tab-icon {
+  position: relative;
+  width: 56rpx;
+  height: 56rpx;
+}
+
+.tab-ball {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.75);
+  border: 1rpx solid rgba(17,24,39,0.08);
+  box-shadow: inset 0 1rpx 0 rgba(255,255,255,0.8), 0 8rpx 18rpx rgba(15,23,42,0.08);
+  backdrop-filter: blur(12px);
+}
+
+.tab-face {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 22rpx;
+  height: 22rpx;
+  border-radius: 50%;
+  border: 4rpx solid rgba(17,24,39,0.8);
+  border-top-color: transparent;
+  opacity: 0.7;
+}
+
+.tab-item.active .tab-ball {
+  animation: tabPop 0.42s ease;
+}
+
+.tab-item.active .tab-face {
+  opacity: 1;
+  transform: scale(1.06);
+}
+
+@keyframes tabPop {
+  0% { transform: scale(0.92); }
+  60% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}

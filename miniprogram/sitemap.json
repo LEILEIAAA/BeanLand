@@ -1,0 +1,9 @@
+{
+  "desc": "Bean 拼豆手作店小程序页面索引",
+  "rules": [
+    {
+      "action": "allow",
+      "page": "*"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+<view class="container">
+  <view class="section-title">选择适合你的拼豆体验</view>
+  <view class="subtitle">所有套餐都会展示体验时长、超时规则和适合人群，到店前先确认更安心。</view>
+
+  <block wx:for="{{packages}}" wx:key="id">
+    <view class="card">
+      <view class="card-title">{{item.name}}</view>
+      <view class="card-meta">{{item.targetAudience}}</view>
+      <view class="price">¥{{item.price}}</view>
+      <view class="tag-row">
+        <view class="tag">{{item.durationMinutes}} 分钟</view>
+        <view class="tag">{{item.overtimeRule}}</view>
+      </view>
+      <view class="button-row">
+        <view class="btn btn-primary" data-id="{{item.id}}" bindtap="book">预约这个套餐</view>
+      </view>
+    </view>
+  </block>
+</view>

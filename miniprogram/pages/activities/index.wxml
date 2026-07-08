@@ -1,0 +1,15 @@
+<view class="container">
+  <view class="section-title">开业活动与主题局</view>
+  <view class="subtitle">暑期学生、亲子、四人同行和五月天主题局都可以在这里报名或咨询。</view>
+
+  <block wx:for="{{activities}}" wx:key="id">
+    <view class="card">
+      <view class="card-title">{{item.name}}</view>
+      <view class="card-meta">上限 {{item.capacity}} 人 · 当前状态 {{item.status}}</view>
+      <view class="price">¥{{item.price}}</view>
+      <view class="button-row">
+        <view class="btn btn-primary" bindtap="join">报名 / 咨询</view>
+      </view>
+    </view>
+  </block>
+</view>

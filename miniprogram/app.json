@@ -1,0 +1,21 @@
+{
+  "pages": [
+    "pages/home/index",
+    "pages/packages/index",
+    "pages/activities/index",
+    "pages/appointment/index",
+    "pages/route/index",
+    "pages/member/index",
+    "pages/recharge/index",
+    "pages/admin/dashboard/index",
+    "pages/admin/appointments/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "Bean 拼豆手作",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FFFFFF"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

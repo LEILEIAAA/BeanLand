@@ -1,0 +1,23 @@
+<view class="container">
+  <view class="section-title">会员储值</view>
+  <view class="subtitle">第一版支持到店充值 / 后台录入，本金余额与赠送余额分开记录。</view>
+
+  <block wx:for="{{rechargePlans}}" wx:key="id">
+    <view class="card">
+      <view class="card-title">充 {{item.rechargeAmount}} 送 {{item.bonusAmount}}</view>
+      <view class="price">到账 ¥{{item.arrivalAmount}}</view>
+      <view class="card-meta">适合：{{item.audience}}</view>
+      <view class="tag-row">
+        <view class="tag status-success">本金 + 赠送分开记账</view>
+      </view>
+      <view class="button-row">
+        <view class="btn btn-primary" data-id="{{item.id}}" bindtap="choose">选择此档位</view>
+      </view>
+    </view>
+  </block>
+
+  <view class="card">
+    <view class="card-title">储值说明</view>
+    <view class="card-meta">赠送余额不可提现，可用于体验、续时、升级、配件和活动报名。</view>
+  </view>
+</view>

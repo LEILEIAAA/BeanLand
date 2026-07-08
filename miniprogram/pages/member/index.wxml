@@ -1,0 +1,44 @@
+<view class="container">
+  <view class="hero">
+    <view class="eyebrow">会员中心</view>
+    <view class="title">{{member.nickname}}</view>
+    <view class="subtitle">余额、集章、优惠券和预约记录都会沉淀在这里。</view>
+  </view>
+
+  <view class="section grid-two">
+    <view class="card">
+      <view class="card-meta">当前总余额</view>
+      <view class="price">¥{{member.totalBalance}}</view>
+    </view>
+    <view class="card">
+      <view class="card-meta">当前集章</view>
+      <view class="price">{{member.stampCount}} 枚</view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">余额明细</view>
+    <view class="card-meta">本金余额：¥{{member.principalBalance}}</view>
+    <view class="card-meta">赠送余额：¥{{member.bonusBalance}}</view>
+    <view class="card-meta">累计消费：¥{{member.totalSpent}} · 到店 {{member.visitCount}} 次</view>
+    <view class="card-meta">最近到店：{{member.lastVisitAt}}</view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">我的优惠券</view>
+    <block wx:for="{{member.coupons}}" wx:key="*this">
+      <view class="card-meta">• {{item}}</view>
+    </block>
+  </view>
+
+  <view class="card">
+    <view class="card-title">最近记录</view>
+    <block wx:for="{{member.records}}" wx:key="title">
+      <view class="card-meta">{{item.title}} · {{item.meta}}</view>
+    </block>
+  </view>
+
+  <view class="button-row">
+    <view class="btn btn-primary" bindtap="goRecharge">立即充值</view>
+  </view>
+</view>

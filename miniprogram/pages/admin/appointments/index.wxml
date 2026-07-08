@@ -1,0 +1,50 @@
+<view class="container">
+  <view class="hero admin-hero">
+    <view class="eyebrow">预约 + 座位计时</view>
+    <view class="title">一页管理今天的到店节奏</view>
+    <view class="subtitle">确认预约、分配桌号、开始计时、续时补费、结束体验都集中在这里。</view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">今日预约与计时</view>
+    <view class="subtitle">按时间流转查看状态，不再在多个页面间切换。</view>
+  </view>
+
+  <block wx:for="{{appointments}}" wx:key="id">
+    <view class="card combined-card">
+      <view class="card-topline">
+        <view>
+          <view class="card-title">{{item.name}} · {{item.people}} 人</view>
+          <view class="card-meta">{{item.packageName}} · {{item.time}}</view>
+        </view>
+        <view class="status-badge">{{item.status}}</view>
+      </view>
+
+      <view class="spark-line">
+        <view class="spark-step current"></view>
+        <view class="spark-step {{item.sessionStatus === '体验中' ? 'active' : ''}}"></view>
+        <view class="spark-step {{item.sessionStatus === '即将超时' ? 'warning' : ''}}"></view>
+      </view>
+
+      <view class="tag-row">
+        <view class="tag">来源：{{item.source}}</view>
+        <view class="tag">桌号：{{item.tableCode}}</view>
+        <view class="tag status-success">剩余 {{item.remaining}}</view>
+        <view class="tag status-warning">{{item.sessionStatus}}</view>
+      </view>
+
+      <view class="button-row">
+        <view class="btn btn-secondary">确认预约</view>
+        <view class="btn btn-secondary">分配桌号</view>
+      </view>
+      <view class="button-row">
+        <view class="btn btn-primary">开始计时</view>
+        <view class="btn btn-secondary">补费续时</view>
+      </view>
+      <view class="button-row">
+        <view class="btn btn-secondary">免费延长</view>
+        <view class="btn btn-primary">结束体验</view>
+      </view>
+    </view>
+  </block>
+</view>

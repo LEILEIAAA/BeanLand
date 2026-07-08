@@ -1,0 +1,77 @@
+<view class="container">
+  <view class="section-title">预约体验</view>
+  <view class="subtitle">提交后会展示预计结束时间，方便你安排到店和后续行程。</view>
+
+  <view class="card">
+    <view class="form-item">
+      <view class="label">姓名 / 昵称</view>
+      <input class="input" placeholder="例如：小豆" data-field="name" bindinput="updateField" />
+    </view>
+    <view class="form-item">
+      <view class="label">手机号</view>
+      <input class="input" type="number" placeholder="用于确认预约" data-field="phone" bindinput="updateField" />
+    </view>
+    <view class="form-item">
+      <view class="label">微信号（可选）</view>
+      <input class="input" placeholder="方便加群 / 咨询" data-field="wechat" bindinput="updateField" />
+    </view>
+    <view class="form-item">
+      <view class="label">预约套餐</view>
+      <picker range="{{packages}}" range-key="name" value="{{packageIndex}}" bindchange="onPackageChange">
+        <view class="picker">{{packages[packageIndex].name}}</view>
+      </picker>
+    </view>
+    <view class="form-item">
+      <view class="label">预约日期</view>
+      <input class="input" placeholder="YYYY-MM-DD" value="{{form.appointmentDate}}" data-field="appointmentDate" bindinput="updateField" />
+    </view>
+    <view class="form-item">
+      <view class="label">预约时段</view>
+      <picker range="{{timeSlots}}" value="{{slotIndex}}" bindchange="onSlotChange">
+        <view class="picker">{{timeSlots[slotIndex]}}</view>
+      </picker>
+    </view>
+    <view class="form-item">
+      <view class="label">预约人数</view>
+      <input class="input" type="number" value="{{form.peopleCount}}" data-field="peopleCount" bindinput="updateField" />
+    </view>
+    <view class="form-item">
+      <view class="label">来源渠道</view>
+      <picker range="{{sourceOptions}}" value="{{sourceIndex}}" bindchange="onSourceChange">
+        <view class="picker">{{sourceOptions[sourceIndex]}}</view>
+      </picker>
+    </view>
+    <view class="form-item">
+      <view class="label">备注</view>
+      <textarea class="input" placeholder="比如：亲子到店、希望靠窗、生日布置" data-field="note" bindinput="updateField" />
+    </view>
+    <view class="form-item">
+      <switch checked="{{form.isMeituan}}" bindchange="toggleMeituan" />
+      <text class="card-meta"> 来自美团</text>
+    </view>
+    <view class="form-item" wx:if="{{form.isMeituan}}">
+      <view class="label">美团券码</view>
+      <input class="input" placeholder="到店核销使用" data-field="meituanCode" bindinput="updateField" />
+    </view>
+    <checkbox-group bindchange="toggleAgree">
+      <label class="card-meta">
+        <checkbox value="agree" /> 我已了解套餐时长与超时规则
+      </label>
+    </checkbox-group>
+    <view class="button-row">
+      <view class="btn btn-primary" bindtap="submit">生成预约确认</view>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{summary}}">
+    <view class="card-title">{{summary.title}}</view>
+    <view class="card-meta">套餐：{{summary.packageName}}</view>
+    <view class="card-meta">时间：{{summary.appointmentDate}} {{summary.timeSlot}}</view>
+    <view class="card-meta">预计结束：{{summary.expectedEndTime.display}}</view>
+    <view class="tag-row">
+      <block wx:for="{{summary.tags}}" wx:key="*this">
+        <view class="tag">{{item}}</view>
+      </block>
+    </view>
+  </view>
+</view>

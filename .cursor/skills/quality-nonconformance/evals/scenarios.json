@@ -1,0 +1,1400 @@
+{
+  "capability": "quality-nonconformance",
+  "version": "1.0.0",
+  "scenarios": [
+    {
+      "id": "QNC-001",
+      "name": "Incoming inspection lot rejection on standard dimension",
+      "difficulty": "easy",
+      "category": "incoming-inspection",
+      "context": {
+        "situation": "You are performing incoming inspection on a lot of 500 machined aluminum bushings (part 4210-B, 6061-T6 aluminum) from a qualified supplier, Apex Precision. The AQL sampling plan (Level II, AQL 1.0) calls for a sample size of 50 pieces. Your dimensional inspection finds 3 of 50 pieces with the inner bore diameter at 25.08mm against a specification of 25.00 ±0.05mm. The accept number for this sample size at AQL 1.0 is 1 (Ac=1, Re=2). The supplier has been consistently good — 12 consecutive lots accepted prior to this one. These bushings are non-safety-critical; they are used in a pneumatic manifold assembly for industrial equipment.",
+        "available_data": {
+          "part_number": "4210-B Rev C",
+          "material": "6061-T6 Aluminum",
+          "supplier": "Apex Precision",
+          "supplier_code": "SUP-0142",
+          "lot_size": 500,
+          "sample_size": 50,
+          "accept_number": 1,
+          "reject_number": 2,
+          "defective_found": 3,
+          "specification": "ID 25.00 ±0.05mm",
+          "defective_values_mm": [25.08, 25.07, 25.06],
+          "previous_lot_history": "12 consecutive lots accepted at normal inspection",
+          "current_inspection_level": "Normal (Level II)",
+          "part_criticality": "Non-safety-critical, industrial pneumatic manifold",
+          "annual_usage": 6000,
+          "unit_cost_usd": 4.50
+        }
+      },
+      "task": "Determine the lot disposition, the appropriate inspection level adjustment, whether a SCAR is warranted, and what communication is needed to the supplier and internal production team.",
+      "evaluation_criteria": [
+        {
+          "criterion": "lot_disposition",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Correctly identifies that 3 defectives exceeds the accept number of 1 (reject at 2), so the lot is rejected. Recommends rejection or 100% sort of the lot. Notes that the defective parts are 0.01-0.03mm beyond the USL — if production needs are urgent, a 100% sort to separate conforming from nonconforming units is a practical option, with the reject cost debited to the supplier.",
+            "fail": "Accepts the lot despite 3 defectives exceeding the accept number. Does not know how to apply the AQL sampling plan. Suggests scrapping the entire lot without considering a sort option."
+          }
+        },
+        {
+          "criterion": "inspection_level_adjustment",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Correctly applies the ANSI/ASQ Z1.4 switching rules: this is the first rejection after 12 consecutive accepted lots under normal inspection. One rejection under normal inspection does NOT trigger tightened inspection — tightened requires 2 of 5 consecutive lots rejected. Normal inspection continues, but the supplier is no longer eligible for reduced inspection (the consecutive acceptance streak is broken).",
+            "fail": "Incorrectly switches to tightened inspection after a single lot rejection. Does not know the 2-of-5 switching rule. Suggests skip-lot or reduced inspection immediately after a rejection."
+          }
+        },
+        {
+          "criterion": "scar_decision",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Determines that a formal SCAR is not warranted for a single lot rejection from a supplier with 12 consecutive good lots. Recommends a notification letter to the supplier documenting the rejection with measurement data, requesting investigation, and noting the impact on their scorecard. Reserves SCAR for repeat occurrences or significant non-conformances.",
+            "fail": "Issues a formal SCAR for a single non-safety-critical lot rejection from an otherwise good supplier (over-escalation). Or takes no supplier communication action at all (under-reaction)."
+          }
+        },
+        {
+          "criterion": "communication",
+          "weight": 0.20,
+          "rubric": {
+            "pass": "Drafts or outlines: (1) a supplier notification with part number, lot, spec, actual measurements, and request for investigation, and (2) an internal notification to production/planning about the lot hold or sort, including timeline for sorted material availability.",
+            "fail": "No communication plan. Does not inform the supplier of the rejection. Does not notify production about the material hold impact."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-002",
+      "name": "Simple NCR for cosmetic defect on non-critical part",
+      "difficulty": "easy",
+      "category": "ncr-disposition",
+      "context": {
+        "situation": "During final inspection of 200 injection-molded plastic housings (part 8890-D, ABS material) for a consumer electronics enclosure, the inspector finds 15 units with a visible flow mark on the interior surface of the housing. The flow mark is approximately 40mm long and is only visible when the housing is disassembled — it is not visible to the end user during normal use. The drawing specifies 'Cosmetic surface per Spec CS-102 Class B' on exterior surfaces only. Interior surfaces have no cosmetic specification. The housings are otherwise dimensionally conforming. The customer is a consumer electronics company, and these units are needed for a production run starting in 3 days.",
+        "available_data": {
+          "part_number": "8890-D Rev A",
+          "material": "ABS plastic",
+          "defect": "Visible flow mark, ~40mm, interior surface only",
+          "quantity_affected": 15,
+          "total_lot": 200,
+          "cosmetic_spec": "CS-102 Class B — applies to exterior surfaces only",
+          "interior_spec": "No cosmetic specification on interior surfaces",
+          "dimensional_conformance": "All dimensions within specification",
+          "customer_delivery_date": "3 days",
+          "unit_cost_usd": 2.80,
+          "annual_volume": 50000
+        }
+      },
+      "task": "Determine the NCR disposition for the 15 affected units, decide whether this requires a CAPA, and recommend whether to alert the customer.",
+      "evaluation_criteria": [
+        {
+          "criterion": "disposition_decision",
+          "weight": 0.40,
+          "rubric": {
+            "pass": "Correctly identifies that the flow marks are on an interior surface with no cosmetic specification, so the parts technically conform to all drawing requirements. Disposition: use-as-is with engineering concurrence documenting that interior surfaces are not specified for cosmetics. No rework or scrap needed. Notes that the NCR should be documented even though the disposition is use-as-is, to track the process trend.",
+            "fail": "Scraps or reworks the parts despite no specification violation. Fails to document the disposition. Uses 'use-as-is' without engineering justification — just says 'they look fine.'"
+          }
+        },
+        {
+          "criterion": "capa_decision",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Determines that a CAPA is NOT required for this isolated cosmetic observation that doesn't violate any specification. However, recommends monitoring: if flow marks begin appearing on exterior (Class B) surfaces, that would warrant investigation. Notes the molding process should be checked for potential causes (melt temperature, injection speed, gate location) as a process improvement, not a corrective action.",
+            "fail": "Initiates a full CAPA for a cosmetic observation that doesn't violate any specification (over-reaction). Or ignores the process signal entirely without even noting it for monitoring (under-reaction)."
+          }
+        },
+        {
+          "criterion": "customer_notification",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Determines that customer notification is NOT required because the parts conform to all drawing specifications. The flow marks are on an unspecified surface and are not visible in normal use. Proactive notification about a non-issue could create unnecessary concern and delay the delivery the customer needs in 3 days.",
+            "fail": "Notifies the customer about a cosmetic condition that doesn't violate any specification, creating unnecessary alarm. Or withholds notification on a genuine non-conformance (different from this scenario)."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-003",
+      "name": "Basic SPC chart interpretation with out-of-control signal",
+      "difficulty": "easy",
+      "category": "spc-interpretation",
+      "context": {
+        "situation": "You are reviewing the X-bar/R chart for a CNC grinding operation on bearing race OD (specification: 52.000 ±0.008mm). Subgroup size is 5, sampled every 30 minutes. The control chart has been stable for the last 80 subgroups with X-bar center line at 52.001mm and control limits at 51.996mm (LCL) and 52.006mm (UCL). The last 4 subgroups show: 52.003, 52.004, 52.004, 52.005mm. The latest subgroup (subgroup 85) plots at 52.005mm — within control limits but you notice the last 9 subgroups have all been above the center line of 52.001mm.",
+        "available_data": {
+          "process": "CNC grinding, bearing race OD",
+          "specification": "52.000 ±0.008mm (USL 52.008, LSL 51.992)",
+          "subgroup_size": 5,
+          "sampling_frequency": "every 30 minutes",
+          "xbar_center_line": 52.001,
+          "xbar_ucl": 52.006,
+          "xbar_lcl": 51.996,
+          "last_9_xbar_values": [52.002, 52.002, 52.003, 52.002, 52.003, 52.003, 52.004, 52.004, 52.005],
+          "all_above_center_line": true,
+          "r_chart_status": "Stable, no signals",
+          "current_cpk": 1.42,
+          "production_context": "Automotive bearing supplier, IATF 16949 environment"
+        }
+      },
+      "task": "Interpret the SPC chart, identify any signals, determine the appropriate response, and recommend actions.",
+      "evaluation_criteria": [
+        {
+          "criterion": "signal_identification",
+          "weight": 0.35,
+          "rubric": {
+            "pass": "Correctly identifies a Western Electric Rule 2 violation: 9 consecutive points on the same side of the center line. This indicates a process mean shift, even though all points are within control limits. Notes that the R chart being stable means the variation hasn't changed — only the mean has shifted upward.",
+            "fail": "Sees no signal because all points are within control limits. Does not know the Western Electric rules beyond Rule 1 (point beyond limits). Treats this as normal variation."
+          }
+        },
+        {
+          "criterion": "response_appropriateness",
+          "weight": 0.35,
+          "rubric": {
+            "pass": "Recommends investigation into the assignable cause of the mean shift — most likely tool wear progression, grinding wheel dressing cycle, or thermal drift. Does NOT recommend stopping production (the process is still within specification with Cpk 1.42). Recommends adjusting the process mean back toward 52.001mm after confirming the assignable cause, and increasing monitoring frequency temporarily to confirm the adjustment holds.",
+            "fail": "Recommends stopping production for a process that is within specification and control limits (over-reaction). Or recommends no action because points are within limits (under-reaction, ignoring the run signal). Suggests adjusting without investigating the cause (tampering)."
+          }
+        },
+        {
+          "criterion": "process_understanding",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Notes that the upward trend with stable R chart is classic tool wear or thermal drift in a grinding process. Mentions that Cpk of 1.42 provides margin but the trend should be addressed before the process drifts further. In IATF 16949, reaction plans should be followed per the control plan.",
+            "fail": "Generic SPC advice without connecting to the grinding process. Does not understand the distinction between mean shift (center line drift) and variation increase (control limit widening)."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-004",
+      "name": "Writing a 5 Whys root cause analysis for a straightforward process failure",
+      "difficulty": "easy",
+      "category": "root-cause-analysis",
+      "context": {
+        "situation": "A torque wrench in your assembly area was found to be out of calibration during its scheduled quarterly calibration check. The as-found reading was 18.2 Nm against a target of 20.0 Nm (9% low). This torque wrench has been used for final assembly of a medical device connector for the past 3 months since its last calibration. Approximately 4,500 connectors were assembled in this period. The connector requires a torque of 20 ±2 Nm — so at 18.2 Nm, the wrench was applying torque below the lower specification limit of 18 Nm. Pull-test results on finished devices have been within specification, suggesting the under-torque may not have caused functional failures, but the measurement system uncertainty means you cannot be certain all units were properly assembled.",
+        "available_data": {
+          "equipment": "Torque wrench TW-0088",
+          "as_found_nm": 18.2,
+          "target_nm": 20.0,
+          "tolerance_nm": "20.0 ±2.0 (18.0-22.0 Nm)",
+          "deviation_percent": 9,
+          "calibration_cycle": "Quarterly (90 days)",
+          "units_assembled_since_last_cal": 4500,
+          "product": "Medical device connector, Class II",
+          "pull_test_results": "All within specification during monitoring period",
+          "regulatory_environment": "FDA 21 CFR 820"
+        }
+      },
+      "task": "Perform a 5 Whys root cause analysis on this calibration failure and determine the appropriate containment and corrective actions.",
+      "evaluation_criteria": [
+        {
+          "criterion": "five_whys_quality",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Conducts a 5 Whys that reaches a systemic cause, not stopping at 'torque wrench drifted' (that's the event, not the cause). Example chain: Why out of cal? → Mechanism wore. Why did wear cause this drift? → Calibration interval didn't account for usage rate. Why? → Interval is time-based (90 days) not usage-based. Why? → Calibration program doesn't track usage cycles. Why? → No process to adjust calibration frequency based on usage data. Root cause: calibration program is purely time-based without usage-based adjustment.",
+            "fail": "Stops at 'torque wrench drifted out of calibration' or 'operator didn't notice.' Each 'why' is opinion rather than verifiable fact. Root cause is stated as 'equipment failure' without reaching the systemic gap."
+          }
+        },
+        {
+          "criterion": "containment_actions",
+          "weight": 0.35,
+          "rubric": {
+            "pass": "Recognizes this as a measurement system failure affecting 4,500 medical device assemblies. Containment: (1) quarantine any unshipped finished goods from this period, (2) evaluate the risk — the wrench at 18.2 Nm was applying torque at the LSL of 18 Nm, and pull-test data is passing, so functional risk is low but not zero, (3) consider the measurement uncertainty of the pull-test system itself, (4) document the risk assessment and lot disposition per 21 CFR 820.90.",
+            "fail": "No containment action on the 4,500 assembled units. Treats this as just a calibration issue without evaluating product impact. Does not consider FDA requirements for product impact assessment when measurement equipment is found out of tolerance."
+          }
+        },
+        {
+          "criterion": "corrective_action",
+          "weight": 0.35,
+          "rubric": {
+            "pass": "Corrective action addresses the systemic root cause (calibration interval methodology), not just the individual wrench. Suggests implementing usage-based calibration intervals or shortening the time-based interval for high-use equipment. Also addresses the detection gap: implement in-process torque verification (spot-check with a calibrated reference wrench) to catch drift between calibration cycles.",
+            "fail": "Corrective action is 'recalibrate the wrench' (that's containment, not corrective action). Or 'train operators to check calibration' without addressing the systemic calibration interval issue."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-005",
+      "name": "Interpreting basic cost of quality data for management presentation",
+      "difficulty": "easy",
+      "category": "cost-of-quality",
+      "context": {
+        "situation": "You are preparing a quarterly management review and have compiled the following cost of quality data for Q1. Total revenue for Q1 was $12.4M. Prevention costs: $62K (training $18K, process validation $28K, supplier qualification audits $16K). Appraisal costs: $186K (incoming inspection $48K, in-process inspection $72K, final inspection $42K, calibration $24K). Internal failure costs: $310K (scrap $142K, rework $98K, re-inspection $32K, production delays from quality holds $38K). External failure costs: $94K (customer returns $52K, warranty $28K, field service $14K). Management has asked you to interpret the data and recommend where to invest.",
+        "available_data": {
+          "q1_revenue_usd": 12400000,
+          "prevention_costs_usd": 62000,
+          "appraisal_costs_usd": 186000,
+          "internal_failure_costs_usd": 310000,
+          "external_failure_costs_usd": 94000,
+          "total_coq_usd": 652000,
+          "coq_percent_revenue": 5.26,
+          "prevention_breakdown": {"training": 18000, "process_validation": 28000, "supplier_audits": 16000},
+          "internal_failure_breakdown": {"scrap": 142000, "rework": 98000, "reinspection": 32000, "production_delays": 38000}
+        }
+      },
+      "task": "Analyze the cost of quality data, identify the key insight, and recommend a specific investment to management with ROI justification.",
+      "evaluation_criteria": [
+        {
+          "criterion": "data_interpretation",
+          "weight": 0.35,
+          "rubric": {
+            "pass": "Correctly calculates total COQ at $652K (5.26% of revenue) and identifies this as above the 3% target. Notes the unhealthy distribution: prevention is only 9.5% of total COQ while internal failure is 47.5%. The classic quality economics principle: under-investment in prevention drives high failure costs. A healthy COQ distribution has prevention at 20-30% of total, not <10%.",
+            "fail": "Presents the numbers without analysis. Does not recognize the prevention-to-failure ratio imbalance. Reports COQ as 'within industry norms' when 5.26% is above the 3% target."
+          }
+        },
+        {
+          "criterion": "investment_recommendation",
+          "weight": 0.35,
+          "rubric": {
+            "pass": "Recommends increasing prevention investment — specifically targeting the $142K scrap cost as the largest failure component. Proposes a specific investment (e.g., SPC implementation on top scrap drivers, poka-yoke fixtures for top rework operations, or supplier development for top incoming rejection sources). Provides a rough ROI: if $40K in prevention investment reduces scrap by 30%, the saving is $42K/year = payback in under 12 months.",
+            "fail": "Recommends increasing inspection (appraisal) to catch more defects. This increases COQ without reducing failure costs. Or provides no specific investment recommendation. Or recommends cutting inspection to reduce appraisal costs."
+          }
+        },
+        {
+          "criterion": "communication_quality",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Presents the analysis in management-appropriate language: leads with the business impact (5.26% of revenue = $652K going to non-value-add quality costs), provides the key insight (prevention under-investment), and makes a specific ask with financial justification. Uses the COQ data to build the business case, not just report numbers.",
+            "fail": "Presents raw data without business context. Uses quality jargon without translation to financial impact. Doesn't make a specific, actionable recommendation."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-006",
+      "name": "Basic CAPA initiation for a recurring defect",
+      "difficulty": "easy",
+      "category": "capa-management",
+      "context": {
+        "situation": "You have received the third NCR in 60 days for the same failure mode: surface roughness exceeding specification (Ra 1.6µm max, actuals ranging from 1.8 to 2.4µm) on CNC-turned stainless steel fittings, part 5520-C. The three NCRs (NCR-2025-0398, -0412, -0456) involve three different production lots, two different machines, and multiple operators. Each NCR was individually dispositioned — the first two lots were reworked (re-polished), the third is pending disposition. Total scrap and rework cost to date: $8,200. No customer complaints, but the parts are for a hydraulic system in industrial equipment where surface roughness affects seal performance.",
+        "available_data": {
+          "ncr_references": ["NCR-2025-0398", "NCR-2025-0412", "NCR-2025-0456"],
+          "part_number": "5520-C Rev B",
+          "material": "316 Stainless Steel",
+          "defect": "Surface roughness Ra exceeding 1.6µm specification",
+          "actual_values_ra": [1.8, 2.1, 1.9, 2.4, 1.8],
+          "machines_affected": ["CNC-T04", "CNC-T06"],
+          "operators_affected": "Multiple (not operator-specific)",
+          "rework_cost_to_date_usd": 8200,
+          "customer_complaints": 0,
+          "product_application": "Hydraulic fitting, seal surface"
+        }
+      },
+      "task": "Determine whether a CAPA is required, draft the CAPA initiation record including problem statement and team composition, and recommend the root cause analysis methodology.",
+      "evaluation_criteria": [
+        {
+          "criterion": "capa_decision",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Correctly identifies that a CAPA IS required: 3 NCRs with the same failure mode in 60 days meets the standard trigger criteria for recurrence. Notes that individual NCR dispositions (rework) addressed the symptoms but not the underlying cause. The pattern across multiple machines and operators suggests a systemic cause, not an isolated event.",
+            "fail": "Does not initiate a CAPA because there are no customer complaints. Or initiates a CAPA but cannot articulate why it's required."
+          }
+        },
+        {
+          "criterion": "problem_statement",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Writes a specific, data-driven problem statement: 'Recurring surface roughness non-conformance on part 5520-C (316SS hydraulic fitting). 3 NCRs in 60 days, Ra values 1.8-2.4µm against 1.6µm max specification. Occurring across multiple machines (CNC-T04, CNC-T06) and operators, indicating systemic process issue. Cumulative scrap/rework cost: $8,200. No customer impact to date, but surface roughness affects seal performance in hydraulic application.'",
+            "fail": "Problem statement is vague: 'Quality issues on part 5520-C' or 'Surface roughness problems.' Does not include quantitative data, scope, or business impact."
+          }
+        },
+        {
+          "criterion": "team_and_methodology",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Recommends a cross-functional team including quality engineering (lead), manufacturing/process engineering (CNC turning expertise), materials engineering or metallurgy (316SS machining characteristics), and tool/insert supplier technical support. Recommends Ishikawa + 5 Whys methodology — the multi-machine, multi-operator pattern suggests multiple potential cause categories (Machine, Material, Method) that need systematic exploration.",
+            "fail": "Team is only quality personnel. Recommends simple 5 Whys only despite evidence of multi-factor causes across machines. Does not include process engineering."
+          }
+        },
+        {
+          "criterion": "initial_investigation_direction",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Identifies the key investigation questions based on the data: (1) Did raw material lots change across the 3 NCRs? (316SS machinability varies by lot/mill), (2) Were cutting parameters the same on both machines? (3) What is the tool/insert condition and change frequency? (4) Is the coolant concentration and flow adequate? The multi-machine pattern is critical — it rules out single-machine causes and points toward material, tooling, or method factors.",
+            "fail": "Jumps to a root cause without investigation. Assumes 'operator error' despite multi-operator evidence. Does not leverage the multi-machine pattern as an analytical clue."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-007",
+      "name": "Determining correct AQL sampling plan for mixed criticality lot",
+      "difficulty": "easy",
+      "category": "incoming-inspection",
+      "context": {
+        "situation": "You receive a lot of 1,200 surgical instrument handles (Part SH-200, stainless steel) from a qualified supplier. The part has three inspection categories: (1) a critical dimension — bore diameter for blade retention (affects patient safety if incorrect), (2) two major dimensions — length and width affecting fit into the instrument tray, and (3) surface finish — a minor cosmetic requirement for the external handle surface. Your company's incoming inspection procedure requires AQL 0 for critical, AQL 1.0 for major, and AQL 4.0 for minor characteristics, all at General Inspection Level II. The supplier has been qualified for 2 years with good history.",
+        "available_data": {
+          "part_number": "SH-200 Rev E",
+          "material": "17-4 PH Stainless Steel",
+          "lot_size": 1200,
+          "critical_dimension": "Bore diameter 8.00 +0.01/-0.00mm (blade retention, patient safety)",
+          "major_dimensions": "Length 152.0 ±0.5mm, Width 18.0 ±0.2mm (instrument tray fit)",
+          "minor_characteristic": "Surface finish Ra ≤ 0.8µm (cosmetic, exterior handle)",
+          "inspection_level": "General Level II",
+          "aql_critical": 0,
+          "aql_major": 1.0,
+          "aql_minor": 4.0,
+          "supplier_status": "Qualified, 2-year history, no recent issues",
+          "regulatory": "FDA Class II medical device, 21 CFR 820"
+        }
+      },
+      "task": "Determine the correct sample sizes and accept/reject numbers for each characteristic category using ANSI/ASQ Z1.4, and explain the rationale for the different AQL levels.",
+      "evaluation_criteria": [
+        {
+          "criterion": "sample_size_determination",
+          "weight": 0.40,
+          "rubric": {
+            "pass": "Correctly determines: Lot size 1,200 at Level II gives code letter K, sample size 125. For AQL 0 (critical): Ac=0, Re=1 — any single critical defect rejects the lot. For AQL 1.0 (major): Ac=7, Re=8 at sample 125. For AQL 4.0 (minor): Ac=18, Re=19 at sample 125. Notes that the same sample of 125 can be inspected for all three characteristic categories simultaneously.",
+            "fail": "Incorrect sample size code letter or sample size. Incorrect accept/reject numbers. Does not recognize that different AQL levels share the same sample size. Confuses the sample size code letter lookup."
+          }
+        },
+        {
+          "criterion": "rationale_for_aql_levels",
+          "weight": 0.35,
+          "rubric": {
+            "pass": "Explains: AQL 0 for critical because patient safety is at stake — zero tolerance for defects that could cause harm. AQL 1.0 for major because functional fit issues cause rework and customer dissatisfaction but no safety risk. AQL 4.0 for minor because cosmetic defects are undesirable but have no functional or safety impact. Notes that for FDA-regulated medical devices, the rationale for AQL selection should be documented and defensible during audit.",
+            "fail": "Cannot explain why different AQL levels are used. Treats all characteristics the same. Does not connect AQL selection to risk/criticality."
+          }
+        },
+        {
+          "criterion": "practical_considerations",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Notes practical considerations: (1) the critical bore dimension may warrant variable data collection (measurements, not just pass/fail) to support SPC even at incoming, (2) for a medical device, retain inspection records with actual measurement values per 21 CFR 820.80, (3) the 'qualified supplier with good history' does not reduce the AQL for critical dimensions — critical is always AQL 0 regardless of supplier history.",
+            "fail": "Suggests reducing critical characteristic inspection based on supplier history. Does not mention data retention requirements for medical devices."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-008",
+      "name": "Supplier SCAR response evaluation — weak root cause",
+      "difficulty": "easy",
+      "category": "supplier-quality",
+      "context": {
+        "situation": "You issued SCAR-2025-0089 to a machined parts supplier for an out-of-tolerance thread pitch diameter on 50 automotive fasteners. The specification was M10x1.5 6g thread class, and 8 of 50 inspected pieces had pitch diameter below the 6g minimum. The supplier has responded with their corrective action report. Their root cause: 'Operator failed to check parts during the production run.' Their corrective action: 'Operator has been retrained on the importance of in-process inspection. Training record attached.' Their effectiveness verification: 'Next 3 lots will be 100% inspected before shipment.'",
+        "available_data": {
+          "scar_number": "SCAR-2025-0089",
+          "part": "M10x1.5 fastener, 6g thread class",
+          "defect": "Pitch diameter below 6g minimum on 8 of 50 pieces",
+          "supplier_root_cause": "Operator failed to check parts during production run",
+          "supplier_corrective_action": "Operator retrained on in-process inspection importance",
+          "supplier_effectiveness_plan": "100% inspection of next 3 lots before shipment",
+          "supplier_evidence": "Training record for 1 operator",
+          "industry": "Automotive, IATF 16949"
+        }
+      },
+      "task": "Evaluate the supplier's SCAR response. Is the root cause adequate? Is the corrective action sufficient? What specific feedback should you provide?",
+      "evaluation_criteria": [
+        {
+          "criterion": "root_cause_evaluation",
+          "weight": 0.40,
+          "rubric": {
+            "pass": "Correctly identifies that 'operator failed to check parts' is NOT a root cause — it's a symptom or an escape description. The root cause must explain WHY the parts were out of tolerance in the first place (machine, tool, setup, material), not just why they weren't detected. Additionally, even the escape analysis is weak: why doesn't the process have built-in controls (poka-yoke, SPC, automated gauging) instead of relying on operator vigilance?",
+            "fail": "Accepts the supplier's root cause as adequate. Does not distinguish between the cause of the defect and the cause of the escape."
+          }
+        },
+        {
+          "criterion": "corrective_action_evaluation",
+          "weight": 0.35,
+          "rubric": {
+            "pass": "Identifies that 'retrain the operator' is the weakest form of corrective action (rank 6 on the effectiveness hierarchy). For a threading defect, the corrective action should address the process: tool wear monitoring, thread gauge SPC, or automated thread inspection. The supplier's effectiveness plan (100% inspection of next 3 lots) is containment, not corrective action. Requests the supplier to address: (1) the actual cause of the dimensional deviation, and (2) a higher-rank corrective action than training.",
+            "fail": "Accepts retraining as an adequate corrective action. Does not identify the distinction between containment (100% inspection) and systemic corrective action."
+          }
+        },
+        {
+          "criterion": "feedback_specificity",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Provides specific, constructive feedback: reject the SCAR response as inadequate, request resubmission with (a) investigation into the actual cause of the pitch diameter deviation (tool condition, machine settings, material), (b) a corrective action ranked higher than training (e.g., in-process SPC on thread gauging, tool life monitoring, automated inspection), and (c) an effectiveness period longer than 3 lots. Sets a resubmission deadline.",
+            "fail": "Vague feedback like 'needs improvement.' Accepts the response. Does not set specific expectations for what an adequate response looks like."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-009",
+      "name": "MRB disposition on use-as-is with engineering justification in aerospace",
+      "difficulty": "medium",
+      "category": "ncr-disposition",
+      "context": {
+        "situation": "Your aerospace machining facility has produced 25 titanium brackets (Ti-6Al-4V, part TB-4400 Rev D) for a commercial aircraft secondary structure application. During final inspection, the CMM reports show that the wall thickness on feature C is 2.92mm against a specification of 3.00 ±0.10mm. The parts are within tolerance (LSL = 2.90mm), but barely — one unit measures 2.91mm, which is 0.01mm above the lower limit. Engineering analysis shows that feature C is a non-load-bearing stiffener rib, and the FEA model indicates that the minimum acceptable wall thickness for structural integrity is 2.75mm, well below the measured values. The customer is Boeing, and these brackets are on a critical path for a 737 MAX delivery. Lead time for replacement brackets is 8 weeks.",
+        "available_data": {
+          "part_number": "TB-4400 Rev D",
+          "material": "Ti-6Al-4V per AMS 4928",
+          "quantity": 25,
+          "feature": "Wall thickness, feature C (stiffener rib, non-load-bearing)",
+          "specification": "3.00 ±0.10mm (LSL 2.90, USL 3.10)",
+          "actual_measurements_mm": [2.92, 2.91, 2.93, 2.92, 2.94, 2.92, 2.93, 2.91, 2.92, 2.93],
+          "minimum_measurement_mm": 2.91,
+          "fea_minimum_mm": 2.75,
+          "customer": "Boeing",
+          "program": "737 MAX secondary structure",
+          "replacement_lead_time_weeks": 8,
+          "regulatory": "AS9100D, FAA Part 21",
+          "feature_function": "Non-load-bearing stiffener rib"
+        }
+      },
+      "task": "Determine the appropriate MRB disposition, document the engineering justification, and outline the process for obtaining customer approval if required.",
+      "evaluation_criteria": [
+        {
+          "criterion": "disposition_decision",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Correctly identifies that all 25 parts are within the drawing tolerance (minimum 2.91mm vs. LSL 2.90mm), so technically there is no non-conformance. However, the marginal measurements (0.01mm above LSL) are worth noting. If the agent treats this as an NCR requiring use-as-is disposition (reasonable interpretation given the marginal results), the analysis should note the FEA minimum of 2.75mm provides substantial margin.",
+            "fail": "Incorrectly identifies the parts as non-conforming when they are within tolerance. Or recommends scrapping 25 titanium brackets ($$$) that meet the drawing specification. Or recommends use-as-is without any engineering analysis."
+          }
+        },
+        {
+          "criterion": "engineering_justification",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Provides a structured engineering justification: (1) all measurements are within the drawing tolerance of 3.00 ±0.10mm, (2) FEA analysis shows the structural minimum is 2.75mm, providing a margin of 0.16mm even on the lowest measured part, (3) the feature is a non-load-bearing stiffener rib with no fatigue criticality, (4) no impact to form, fit, or function. Notes that even though the parts are technically conforming, the marginal measurements should trigger a process investigation.",
+            "fail": "No engineering justification beyond 'parts are in spec.' Does not reference the FEA analysis. Does not note that the marginal measurements warrant process investigation."
+          }
+        },
+        {
+          "criterion": "customer_approval_process",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Correctly identifies the AS9100 requirement: since the parts are within tolerance, customer approval for use-as-is is not technically required (use-as-is/repair approval per AS9100 §8.7.1 applies to nonconforming product). However, notes that Boeing may have customer-specific requirements for notification of marginal results, and proactive communication is recommended given the critical path nature of the order.",
+            "fail": "Requires Boeing approval for conforming parts (over-escalation). Or processes the parts without any consideration of whether Boeing's specific requirements include marginal result notification."
+          }
+        },
+        {
+          "criterion": "process_improvement",
+          "weight": 0.20,
+          "rubric": {
+            "pass": "Recommends investigating why the process is running near the lower specification limit. Suggests checking tool compensation, fixture clamping, and raw material dimensions. Notes that the process should be centered on 3.00mm nominal, not running at 2.92mm mean. Recommends SPC monitoring on this feature for future lots.",
+            "fail": "No process improvement recommendation. Accepts marginal results as normal."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-010",
+      "name": "SPC capability study shows capable but off-center process",
+      "difficulty": "medium",
+      "category": "spc-interpretation",
+      "context": {
+        "situation": "Your automotive customer has requested a process capability study on a new stamped metal bracket (part BK-7700) before PPAP approval. You've collected 125 measurements (25 subgroups of 5) over a 2-week production qualification run. The critical dimension is a hole position: 45.00 ±0.15mm from datum A. Your data shows: X-bar grand mean = 45.08mm, overall standard deviation (σ_overall) = 0.032mm, within-subgroup standard deviation (σ_within) = 0.028mm. The customer requires Ppk ≥ 1.67 for initial process approval.",
+        "available_data": {
+          "part_number": "BK-7700",
+          "specification": "45.00 ±0.15mm (USL 45.15, LSL 44.85)",
+          "nominal": 45.00,
+          "grand_mean": 45.08,
+          "sigma_overall": 0.032,
+          "sigma_within": 0.028,
+          "sample_size": 125,
+          "subgroups": 25,
+          "subgroup_size": 5,
+          "customer_requirement": "Ppk ≥ 1.67 for initial PPAP approval",
+          "industry": "Automotive, IATF 16949"
+        }
+      },
+      "task": "Calculate the relevant capability indices, interpret the results, determine whether the customer's requirement is met, and recommend corrective actions if needed.",
+      "evaluation_criteria": [
+        {
+          "criterion": "capability_calculations",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Correctly calculates: Cp = (USL-LSL)/(6×σ_within) = 0.30/(6×0.028) = 1.79. Cpk = min((USL-mean)/(3×σ_within), (mean-LSL)/(3×σ_within)) = min(0.07/0.084, 0.23/0.084) = min(0.83, 2.74) = 0.83. Pp = (USL-LSL)/(6×σ_overall) = 0.30/(6×0.032) = 1.56. Ppk = min(0.07/0.096, 0.23/0.096) = min(0.73, 2.40) = 0.73. The customer-required Ppk of 1.67 is NOT met (Ppk = 0.73).",
+            "fail": "Calculation errors in the capability indices. Confuses Cp/Cpk with Pp/Ppk. Uses the wrong formula. Gets the correct number but misidentifies which metric the customer is asking for."
+          }
+        },
+        {
+          "criterion": "interpretation",
+          "weight": 0.35,
+          "rubric": {
+            "pass": "Correctly interprets: Cp of 1.79 shows the process has POTENTIAL capability — the variation is tight relative to the tolerance. But Cpk of 0.83 shows the process is severely off-center. The mean of 45.08mm is shifted 0.08mm above nominal, consuming most of the upper tolerance band. The key insight: this is a centering problem, not a variation problem. Shifting the mean back toward 45.00mm would dramatically improve Cpk without changing the process variation. Also notes that Pp/Ppk being slightly lower than Cp/Cpk indicates some between-subgroup variation.",
+            "fail": "Does not distinguish between capability (Cp) and actual performance (Cpk). Recommends reducing variation when the problem is centering. Does not recognize that the process mean is the primary issue."
+          }
+        },
+        {
+          "criterion": "corrective_action",
+          "weight": 0.35,
+          "rubric": {
+            "pass": "Recommends: (1) adjust the die or tooling to shift the process mean from 45.08 toward 45.00mm — this is a setup adjustment, not a process change, (2) after adjustment, run a new capability study to confirm Ppk ≥ 1.67, (3) if the mean shift was caused by die wear or press deflection, investigate and address the root cause to prevent future drift, (4) submit the updated capability study with the PPAP package. Notes that the Ppk of 1.67 requirement is standard for IATF 16949 initial process studies.",
+            "fail": "Recommends reducing process variation (expensive process changes) when a simple mean shift would solve the problem. Submits the current data to the customer hoping they'll accept Ppk 0.73. Does not differentiate between the centering fix and a variation reduction."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-011",
+      "name": "Writing an 8D report for an automotive customer complaint",
+      "difficulty": "medium",
+      "category": "root-cause-analysis",
+      "context": {
+        "situation": "Your automotive tier 1 customer (Continental AG) has submitted a formal quality complaint: 12 of 500 brake caliper mounting brackets from your last shipment failed their incoming CMM inspection for a hole true position of 0.25mm tolerance zone. Their measurements show true position values of 0.28-0.35mm on the 12 rejected parts. Your internal records show the lot passed your final inspection with zero rejects on a sample of 50 (AQL 1.0). Continental is requesting an 8D response within 10 business days. They have placed your company on Quality Alert status, which means the next shipment requires 100% inspection data submitted with the delivery.",
+        "available_data": {
+          "customer": "Continental AG — Automotive Brake Division",
+          "part_number": "BCM-3300 Rev F",
+          "defect": "Hole true position exceeding 0.25mm tolerance zone",
+          "customer_reject_values_mm": [0.28, 0.30, 0.29, 0.32, 0.31, 0.28, 0.35, 0.29, 0.30, 0.31, 0.28, 0.33],
+          "customer_reject_quantity": 12,
+          "total_lot": 500,
+          "our_inspection_result": "0 rejects in sample of 50 (AQL 1.0)",
+          "customer_request": "8D response within 10 business days",
+          "customer_status": "Quality Alert — 100% inspection data required with next shipment",
+          "measurement_equipment_ours": "CMM — Hexagon Global S, last calibrated 2025-01-15",
+          "measurement_equipment_theirs": "CMM — Zeiss CONTURA, calibration current"
+        }
+      },
+      "task": "Outline the complete 8D response, identify the most likely root cause based on the discrepancy between your inspection and the customer's, and address the D3 containment actions.",
+      "evaluation_criteria": [
+        {
+          "criterion": "d2_problem_definition",
+          "weight": 0.20,
+          "rubric": {
+            "pass": "Defines the problem using IS/IS NOT analysis: IS: hole true position rejection on 12 of 500 pieces (2.4%) per Continental incoming inspection. IS NOT: not a dimensional issue on other features (only true position affected). IS: measured by Continental's Zeiss CMM. IS NOT: not detected by our Hexagon CMM. This discrepancy between measurement systems is the key analytical clue.",
+            "fail": "Vague problem definition. Does not highlight the measurement discrepancy as a critical data point."
+          }
+        },
+        {
+          "criterion": "d3_containment",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Addresses both customer-side and internal containment: (1) offer to sort the remaining 488 pieces at Continental's facility using their CMM (or an independent measurement provider) at your cost, (2) quarantine any WIP or finished goods of BCM-3300 at your facility, (3) for the next shipment: 100% CMM inspection of all true position dimensions with data submitted per Continental's Quality Alert requirements. Notes the critical first step: conduct a correlation study between your CMM and Continental's CMM on the same parts.",
+            "fail": "Containment only addresses your internal stock, not the 488 uninspected parts at Continental. Does not address the measurement correlation issue. Containment is generic ('we will inspect more carefully')."
+          }
+        },
+        {
+          "criterion": "root_cause_hypothesis",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Identifies the most likely root cause: measurement system discrepancy. Zero rejects in your sample vs. 2.4% rejects at Continental suggests your CMM may be accepting parts that Continental's CMM rejects. This could be caused by: different datum alignment methods, different probe configurations, CMM uncertainty differences, or fixture differences (your fixture vs. their fixture may reference different datum surfaces). Recommends a Gauge R&R or correlation study between the two CMMs as the critical investigation step before concluding there is a process issue.",
+            "fail": "Assumes the process is at fault without investigating the measurement discrepancy. Proposes a root cause like 'machine drift' without explaining why your inspection didn't detect it. Does not consider that the root cause may be measurement-related rather than process-related."
+          }
+        },
+        {
+          "criterion": "d5_d7_corrective_preventive",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "D5 corrective action depends on investigation outcome: if measurement discrepancy is confirmed, corrective action is to align your measurement method with Continental's (update CMM program, fixture, datum strategy) and implement correlation checks. D7 prevention: establish periodic measurement correlation with key customers for critical characteristics, and add measurement uncertainty consideration to the control plan for tight-tolerance features.",
+            "fail": "Corrective action is 'tighten the process' without addressing the measurement question. Prevention is generic. Does not connect D5/D7 to the verified root cause."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-012",
+      "name": "Supplier audit finding — inadequate calibration program",
+      "difficulty": "medium",
+      "category": "supplier-quality",
+      "context": {
+        "situation": "During a process audit of a CNC machining supplier (Vertex Manufacturing) that provides safety-critical hydraulic valve bodies for your aerospace products, you discover the following: (1) The supplier's calibration lab has 340 gauges in the calibration system, but 28 are overdue for calibration by 10-45 days. (2) When you ask to see the out-of-tolerance investigation for a micrometer found to be 0.008mm out of tolerance at its last calibration, the supplier has no documented impact assessment — they simply adjusted the micrometer and returned it to service. (3) The supplier uses the same 12-month calibration interval for all gauges regardless of usage frequency — a micrometer used daily has the same interval as one used monthly. You are auditing against AS9100D and ISO 10012 (measurement management systems).",
+        "available_data": {
+          "supplier": "Vertex Manufacturing",
+          "part_criticality": "Safety-critical hydraulic valve bodies, aerospace",
+          "calibration_system_size": 340,
+          "overdue_count": 28,
+          "overdue_percentage": 8.2,
+          "overdue_range_days": "10-45 days",
+          "out_of_tolerance_example": "Micrometer 0.008mm out at calibration, no impact assessment",
+          "calibration_interval": "12 months for all gauges, regardless of usage",
+          "audit_standard": "AS9100D §7.1.5, ISO 10012",
+          "your_products": "Hydraulic valve bodies, flight-critical"
+        }
+      },
+      "task": "Write the audit findings, classify their severity, determine the overall audit recommendation, and outline the expected corrective action from the supplier.",
+      "evaluation_criteria": [
+        {
+          "criterion": "finding_identification",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Identifies three distinct findings: (1) MAJOR: 8.2% of gauges overdue for calibration — gauges out of calibration may have been used to accept/reject product, creating uncertainty about product conformance decisions (AS9100D §7.1.5.2). (2) MAJOR: No documented impact assessment when gauge found out of tolerance at calibration — per AS9100D §7.1.5.2, 'when measuring equipment is found not to conform to requirements, the organization shall determine if the validity of previous measurement results has been adversely affected.' (3) MINOR: Universal 12-month calibration interval without risk-based or usage-based justification — while not a direct non-conformity, it's an inadequate practice that contributes to findings 1 and 2.",
+            "fail": "Identifies only one finding or lumps all issues together. Misclassifies severity (e.g., calling the missing impact assessment a minor finding). Does not reference the specific AS9100D clause requirements."
+          }
+        },
+        {
+          "criterion": "audit_recommendation",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Recommends: Approved with Conditions — supplier must submit corrective action plan within 15 business days addressing all findings, with a follow-up audit scheduled within 6 months to verify implementation. Tightened incoming inspection on all parts from this supplier until corrective actions are verified. Notes that the missing impact assessment (finding 2) is particularly concerning because it means product accepted using an out-of-tolerance gauge may have been shipped to you without evaluation.",
+            "fail": "Approves the supplier without conditions despite two major findings. Or recommends immediate ASL removal without allowing corrective action opportunity (disproportionate for a first audit finding)."
+          }
+        },
+        {
+          "criterion": "corrective_action_expectations",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Specifies corrective action expectations: (1) immediate containment: calibrate all 28 overdue gauges within 5 business days, (2) for the out-of-tolerance micrometer: conduct retrospective impact assessment on all product inspected with that gauge since last known good calibration, (3) systemic: implement a calibration out-of-tolerance impact assessment procedure, (4) improvement: transition from universal to risk-based calibration intervals, and (5) systemic: implement calibration recall system with automated overdue alerts.",
+            "fail": "Generic expectation: 'fix the calibration program.' Does not address the retrospective impact assessment need. Does not distinguish between immediate containment and systemic corrective action."
+          }
+        },
+        {
+          "criterion": "product_risk_assessment",
+          "weight": 0.20,
+          "rubric": {
+            "pass": "Identifies the product risk: if any of the 28 overdue gauges or the out-of-tolerance micrometer were used for final inspection of parts shipped to your facility, those parts' conformance is uncertain. Recommends reviewing your own incoming inspection data on recent lots from this supplier, and conducting additional inspection on any parts in your inventory from lots inspected during the questionable calibration periods.",
+            "fail": "Does not connect the calibration findings to product risk. Treats this as a pure system finding without considering product impact."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-013",
+      "name": "CAPA effectiveness verification — determining monitoring period adequacy",
+      "difficulty": "medium",
+      "category": "capa-management",
+      "context": {
+        "situation": "CAPA-2024-0112 was initiated 8 months ago for a recurring solder defect (cold solder joints) on a Class III implantable medical device PCB assembly. Root cause was identified as inadequate reflow profile — the peak temperature was 2°C below the solder paste manufacturer's recommendation, causing insufficient wetting. Corrective action: reflow profile was updated to the correct peak temperature, and a thermal profiling verification step was added to the setup procedure. The CAPA has been in the effectiveness monitoring phase for 90 days. During this period, zero cold solder defects have been detected in approximately 1,200 assemblies. The quality manager wants to close the CAPA. However, the original defect rate was only 0.4% (approximately 5 defects per 1,200 assemblies), and the defect was intermittent, not occurring on every board.",
+        "available_data": {
+          "capa_number": "CAPA-2024-0112",
+          "defect": "Cold solder joints on Class III implantable device PCB",
+          "root_cause": "Reflow peak temperature 2°C below paste specification",
+          "corrective_action": "Updated reflow profile + thermal profiling verification at setup",
+          "monitoring_period": "90 days",
+          "units_produced_during_monitoring": 1200,
+          "defects_during_monitoring": 0,
+          "original_defect_rate": 0.004,
+          "original_defects_per_1200": 5,
+          "product_class": "FDA Class III implantable medical device",
+          "regulatory": "FDA 21 CFR 820, ISO 13485"
+        }
+      },
+      "task": "Evaluate whether the 90-day monitoring period with zero defects in 1,200 units is sufficient evidence to close this CAPA for a Class III implantable device.",
+      "evaluation_criteria": [
+        {
+          "criterion": "statistical_assessment",
+          "weight": 0.35,
+          "rubric": {
+            "pass": "Applies statistical reasoning: with an original defect rate of 0.4%, you would expect approximately 5 defects in 1,200 units if the process had NOT improved. Observing zero in 1,200 is meaningful but not conclusive for a Class III device. Using a zero-failure test methodology: to demonstrate with 95% confidence that the defect rate is below 0.1% (a 4x improvement), you would need approximately 3,000 defect-free units. The current 1,200 provides about 90% confidence that the true defect rate is below 0.25%. For a Class III implantable, the standard of evidence should be higher.",
+            "fail": "States 'zero defects in 90 days is sufficient' without statistical reasoning. Does not consider the relationship between sample size, original defect rate, and confidence level. Applies a simple 'no defects = it's fixed' logic to a Class III device."
+          }
+        },
+        {
+          "criterion": "risk_based_decision",
+          "weight": 0.35,
+          "rubric": {
+            "pass": "Recommends extending the monitoring period for a Class III implantable device. Rationale: the consequence of a false-positive closure (concluding the problem is fixed when it isn't) is a cold solder joint on an implantable device — a patient safety issue. The cost of extending monitoring (continued data collection for another 60-90 days) is negligible compared to the risk. Recommends targeting at least 3,000 defect-free units for closure, or implementing an ongoing SPC program for solder joint quality as a permanent control.",
+            "fail": "Closes the CAPA based on 90 days alone without risk adjustment for the Class III classification. Does not consider the regulatory and patient safety implications of premature closure."
+          }
+        },
+        {
+          "criterion": "additional_evidence",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Recommends supplementary evidence beyond the defect count: (1) reflow profile data showing consistent peak temperature within specification across all production runs during the monitoring period, (2) X-ray inspection data on solder joints if available (proactive leading indicator vs. defect-count lagging indicator), (3) comparison of solder joint quality metrics (voiding percentage, wetting angle) pre- and post-corrective action, (4) verification that the thermal profiling step is being consistently performed at setup per the updated procedure.",
+            "fail": "Relies solely on the defect count without seeking additional supporting evidence. Does not recommend leading indicators or process verification data."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-014",
+      "name": "Regulatory audit preparation — CAPA system review",
+      "difficulty": "medium",
+      "category": "regulatory-compliance",
+      "context": {
+        "situation": "Your medical device facility has an FDA inspection scheduled in 3 weeks. The last inspection 2 years ago resulted in two Form 483 observations: (1) CAPAs not being closed in a timely manner, and (2) effectiveness verification not consistently performed. In your 483 response, you committed to: (a) CAPA closure within 180 days, (b) mandatory effectiveness verification for all CAPAs, and (c) monthly management review of CAPA metrics. Your current CAPA system status: 34 total open CAPAs. Of these, 6 are overdue (5 by 1-3 weeks, 1 by 2 months). Your CAPA effectiveness verification rate has improved from 45% to 82%. Average CAPA closure time has improved from 245 days to 162 days.",
+        "available_data": {
+          "prior_483_observations": ["CAPA timeliness", "Effectiveness verification gaps"],
+          "commitments_made": ["Closure within 180 days", "Mandatory effectiveness verification", "Monthly management review"],
+          "open_capas": 34,
+          "overdue_capas": 6,
+          "overdue_detail": {"1_3_weeks": 5, "2_months": 1},
+          "effectiveness_verification_rate": {"prior": 0.45, "current": 0.82},
+          "avg_closure_days": {"prior": 245, "current": 162},
+          "time_to_inspection": "3 weeks",
+          "monthly_management_reviews": "Conducted 20 of last 24 months (4 months missed)"
+        }
+      },
+      "task": "Assess your readiness for the FDA inspection regarding the prior 483 observations, identify gaps, and recommend pre-inspection actions.",
+      "evaluation_criteria": [
+        {
+          "criterion": "gap_assessment",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Identifies specific gaps against the prior commitments: (1) 6 overdue CAPAs contradicts the timeliness commitment — especially the one 2 months overdue, (2) 82% effectiveness verification is significantly improved but 18% without verification means the commitment to 'mandatory' verification is not fully met, (3) 4 missed monthly management reviews in 24 months means the commitment was not consistently upheld. The investigator will check whether these specific commitments were met.",
+            "fail": "Sees only the improvements without identifying the remaining gaps. Presents the current state as fully compliant. Does not recognize that the investigator will specifically check the commitments from the prior 483 response."
+          }
+        },
+        {
+          "criterion": "pre_inspection_actions",
+          "weight": 0.40,
+          "rubric": {
+            "pass": "Recommends specific, honest actions: (1) Prioritize the 6 overdue CAPAs — close or meaningfully advance them in the next 3 weeks, NOT by rushing closure with weak evidence but by documenting clear status and target dates. (2) For the 18% without effectiveness verification: review each one — some may be recently closed and in the monitoring period (acceptable), others may be true gaps requiring retrospective verification. (3) Document the 4 missed management reviews — were they rescheduled? Were the topics covered in adjacent months? (4) Prepare a CAPA trend analysis showing the improvement trajectory. FDA wants to see systemic improvement, not perfection.",
+            "fail": "Recommends mass-closing overdue CAPAs before the inspection (this will look worse, not better — the investigator will review closure quality). Recommends fabricating management review records. Does not prioritize based on what the investigator will specifically look at."
+          }
+        },
+        {
+          "criterion": "inspection_strategy",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Advises: (1) Have the CAPA trend data ready to present proactively — showing the improvement from 45% to 82% effectiveness verification and 245 to 162 days closure time demonstrates systemic improvement. (2) Be transparent about remaining gaps — 'We've made significant progress; we're at 82% and working toward 100%' is a strong position. (3) The investigator will pull specific CAPA files — ensure the 5-10 highest-risk CAPAs (customer complaints, safety-related, recently closed) have complete, well-organized files. (4) Do NOT coach employees to avoid topics; coach them to answer honestly and specifically.",
+            "fail": "Advises hiding the gaps or deflecting questions. Over-promises ('we're fully compliant'). Does not prepare specific CAPA files for investigator review. Does not emphasize the improvement trajectory."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-015",
+      "name": "Control chart selection for a new process characteristic",
+      "difficulty": "medium",
+      "category": "spc-interpretation",
+      "context": {
+        "situation": "Your company is launching a new medical device component that requires three SPC-monitored characteristics: (1) a critical diameter measured to 0.001mm resolution, produced in lots of 200 with one measurement per part during 100% inspection (no subgroups), (2) a solder joint defect count on a PCB with 847 solder joints per board, with 50 boards inspected per shift, and (3) a leak test pass/fail result on a sealed housing, tested 100% with 200 units per shift. Your quality engineer has proposed X-bar/R charts for all three. The production manager wants to know the correct chart types and the minimum data needed before establishing control limits.",
+        "available_data": {
+          "characteristic_1": {
+            "name": "Critical diameter",
+            "data_type": "Continuous (0.001mm resolution)",
+            "subgroup": "n=1 (individual measurement per part, 100% inspection)",
+            "production_volume": "200 per lot"
+          },
+          "characteristic_2": {
+            "name": "Solder joint defects",
+            "data_type": "Count of defects per board",
+            "opportunity": "847 solder joints per board (fixed opportunity area)",
+            "sample_size": "50 boards per shift"
+          },
+          "characteristic_3": {
+            "name": "Leak test pass/fail",
+            "data_type": "Attribute (pass/fail)",
+            "sample_size": "200 units per shift (variable batch sizes daily)"
+          }
+        }
+      },
+      "task": "Correct the quality engineer's chart selection, recommend the right chart type for each characteristic with rationale, and specify the minimum data collection requirements before establishing control limits.",
+      "evaluation_criteria": [
+        {
+          "criterion": "chart_selection",
+          "weight": 0.40,
+          "rubric": {
+            "pass": "Correctly identifies: (1) Critical diameter: Individuals/Moving Range (I-MR) chart — continuous data with subgroup size n=1 (one measurement per part). X-bar/R requires subgroups of 2+. (2) Solder defect count: c-chart — counting defects (not defectives) with a fixed opportunity area (847 joints per board). (3) Leak test: p-chart — proportion defective with variable sample sizes (daily batches vary). If sample size were constant, np-chart would also work. Explains why X-bar/R is wrong for all three.",
+            "fail": "Agrees with X-bar/R for all three. Confuses defects vs. defectives chart selection. Selects a variable chart for attribute data or vice versa."
+          }
+        },
+        {
+          "criterion": "minimum_data_requirements",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Specifies minimum data before establishing control limits: I-MR chart requires minimum 20-30 individual readings (prefer 100+ for stability). c-chart requires minimum 25 subgroups (shift data points). p-chart requires minimum 25 subgroups with sufficient sample size that the expected number of defectives per sample is ≥ 5 (for statistical validity). Notes that control limits established with insufficient data will be unreliable and require recalculation as more data accumulates.",
+            "fail": "No minimum data requirement specified. States control limits can be established immediately. Uses an arbitrary number without statistical justification."
+          }
+        },
+        {
+          "criterion": "practical_guidance",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Adds practical guidance: (1) for I-MR on the critical diameter, verify data normality since I-MR charts are sensitive to non-normality, (2) for the c-chart, verify the Poisson distribution assumption — if defect rates vary significantly by solder joint type, consider stratifying, (3) for the p-chart on leak test, note that if the defect rate is very low (<1%), the lower control limit may calculate negative (set to zero) and the chart may have limited sensitivity — consider alternative metrics or larger groupings.",
+            "fail": "No practical considerations beyond chart selection. Does not mention normality assumption for I-MR or Poisson assumption for c-chart."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-016",
+      "name": "Customer-reported field failure with no internal detection history",
+      "difficulty": "hard",
+      "category": "ncr-disposition",
+      "context": {
+        "situation": "Your company manufactures Class II endoscopic accessories — specifically, biopsy forceps. Your internal quality data has been clean for 8 months: incoming acceptance rate 99.8%, in-process defect rate 150 PPM, final inspection zero rejects on the last 40 lots. Then a hospital system reports three failures in 6 weeks: the distal jaw fractured during tissue sampling, requiring endoscopic retrieval of the fragment in all three cases. No patient injuries reported, but the endoscopic retrievals added 20-40 minutes of procedure time and anesthesia. The three failures come from three different production lots. Your design verification file shows the jaw material (17-4 PH stainless steel) has a fatigue life exceeding 10,000 open/close cycles under the verified loading condition (uniaxial tension). Clinical use involves fewer than 20 cycles per procedure. The hospital wants answers and is considering switching to a competitor's product.",
+        "available_data": {
+          "product": "Endoscopic biopsy forceps, Class II medical device",
+          "failure_mode": "Distal jaw fracture during tissue sampling",
+          "field_failures": 3,
+          "failure_lots": "Three different production lots",
+          "units_in_field_estimated": 12000,
+          "field_failure_rate": 0.00025,
+          "internal_defect_data": "Clean — no related defects in 8 months",
+          "design_verification": "Fatigue life >10,000 cycles, uniaxial tension",
+          "clinical_use_cycles": "<20 per procedure",
+          "material": "17-4 PH stainless steel, H1025 condition",
+          "customer_impact": "Endoscopic fragment retrieval required (20-40 min added procedure time)",
+          "regulatory": "FDA 21 CFR 820, MDR reporting requirements"
+        }
+      },
+      "task": "Determine the immediate actions, assess MDR reporting requirements, develop the investigation plan, and manage the customer relationship.",
+      "evaluation_criteria": [
+        {
+          "criterion": "immediate_actions_and_containment",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Outlines immediate containment: (1) place quality hold on all biopsy forceps in finished goods inventory, (2) notify the distribution chain to quarantine affected lot numbers, (3) request the failed units from the hospital for failure analysis, (4) do NOT recall all product yet — assess the scope first based on failure analysis, but prepare the recall machinery. Notes that 3 failures across 12,000 units (0.025%) requires investigation but does not automatically trigger a full recall.",
+            "fail": "No containment actions on inventory. Immediately recalls all 12,000 units without failure analysis (disproportionate at this stage). Or takes no containment action because the failure rate is low."
+          }
+        },
+        {
+          "criterion": "mdr_assessment",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Correctly assesses MDR obligation: the fractured jaw requiring endoscopic retrieval constitutes a device malfunction that could cause or contribute to death or serious injury (a retained fragment in the GI tract, even if successfully retrieved, represents a risk of perforation, bleeding, or infection). MDR is required within 30 calendar days per 21 CFR 803. If any event were reportable as causing serious injury, the timeline shortens to 30 days (or 5 days if remedial action is needed). Notes that all three events should be reported.",
+            "fail": "Does not address MDR reporting. Incorrectly concludes MDR is not required because no patient was injured. Gets the reporting timeline wrong."
+          }
+        },
+        {
+          "criterion": "investigation_plan",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Develops a rigorous investigation: (1) failure analysis on the returned units — fractographic analysis (SEM) to determine fracture mode (fatigue, overload, stress corrosion, material defect), (2) gap analysis between design verification conditions (uniaxial tension) and clinical loading (multiaxial with torsion during tissue sampling), (3) review material certifications for the three lots — 17-4 PH in H1025 condition must meet specific hardness/strength; verify actual heat treat was correct, (4) check manufacturing process for any stress concentrators (burrs, tool marks, EDM recast layer if applicable) not present on the design verification samples. The fact that 3 different lots are affected suggests this is design-related or process-related, not material-lot-specific.",
+            "fail": "Investigation is 'review our inspection data' (which is already clean). Does not pursue failure analysis of the returned units. Does not consider the gap between design verification loading and clinical loading. Does not recognize the multi-lot pattern as analytically significant."
+          }
+        },
+        {
+          "criterion": "customer_management",
+          "weight": 0.20,
+          "rubric": {
+            "pass": "Addresses the hospital relationship: (1) acknowledge the clinical seriousness — fragment retrieval during endoscopy is a patient safety event even without injury, (2) provide a specific timeline for investigation and updates (e.g., failure analysis results within 2 weeks), (3) offer interim measures — can you provide product from a different production batch while investigation proceeds? (4) commit to sharing the investigation findings and corrective actions transparently. Notes that transparency now preserves the relationship; defensiveness guarantees they switch to the competitor.",
+            "fail": "Defensive posture: points to internal quality data as evidence that the product is fine. Does not acknowledge the clinical seriousness. Provides no timeline or interim measures."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-017",
+      "name": "Supplier audit reveals falsified Certificates of Conformance",
+      "difficulty": "hard",
+      "category": "supplier-quality",
+      "context": {
+        "situation": "During a scheduled process audit of Atlas Castings, a Tier 2 supplier of A356 aluminum castings for your automotive brake components, your auditor discovers a discrepancy. The material test reports (CoCs) submitted with the last 6 months of shipments show tensile strength values consistently at 235-245 MPa and elongation at 4.0-4.5%, which align with A356-T6 specifications. However, your auditor notices that the test results on the CoCs for three different lots are identical to the second decimal place — statistically impossible for independent tests. When pressed, the supplier's lab technician admits that the tensile test machine has been broken for 5 months, and the quality manager has been copying results from older tests onto new CoCs. Your company receives approximately 4,000 castings per month from this supplier for brake caliper housings. You have about 2 months of inventory (WIP + finished goods + customer pipeline) containing castings from the falsified period.",
+        "available_data": {
+          "supplier": "Atlas Castings",
+          "material": "A356-T6 Aluminum",
+          "product": "Brake caliper housings (safety-critical automotive)",
+          "falsification_period": "5 months",
+          "monthly_volume": 4000,
+          "total_suspect_castings": 20000,
+          "inventory_exposure": "~2 months in pipeline (WIP + FG + customer inventory)",
+          "falsification_type": "Copied historical tensile test results onto new CoCs",
+          "actual_testing": "Tensile test machine broken for 5 months — no testing performed",
+          "industry": "Automotive, IATF 16949",
+          "part_function": "Brake caliper housing — safety-critical, structural"
+        }
+      },
+      "task": "Determine the containment scope, the escalation and notification requirements, the disposition methodology for 20,000 suspect castings, and the long-term supplier management decision.",
+      "evaluation_criteria": [
+        {
+          "criterion": "containment_scope",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Identifies the full containment scope: (1) all castings received in the last 5+ months (add buffer) from Atlas — approximately 20,000+ units, (2) all WIP at your facility containing these castings, (3) all finished brake calipers in your inventory, (4) all finished brake calipers shipped to OEM customers — customer notification required, (5) product in OEM customer's production pipeline and potentially installed in vehicles. Notes that brake caliper housings are safety-critical — this is not a 'sort and see' situation. An A356 casting that was not tested could have any mechanical properties, including properties below the minimum for structural integrity under braking loads.",
+            "fail": "Containment limited to incoming stock only. Does not trace through WIP to finished goods to shipped product. Does not recognize the vehicle-level safety implication."
+          }
+        },
+        {
+          "criterion": "notification_and_escalation",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Identifies required notifications: (1) immediate internal escalation to VP Quality, VP Operations, and Legal, (2) OEM customer notification within 24 hours per IATF 16949 requirements — these are safety-critical brake components, (3) evaluate NHTSA reporting obligations per 49 CFR Part 573 — if untested castings with potentially substandard mechanical properties are in vehicles, this may constitute a safety defect requiring manufacturer notification, (4) IATF 16949 registrar notification of a significant quality event at a critical supplier. Notes this is qualitatively different from a normal non-conformance — it's a fraud/integrity issue.",
+            "fail": "No customer notification. Does not consider NHTSA reporting. Treats this as a standard supplier quality issue without recognizing the integrity dimension."
+          }
+        },
+        {
+          "criterion": "disposition_methodology",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Outlines the disposition: (1) sampling plan for suspect inventory — pull representative samples from each month's production during the falsified period, send to independent accredited testing lab for full mechanical property testing (tensile, elongation, hardness), (2) if lab results show material meets A356-T6 specifications, the castings may be acceptable — the supplier's crime was falsifying data, but the material may be fine because the T6 heat treatment process was presumably still operating, (3) if any lab results show material below specification, all castings from that period must be quarantined pending 100% testing or scrapped, (4) for castings already in vehicles — the OEM's engineering team must assess based on the test results whether a recall is warranted.",
+            "fail": "Scraps all 20,000 castings immediately without testing (may be a massive unnecessary cost if material is actually conforming). Or accepts all castings without any testing because 'the supplier probably did the heat treat correctly.' Does not involve independent testing."
+          }
+        },
+        {
+          "criterion": "supplier_decision",
+          "weight": 0.20,
+          "rubric": {
+            "pass": "Recommends immediate escalation to Level 4-5 (phase-out/ASL removal). Falsified data is a trust-destroying event — no amount of corrective action rebuilds confidence that future data is truthful. Begin immediate qualification of alternate source. Maintain controlled shipping (CS-2) with third-party testing at supplier's expense only for the transition period. Notes that 'supplier development' is not appropriate when the issue is integrity, not capability. Document all quality costs for potential legal recovery.",
+            "fail": "Issues a SCAR and continues the relationship with monitoring. Tries to 'develop' a supplier that committed data fraud. Does not begin alternate source qualification."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-018",
+      "name": "SPC in-control but customer assembly complaints increasing",
+      "difficulty": "hard",
+      "category": "spc-interpretation",
+      "context": {
+        "situation": "Your CNC turning operation produces precision shafts (Part SH-6600, 303 stainless steel) for a precision instrument manufacturer. The critical OD dimension is 12.000 ±0.020mm. Your X-bar/R chart (subgroup n=5, sampled hourly) has been stable for 18 months with X-bar center line at 12.002mm, UCL at 12.008mm, LCL at 11.996mm. Your process Cpk is 1.45. No Western Electric rule violations. But the customer's complaint rate on your shafts has tripled from 0.1% to 0.3% in the last quarter. Their failure mode is intermittent binding in their precision bearing bore assembly. Their bore specification is 12.020 ±0.010mm. When you request their data, you discover their bore process runs at 12.018mm mean with Cpk of 1.85 — highly capable and centered low in their tolerance band.",
+        "available_data": {
+          "your_part": "SH-6600, 303 Stainless Steel shaft",
+          "your_spec": "OD 12.000 ±0.020mm (LSL 11.980, USL 12.020)",
+          "your_mean": 12.002,
+          "your_cpk": 1.45,
+          "your_sigma": 0.0046,
+          "customer_bore_spec": "ID 12.020 ±0.010mm (LSL 12.010, USL 12.030)",
+          "customer_bore_mean": 12.018,
+          "customer_bore_cpk": 1.85,
+          "customer_bore_sigma": 0.0018,
+          "customer_complaint_rate_prior": 0.001,
+          "customer_complaint_rate_current": 0.003,
+          "failure_mode": "Intermittent binding during bearing bore assembly",
+          "assembly_requirement": "Interference fit not to exceed 0.005mm, clearance fit 0.000 to 0.015mm preferred"
+        }
+      },
+      "task": "Diagnose the root cause of the increasing customer complaints despite your process being in statistical control and capable, perform the tolerance stack-up analysis, and recommend a resolution.",
+      "evaluation_criteria": [
+        {
+          "criterion": "tolerance_stackup_analysis",
+          "weight": 0.35,
+          "rubric": {
+            "pass": "Performs the clearance distribution analysis: Assembly clearance = Bore ID - Shaft OD. Mean clearance = 12.018 - 12.002 = 0.016mm. Standard deviation of clearance = √(σ_bore² + σ_shaft²) = √(0.0018² + 0.0046²) = 0.0049mm. At 3σ worst case: minimum clearance = 0.016 - 3(0.0049) = 0.016 - 0.015 = 0.001mm. Assembly binding occurs when clearance ≤ 0 (interference). The probability of interference: Z = (0 - 0.016)/0.0049 = -3.27, giving a defect rate of approximately 0.05% from the clearance distribution alone. But the customer reports 0.3% binding, suggesting additional factors (thermal expansion, surface finish, concentricity) worsen the effective clearance.",
+            "fail": "Does not perform a tolerance stack-up analysis. Simply compares individual part specifications without considering the assembly interaction. Does not calculate the clearance distribution."
+          }
+        },
+        {
+          "criterion": "root_cause_diagnosis",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Identifies that the root cause is NOT a process capability issue on either side — both processes are individually capable. The problem is the tolerance stack-up interaction. The customer's bore running at the low end of its tolerance (12.018mm) and your shaft running above nominal (12.002mm) creates a mean clearance of only 0.016mm with 0.005mm effective standard deviation. The tripling of complaints may be caused by: your process drifting slightly upward (check recent trend data), seasonal thermal effects on either process, or a subtle change in surface finish affecting assembly friction. This is a specification adequacy issue, not a manufacturing defect.",
+            "fail": "Blames the customer's process. Insists your parts meet specification and the problem is not yours. Does not recognize the tolerance stack-up as the root cause."
+          }
+        },
+        {
+          "criterion": "resolution_recommendation",
+          "weight": 0.35,
+          "rubric": {
+            "pass": "Recommends a collaborative approach: (1) propose re-centering your process from 12.002mm to approximately 11.998mm — this shifts the mean clearance from 0.016 to 0.020mm, dramatically reducing interference probability (Z = -4.08, essentially zero), (2) verify the re-centering is achievable without increasing variation, (3) propose a joint specification review — if the assembly requires minimum 0.005mm clearance, the combined specifications should guarantee this at worst case, which may require either tightening individual tolerances or establishing a bilateral statistical tolerance, (4) update your SPC target to 12.000mm or slightly below, not 12.002mm.",
+            "fail": "Recommends tightening your tolerance (expensive and unnecessary if centering is the issue). Refuses to change because 'parts meet spec.' Recommends the customer change their process without offering to adjust yours."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-019",
+      "name": "Non-conformance discovered on already-shipped product — measurement system failure",
+      "difficulty": "hard",
+      "category": "ncr-disposition",
+      "context": {
+        "situation": "Your metrology lab discovers that a CMM probe qualification failure was not flagged 6 weeks ago. The probe has been used for final inspection of surgical instrument components (Part SI-4400, a Class II implantable device retractor). Review of the CMM's internal log shows the probe qualification check result was outside acceptance but the operator proceeded to inspect product — the software displayed a warning that was dismissed. The probe has a 0.018mm Z-axis bias. The affected dimension is a blade slot depth of 4.50 ±0.03mm. Over 6 weeks, 14 lots (approximately 8,400 units) were inspected with this probe. 9 lots (approximately 5,000 units) have been shipped to three different medical device OEM customers. 5 lots remain in your finished goods.",
+        "available_data": {
+          "equipment": "CMM — Hexagon Global, probe serial PH10-0442",
+          "probe_bias": "0.018mm on Z-axis (probe reads shallow)",
+          "affected_dimension": "Blade slot depth 4.50 ±0.03mm (LSL 4.47, USL 4.53)",
+          "tolerance_width": 0.06,
+          "bias_as_percent_tolerance": 30,
+          "lots_inspected": 14,
+          "total_units": 8400,
+          "lots_shipped": 9,
+          "units_shipped": 5000,
+          "lots_in_stock": 5,
+          "units_in_stock": 3400,
+          "customers_affected": 3,
+          "product": "Class II implantable device retractor",
+          "product_function": "Blade slot holds surgical blade during retraction — depth affects blade retention force",
+          "regulatory": "FDA 21 CFR 820"
+        }
+      },
+      "task": "Determine the containment strategy, risk assessment methodology, customer notification approach, and corrective actions.",
+      "evaluation_criteria": [
+        {
+          "criterion": "risk_quantification",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Quantifies the measurement risk: 0.018mm bias means readings were 0.018mm shallower than actual. Actual depth = measured + 0.018mm (the probe reading shallow means actual parts are deeper, which for a blade slot means the slot is deeper than measured — this affects blade retention force). For parts that measured at the lower end of specification (near 4.47mm), the actual depth could be 4.47 + 0.018 = 4.488mm — still within specification. For parts that measured at the upper end (near 4.53mm), actual could be 4.53 + 0.018 = 4.548mm — potentially outside USL of 4.53mm. Reviews the original measurement data for all 14 lots to determine how many measurements were in the upper portion of the tolerance band where the bias pushes them out of spec.",
+            "fail": "Does not quantify the impact of the bias on the measurement data. Assumes all 8,400 units are nonconforming (over-reaction) or assumes all are fine (under-reaction). Does not understand the direction of the bias effect."
+          }
+        },
+        {
+          "criterion": "containment_strategy",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Stratifies containment by risk: (1) immediately hold the 5 lots (3,400 units) in stock — these can be re-inspected with the corrected probe, (2) for shipped lots: review the original measurement data to identify which lots had measurements in the upper 1/3 of the tolerance band (most at-risk lots), (3) notify customers with lot-level risk stratification — high-risk lots need customer quarantine and potential return for re-inspection; low-risk lots (measurements in the lower 2/3 of tolerance) need notification but may not require action, (4) offer to send your quality engineer to customer sites to perform re-inspection on the highest-risk lots.",
+            "fail": "Same action for all 14 lots regardless of risk. Does not use the measurement data to stratify risk. Does not offer on-site support at customer facilities."
+          }
+        },
+        {
+          "criterion": "customer_notification",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Proactive notification to all three customers within 24 hours with: (1) lot numbers and quantities affected, (2) the nature of the measurement issue and the direction of the bias, (3) the risk stratification analysis, (4) recommended actions by lot (hold, re-inspect, use with documentation), (5) a direct quality engineering contact for each customer. Emphasizes transparency — customers will judge your quality system by how you handle this, not by the fact that it happened. Notes that for Class II medical devices, the OEM customers must evaluate their own MDR obligations for devices already distributed to hospitals.",
+            "fail": "Delayed notification. Vague notification without lot-level detail. Tries to manage the issue internally without informing customers. Does not mention the customers' MDR evaluation obligations."
+          }
+        },
+        {
+          "criterion": "corrective_action",
+          "weight": 0.20,
+          "rubric": {
+            "pass": "Addresses both the immediate and systemic causes: (1) immediate: re-qualify the probe and re-inspect the held lots, (2) root cause: CMM software warning was dismissed by operator — this is a training AND system issue; the software should prevent inspection with a failed probe qualification, not just warn, (3) corrective action: implement software interlock that blocks measurement execution when probe qualification fails (engineering control, rank 3) + operator re-training (supplementary, rank 6), (4) systemic review: audit all CMMs for similar warning-dismissal patterns, review probe qualification records for the last 12 months.",
+            "fail": "Corrective action is only 'retrain the operator.' Does not address the software interlock gap. Does not conduct a systemic review across all CMMs."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-020",
+      "name": "Multiple interacting root causes for injection molding defect",
+      "difficulty": "hard",
+      "category": "root-cause-analysis",
+      "context": {
+        "situation": "Your injection molding operation produces medical-grade polycarbonate housings (Part MH-9900) for a Class II diagnostic device. You are experiencing simultaneous short shots (incomplete fill) and flash on the same 4-cavity mold — Tool #T-440. The defects appear randomly across cavities but are more frequent in cavities 2 and 3. Shot weight SPC shows variation has doubled from σ=0.8g to σ=1.6g over the past month, and the chart shows both Rule 1 violations (two points beyond 3σ) and a general widening of the distribution. The floor quality technician performed a 5 Whys analysis and concluded 'injection pressure too low,' recommending a 10% pressure increase. After the increase, flash worsened in cavities 1 and 4, while short shots continued in cavities 2 and 3. The tool was last maintained (PM) 3 months ago. The resin lot changed 5 weeks ago. Production has been running 24/7 on this tool for the last 2 months to meet a demand surge.",
+        "available_data": {
+          "part": "MH-9900, medical-grade polycarbonate housing",
+          "tool": "Tool #T-440, 4-cavity",
+          "defects": ["Short shots (cavities 2 and 3 primarily)", "Flash (cavities 1 and 4 primarily)"],
+          "shot_weight_sigma_before": 0.8,
+          "shot_weight_sigma_current": 1.6,
+          "spc_signals": "Two Rule 1 violations + distribution widening",
+          "prior_rca": "5 Whys concluded 'injection pressure too low'",
+          "prior_corrective_attempt": "10% pressure increase — flash worsened, short shots continued",
+          "last_tool_pm": "3 months ago",
+          "resin_lot_change": "5 weeks ago",
+          "production_schedule": "24/7 for 2 months continuous",
+          "regulatory": "FDA 21 CFR 820, Class II medical device"
+        }
+      },
+      "task": "Critique the original 5 Whys analysis, identify the likely interacting root causes, design the investigation approach, and recommend corrective actions.",
+      "evaluation_criteria": [
+        {
+          "criterion": "rca_critique",
+          "weight": 0.20,
+          "rubric": {
+            "pass": "Correctly identifies that the 5 Whys analysis was inadequate: (1) it produced a single-parameter root cause for a multi-factor problem — short shots AND flash simultaneously is pathological and cannot be caused by a single pressure setting, (2) the failed corrective action (pressure increase) proved the root cause wrong, (3) 5 Whys is the wrong tool for a multi-cavity, multi-defect-type problem — Ishikawa or fault tree analysis is needed, (4) cavity-specific defect patterns (2&3 vs. 1&4) strongly indicate a physical asymmetry in the mold or runner system, not a process parameter issue.",
+            "fail": "Agrees with the 5 Whys conclusion. Recommends further pressure adjustments. Does not recognize that opposing defects (short shot + flash) indicate multiple interacting causes."
+          }
+        },
+        {
+          "criterion": "interacting_causes",
+          "weight": 0.35,
+          "rubric": {
+            "pass": "Identifies at least 3 interacting causes from the evidence: (1) MOLD: non-uniform clamp force distribution — after 2 months of 24/7 operation, platen deflection or tie bar stretch has created uneven force across the mold face, causing flash at cavities 1&4 (edges) and insufficient sealing at cavities 2&3 (center). Check with pressure-indicating film (Fujifilm Prescale) between parting surfaces. (2) MATERIAL: resin lot change 5 weeks ago — different MFI (melt flow index) lots process differently. Higher MFI runs faster (causes flash) while lower MFI needs more pressure (causes short shots). Lot-to-lot variation may be amplified by the clamp force issue. (3) MOLD CONDITION: 3 months without PM on a tool running 24/7 — vent blockage from outgassing deposits restricts gas escape in cavities 2&3, causing short shots, while the clean vents in cavities 1&4 see extra flash from the material taking the path of least resistance.",
+            "fail": "Identifies only one cause. Does not explain the cavity-specific pattern. Does not connect the timeline (resin lot change, PM schedule, continuous operation) to the evidence."
+          }
+        },
+        {
+          "criterion": "investigation_design",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Designs a systematic investigation: (1) immediate: pressure-indicating film test between mold halves to map clamp force distribution, (2) mold: pull the tool for inspection — measure parting line flatness, vent depths, runner balance, and cavity surface condition, (3) material: test MFI on the current resin lot vs. the previous lot — compare, (4) process: if available, review cavity pressure transducer data for fill balance between cavities, (5) designed experiment: after mold maintenance and material verification, run a short DOE varying key parameters (pressure, speed, temperature) to find the new optimal window. Notes that the investigation should be done in a specific sequence — mold condition first, then material, then process parameters.",
+            "fail": "Jumps to a designed experiment without checking mold condition. Continues adjusting parameters without physical inspection of the tool. Does not prioritize the investigation steps logically."
+          }
+        },
+        {
+          "criterion": "corrective_actions",
+          "weight": 0.20,
+          "rubric": {
+            "pass": "Multi-pronged corrective actions addressing all contributing causes: (1) mold maintenance: clean vents, re-stone parting surfaces, verify runner balance, inspect for wear, (2) material: implement incoming MFI testing with acceptance criteria; adjust process parameters by MFI lot if variation is significant, (3) preventive maintenance schedule: reduce PM interval for continuously running tools — hours-based, not calendar-based, (4) SPC: add cavity-specific shot weight monitoring (if cavity pressure transducers are available) or add cavity-specific dimensional tracking to detect fill imbalance early. Each cause gets its own corrective action; fixing only one will reduce but not eliminate the defect.",
+            "fail": "Single corrective action targeting one cause. Relies on parameter adjustment without mold maintenance. Does not address the PM schedule for continuous operation."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-021",
+      "name": "Intermittent BGA solder defect that cannot be reproduced in testing",
+      "difficulty": "hard",
+      "category": "root-cause-analysis",
+      "context": {
+        "situation": "Your electronics assembly line has a persistent 0.35% field return rate on a PCB assembly due to intermittent solder joint failures on a 256-ball BGA component (U14, FPGA). You've received 52 returns over 6 months across approximately 15,000 units shipped. Cross-section analysis of 8 returned units consistently shows voiding >25% in BGA solder joints at the die-side corner positions (balls A1-C3 region). Your in-process 2D X-ray inspection (100% automated) consistently reports voiding below 12% across all production boards — well within your 20% acceptance limit. You've run thermal cycling tests (500 cycles, -40/+125°C) on 50 boards from current production: zero failures. The defect is clearly real (52 returns, consistent failure mode) but your process inspection and accelerated testing cannot detect or reproduce it.",
+        "available_data": {
+          "product": "PCB assembly with 256-ball BGA (FPGA, U14)",
+          "field_return_rate": 0.0035,
+          "returns": 52,
+          "units_shipped": 15000,
+          "failure_mode": "Intermittent solder joint failure, BGA U14",
+          "failure_location": "Die-side corner positions (A1-C3 region)",
+          "cross_section_finding": "Voiding >25% at failure location",
+          "production_xray_result": "Voiding <12% consistently (acceptance limit 20%)",
+          "thermal_cycling_test": "500 cycles -40/+125°C, 50 boards, zero failures",
+          "assembly_process": "SAC305 solder paste, forced convection reflow, 245°C peak",
+          "board_thickness": "2.4mm, 12-layer, high-density"
+        }
+      },
+      "task": "Explain why the in-process inspection and accelerated testing fail to detect this defect, develop an investigation methodology, and recommend process and inspection improvements.",
+      "evaluation_criteria": [
+        {
+          "criterion": "diagnosis_of_detection_gap",
+          "weight": 0.35,
+          "rubric": {
+            "pass": "Explains the detection gap: (1) 2D X-ray averages void volume across the entire joint depth — a void concentrated at the die-side interface (top of joint) can be 30%+ locally while the averaged 2D image shows <12% total, (2) 3D X-ray (CT) or oblique-angle X-ray imaging would show the layer-specific voiding that 2D misses, (3) thermal cycling at -40/+125°C for 500 cycles may not reproduce the field failure because: the field thermal profile is different (slower ramp rates, different dwell times, different temperature range), the failure mechanism may require 1000+ cycles at field conditions, or the failure is accelerated by power cycling stresses (electromigration + thermal) that ATC alone doesn't replicate, (4) the corner ball positions (A1-C3) experience the highest thermomechanical stress because they are farthest from the neutral point of the BGA — this is a known stress concentration zone where even acceptable voids become crack initiators.",
+            "fail": "Cannot explain the discrepancy between production X-ray results and returned unit cross-sections. Does not understand the limitation of 2D X-ray for layer-specific voiding. Suggests the returns are customer-caused or random."
+          }
+        },
+        {
+          "criterion": "investigation_methodology",
+          "weight": 0.35,
+          "rubric": {
+            "pass": "Proposes a multi-step investigation: (1) obtain 3D X-ray (CT) capability — scan production boards to determine the true void distribution at the die-side interface layer, not just the 2D average, (2) cross-section production boards (destructive analysis) from the A1-C3 region specifically — compare to field returns to see if the voiding pattern exists in production at a level not visible to 2D X-ray, (3) reflow profile investigation: analyze the reflow profile specifically at the A1-C3 board location (which may see a different thermal profile than the thermocouple location due to board mass and airflow patterns), (4) component-level analysis: is the BGA package itself contributing to voiding through outgassing from the mold compound or flux residue in the corner ball region? (5) extended thermal cycling with power cycling to better replicate field conditions.",
+            "fail": "Proposes increasing 2D X-ray frequency (same method, more often, still won't detect the defect). Does not suggest 3D/oblique X-ray imaging. Does not investigate whether the reflow profile is uniform across the board surface."
+          }
+        },
+        {
+          "criterion": "process_improvement_recommendations",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Recommends: (1) if voiding is confirmed at the die-side interface: optimize the reflow profile soak zone to allow better flux activation and void collapse before peak temperature, (2) evaluate stencil aperture design for the corner ball positions — reduce aperture for corner balls to decrease paste volume and voiding, (3) implement 3D or oblique-angle X-ray inspection for the BGA corner region as a production screening tool, (4) establish BGA voiding SPC based on corner-ball-specific data rather than whole-component averages, (5) use IPC-7095 guidelines for BGA voiding acceptance but apply them at the joint-region level, not the package level. Notes that the acceptance criterion of 20% must be applied to the local interface region, not the whole-joint 2D projection.",
+            "fail": "Recommendations are generic ('improve the reflow process'). Does not address the specific corner-ball-position voiding mechanism. Does not differentiate between whole-joint and interface-layer voiding criteria."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-022",
+      "name": "Sole-source titanium forging supplier with recurring quality issues",
+      "difficulty": "hard",
+      "category": "supplier-quality",
+      "context": {
+        "situation": "Your sole-source supplier for custom titanium forgings (Ti-6Al-4V, closed-die forging) has received their third SCAR in 12 months. The recurring issue is grain flow non-conformance — the microstructural grain flow does not follow the specified contour in the forging, which affects fatigue life. The forgings are for a landing gear component (commercial aerospace, AS9100D). Each forging costs $14,000 with a 6-month tooling lead time and 4-month production lead time. Annual demand is 80 units. There is no other qualified supplier. Qualifying a new forging source requires tooling procurement (6 months), process development (6 months), first article inspection (3 months), and customer qualification (6 months) — approximately 21 months total, and that's optimistic. Your customer (Airbus) has asked about your supplier management plan for this commodity.",
+        "available_data": {
+          "supplier": "TitanForge Aerospace LLC",
+          "material": "Ti-6Al-4V per AMS 4928",
+          "product": "Landing gear bracket forging, closed-die",
+          "scar_count_12_months": 3,
+          "recurring_defect": "Grain flow non-conformance — deviation from specified contour",
+          "unit_cost_usd": 14000,
+          "annual_demand": 80,
+          "tooling_lead_time_months": 6,
+          "production_lead_time_months": 4,
+          "alternate_qualification_months": 21,
+          "customer": "Airbus",
+          "regulatory": "AS9100D, EASA Part 21, NADCAP forging",
+          "safety_criticality": "Landing gear — flight-critical structural"
+        }
+      },
+      "task": "Develop a comprehensive strategy that addresses the quality problem, manages the sole-source risk, maintains production continuity, and satisfies your customer's supply chain risk inquiry.",
+      "evaluation_criteria": [
+        {
+          "criterion": "supplier_development_approach",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Proposes a collaborative development approach rather than purely punitive escalation: (1) deploy your metallurgical engineer to work with the supplier's forging process engineers — joint analysis of the grain flow deviation mechanism (billet preheat temperature, forging sequence, die design, press force profile), (2) review the forging simulation (if available) against actual grain flow — FEA models of forging flow can identify where the die design or process window is marginal, (3) propose a joint investment: supplier invests in die refurbishment and process parameter optimization, you commit to volume stability and potentially a price adjustment to fund the investment, (4) increase the frequency of in-process metallographic monitoring at the supplier's facility (not just final inspection).",
+            "fail": "Follows the standard escalation ladder (controlled shipping → phase-out) without recognizing that the standard approach doesn't work for a sole-source safety-critical commodity with 21-month qualification lead time. Or accepts recurring non-conformances because 'we have no choice.'"
+          }
+        },
+        {
+          "criterion": "dual_source_strategy",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Begins alternate source qualification immediately as a parallel path, not a threat: (1) frame the dual-sourcing as supply chain risk mitigation, not as a punitive action against the current supplier, (2) estimate the qualification investment (~$400K: tooling + first articles + process development + qualification testing) and timeline (21 months minimum), (3) brief Airbus proactively on the dual-source initiative — they will view this positively as risk management, (4) notes that even if the current supplier improves, having a second source is sound practice for a flight-critical forging.",
+            "fail": "Does not begin alternate source qualification. Or uses the dual-source initiative as a threat against the supplier (damaging the relationship you depend on for the next 21 months). Does not inform Airbus of the strategy."
+          }
+        },
+        {
+          "criterion": "production_continuity",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Addresses the 21-month dependency period: (1) build a safety stock buffer — target 6 months of conforming forgings to protect against supply disruptions (this requires the MRB to evaluate each forging individually, not blanket-accept or blanket-reject), (2) each non-conforming forging must be individually assessed — grain flow deviations vary in severity, and engineering analysis with customer concession may permit some deviations for non-fatigue-critical areas of the bracket, (3) increase incoming metallographic inspection from sample-based to per-forging inspection of the critical grain flow region, (4) establish an Airbus communication cadence (quarterly updates on supplier improvement AND dual-source qualification progress).",
+            "fail": "No production continuity plan. Accepts all forgings use-as-is regardless of severity (unsafe for flight-critical landing gear). Or rejects all non-conforming forgings immediately without evaluating individual severity (shuts down production)."
+          }
+        },
+        {
+          "criterion": "airbus_response",
+          "weight": 0.20,
+          "rubric": {
+            "pass": "Crafts a transparent, structured response to Airbus: (1) acknowledge the recurring non-conformances and provide data (3 SCARs, defect type, disposition history), (2) present the three-pronged strategy: supplier development (joint technical improvement), risk mitigation (dual-source qualification underway), and containment (enhanced incoming inspection), (3) commit to specific milestones and reporting cadence, (4) request Airbus engineering support for grain flow acceptance criteria discussion — as the design authority, their input on functional acceptance boundaries could improve both disposition efficiency and safety margin confidence.",
+            "fail": "Minimizes the issue to Airbus. Provides a vague assurance without a specific plan. Does not involve Airbus engineering in the technical discussion."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-023",
+      "name": "FDA 483 observation response for CAPA system deficiency",
+      "difficulty": "hard",
+      "category": "regulatory-compliance",
+      "context": {
+        "situation": "During an FDA inspection of your Class II/III medical device facility, the investigator issues a Form 483 with three observations focused on your CAPA system. Observation 1: 'Five of twelve CAPAs reviewed (CAPA-2024-003, -007, -012, -018, -024) lacked documentation of effectiveness verification. The corrective actions were implemented, but no evidence demonstrated the actions were effective in preventing recurrence.' Observation 2: 'CAPA-2024-012, initiated for a customer complaint involving a device malfunction during surgery, was not investigated within a timely manner. The complaint was received on 2024-03-15, and the CAPA investigation was not started until 2024-06-22, more than 3 months later.' Observation 3: 'The procedure for CAPA (QP-0820-100 Rev F) does not define criteria for when a CAPA must be initiated. Multiple complaint records and nonconformance records that appeared to warrant CAPA were closed without CAPA initiation, and no documented rationale was provided for the decision not to initiate.'",
+        "available_data": {
+          "observations": 3,
+          "obs1_capas_lacking_effectiveness": ["CAPA-2024-003", "CAPA-2024-007", "CAPA-2024-012", "CAPA-2024-018", "CAPA-2024-024"],
+          "obs1_issue": "5 of 12 CAPAs reviewed had no effectiveness verification documentation",
+          "obs2_capa": "CAPA-2024-012",
+          "obs2_delay": "3+ months from complaint to investigation start",
+          "obs2_complaint_type": "Device malfunction during surgery",
+          "obs3_issue": "No defined CAPA initiation criteria in procedure",
+          "response_deadline": "15 business days",
+          "regulatory": "FDA 21 CFR 820.100"
+        }
+      },
+      "task": "Draft the complete FDA 483 response addressing all three observations with specific corrective actions, timelines, and evidence of systemic improvement.",
+      "evaluation_criteria": [
+        {
+          "criterion": "obs1_response_quality",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Responds to Observation 1 with: (1) acknowledgment that effectiveness verification documentation is incomplete, (2) root cause: the CAPA procedure did not define mandatory effectiveness verification criteria or evidence requirements, (3) immediate action: retrospective effectiveness reviews initiated for all 5 cited CAPAs (with specific status and target dates), (4) systemic corrective action: CAPA procedure updated to include mandatory effectiveness verification phase with defined evidence requirements (process data, defect rate comparison, recurrence monitoring period), (5) scope extension: reviewed ALL CAPAs closed in the last 2 years for effectiveness verification gaps, with results summarized.",
+            "fail": "Addresses only the 5 cited CAPAs without systemic corrective action. Does not update the procedure. Does not perform scope extension. Provides corrective actions without specific timelines."
+          }
+        },
+        {
+          "criterion": "obs2_response_quality",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Responds to Observation 2 with: (1) acknowledgment of the unacceptable delay — a surgical device malfunction complaint should have been prioritized, (2) investigation into the delay: was it a resource issue, a prioritization failure, or a system gap? (3) corrective action: implement complaint triage with mandatory timelines — safety-related complaints trigger CAPA investigation within 5 business days, other complaints within 30 days, (4) process change: complaint-to-CAPA linkage in the QMS system with automated escalation if investigation is not started within the defined timeframe, (5) importantly: addresses the underlying MDR evaluation question — was this complaint evaluated for MDR reporting, and was the 3-month delay in the MDR analysis timeline acceptable?",
+            "fail": "Blames the delay on workload without addressing the systemic cause. Does not connect the delay to MDR reporting timeline concerns. Corrective action is 'hire more people' without process improvement."
+          }
+        },
+        {
+          "criterion": "obs3_response_quality",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Responds to Observation 3 with: (1) acknowledgment that the CAPA procedure lacks defined initiation criteria, (2) corrective action: update QP-0820-100 to include explicit CAPA initiation criteria (recurring non-conformances, customer complaints involving safety/performance, audit findings, field failures, trend signals, regulatory changes), (3) additionally: implement a documented decision record for complaints and NCRs where CAPA is NOT initiated — the rationale must be recorded and approved by quality management, (4) retrospective review: assess the complaint records and NCRs cited by the investigator and determine if CAPAs should now be initiated retroactively.",
+            "fail": "Updates the procedure but does not address the undocumented non-initiation decisions. Does not implement a decision record for 'CAPA not required' determinations. Does not retrospectively review the specific records the investigator cited."
+          }
+        },
+        {
+          "criterion": "overall_response_quality",
+          "weight": 0.15,
+          "rubric": {
+            "pass": "Response demonstrates systemic thinking: acknowledges each observation specifically, provides root cause for each, implements both immediate and systemic corrective actions, performs scope extension beyond the specific examples cited, includes specific timelines and responsible parties, and attaches or references evidence of actions already taken. Tone is respectful, accountable, and committed to improvement — not defensive or minimizing.",
+            "fail": "Response is defensive, vague, or formulaic. Treats the 3 observations independently without recognizing they collectively indicate a CAPA system maturity problem. Does not demonstrate scope extension. Uses passive language ('improvements will be made') without specific commitments."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-024",
+      "name": "Building the cost of quality business case for automation investment",
+      "difficulty": "medium",
+      "category": "cost-of-quality",
+      "context": {
+        "situation": "Your manufacturing plant produces precision machined components for automotive and industrial customers. Annual revenue is $48M. The quality team has compiled 12 months of COQ data: Prevention costs: $185K. Appraisal costs: $720K (heavily weighted toward manual inspection labor). Internal failure costs: $1,340K (scrap $680K, rework $420K, re-inspection $140K, production delays $100K). External failure costs: $460K (returns $280K, warranty $120K, field service $60K). The largest single scrap driver is a CNC milling operation (Cell 7) producing engine mounting brackets — $310K in scrap over 12 months due to a positional tolerance that is borderline capable (Cpk = 1.05). The quality manager wants to propose a $280K capital investment in an automated vision inspection system for Cell 7 that would detect the positional tolerance drift in real-time and alert the operator to adjust, plus a $45K investment in a spindle thermal compensation system that engineering estimates would improve Cpk from 1.05 to 1.67.",
+        "available_data": {
+          "annual_revenue_usd": 48000000,
+          "prevention_costs_usd": 185000,
+          "appraisal_costs_usd": 720000,
+          "internal_failure_costs_usd": 1340000,
+          "external_failure_costs_usd": 460000,
+          "total_coq_usd": 2705000,
+          "cell_7_scrap_usd": 310000,
+          "cell_7_current_cpk": 1.05,
+          "cell_7_projected_cpk_after": 1.67,
+          "vision_system_cost_usd": 280000,
+          "thermal_compensation_cost_usd": 45000,
+          "total_investment_usd": 325000,
+          "cell_7_product": "Engine mounting brackets — automotive safety"
+        }
+      },
+      "task": "Build the financial business case for the investment, calculate the ROI, and present the analysis in terms that a plant manager would find compelling.",
+      "evaluation_criteria": [
+        {
+          "criterion": "coq_analysis",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Correctly analyzes the COQ: total COQ is $2.705M (5.6% of revenue) — above the 3% target. The distribution is unhealthy: prevention is only 6.8% of total COQ, appraisal is 26.6%, internal failure is 49.5%, external failure is 17.0%. The ratio of failure costs ($1.8M) to prevention costs ($185K) is approximately 10:1. Notes that Cell 7 alone accounts for $310K of the $680K scrap — 45.6% of total scrap from one operation.",
+            "fail": "Does not calculate COQ as percentage of revenue. Does not identify the prevention-to-failure imbalance. Does not highlight Cell 7's disproportionate contribution to scrap."
+          }
+        },
+        {
+          "criterion": "roi_calculation",
+          "weight": 0.35,
+          "rubric": {
+            "pass": "Builds a specific ROI model: Investment: $325K ($280K vision + $45K thermal compensation). Expected benefits: (1) thermal compensation improving Cpk from 1.05 to 1.67 reduces the expected defect rate from approximately 1.5% to approximately 0.02% — effectively eliminating scrap on this characteristic, (2) estimated scrap reduction: $310K × 90% = $279K annual savings (conservative 90% capture, not 100%), (3) secondary benefits: reduced rework and re-inspection (estimate $40K), reduced appraisal labor from automated inspection ($30K). Total estimated annual benefit: $349K. Payback period: $325K / $349K = 0.93 years (<12 months). ROI Year 1: ($349K - $325K) / $325K = 7.4%.",
+            "fail": "No specific financial model. Vague benefit estimates without linking to specific COQ categories. Does not calculate payback period or ROI. Over-estimates benefits without conservative assumptions."
+          }
+        },
+        {
+          "criterion": "business_presentation",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Presents in plant-manager language: (1) headline: 'We're spending $310K per year scrapping engine mounting brackets that a $325K one-time investment would virtually eliminate — payback in under 12 months,' (2) frames the investment as moving from reactive (scrapping and reworking) to preventive (process control and early detection), (3) notes the secondary benefit: improved Cpk to 1.67 meets automotive customer requirements and eliminates the risk of a customer-mandated controlled shipping program, (4) addresses risk: what if the investment doesn't achieve the projected Cpk improvement? At even 50% of projected benefit ($175K/year), payback is under 2 years — still a sound investment.",
+            "fail": "Presents in quality jargon without business translation. Does not lead with the headline. Does not address the downside risk. Focuses on Cpk numbers rather than dollars."
+          }
+        },
+        {
+          "criterion": "broader_coq_strategy",
+          "weight": 0.15,
+          "rubric": {
+            "pass": "Uses Cell 7 as a proof case for a broader prevention investment strategy: if $325K addresses $310K in scrap from one cell, what are the next highest-scrap operations? Proposes a prioritized prevention investment roadmap targeting the top 3-5 scrap/rework drivers, with a goal of reducing total COQ from 5.6% to below 3% within 18-24 months.",
+            "fail": "Treats Cell 7 in isolation without connecting to the broader COQ improvement opportunity."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-025",
+      "name": "PPAP submission with marginal capability data",
+      "difficulty": "medium",
+      "category": "regulatory-compliance",
+      "context": {
+        "situation": "You are preparing a PPAP (Production Part Approval Process) Level 3 submission for a new stamped steel bracket (Part ST-2200) for a Tier 1 automotive customer. Your initial capability study (125 pieces, 25 subgroups of 5) shows the following for the 8 critical dimensions: 7 dimensions have Ppk ≥ 1.67 (meeting customer requirements). One dimension — a hole-to-edge distance — shows Ppk = 1.42 and Cpk = 1.58. The customer's PPAP requirements specify Ppk ≥ 1.67 for all special characteristics. The hole-to-edge distance is designated as a significant characteristic (S). Your tooling engineer believes the Ppk can be improved to 1.67+ by adjusting the progression die's pilot pin alignment, which would require a 2-day die adjustment. However, your customer needs the PPAP submission by Friday (3 days from now) to maintain their program timeline.",
+        "available_data": {
+          "part_number": "ST-2200",
+          "customer_requirement": "Ppk ≥ 1.67 for all special characteristics",
+          "dimensions_passing": 7,
+          "dimensions_failing": 1,
+          "failing_dimension": "Hole-to-edge distance — Significant characteristic (S)",
+          "failing_ppk": 1.42,
+          "failing_cpk": 1.58,
+          "potential_fix": "Die pilot pin alignment adjustment (2-day turnaround)",
+          "customer_deadline": "3 days (Friday)",
+          "ppap_level": "Level 3"
+        }
+      },
+      "task": "Determine how to handle the PPAP submission with one dimension below the Ppk threshold, and advise on the communication strategy with the customer.",
+      "evaluation_criteria": [
+        {
+          "criterion": "ppap_strategy",
+          "weight": 0.35,
+          "rubric": {
+            "pass": "Recommends submitting the PPAP with the current data AND a corrective action plan — this is standard practice. Specifically: (1) submit the PPAP on time with all data including the Ppk 1.42 dimension, (2) include a 'warranted with deviations' note on the PSW (Part Submission Warrant) for the one failing dimension, (3) attach a corrective action plan documenting: the root cause (die pilot pin alignment), the planned fix (2-day die adjustment), the timeline for resubmission of the capability study on that dimension, (4) request interim approval with the corrective action plan in place. Most automotive customers will grant interim approval when the data is close (1.42 vs. 1.67) and the corrective action is clear and quick.",
+            "fail": "Delays the entire PPAP submission to fix one dimension (missing the deadline, impacting customer's program). Or submits the PPAP with an artificially inflated Ppk number. Or submits without acknowledging the gap."
+          }
+        },
+        {
+          "criterion": "customer_communication",
+          "weight": 0.35,
+          "rubric": {
+            "pass": "Proactively contacts the customer's SQE before the submission with transparency: 'We have 7 of 8 characteristics meeting Ppk ≥ 1.67. One significant characteristic (hole-to-edge) is at Ppk 1.42. We've identified the cause (pilot pin alignment in the progression die) and can implement the fix in 2 days. We'd like to submit the PPAP on time with a corrective action plan for this dimension, and resubmit the capability data for this characteristic within 2 weeks of the die adjustment. Can you support interim approval with this approach?' This gives the customer's SQE the information they need to approve the deviation.",
+            "fail": "Submits without prior communication and hopes the customer doesn't notice. Or contacts the customer but does not have a corrective action plan ready. Or asks for a deadline extension without offering a concrete fix."
+          }
+        },
+        {
+          "criterion": "technical_accuracy",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Notes technical details: (1) Cpk of 1.58 suggests the process has better within-subgroup capability than the Ppk of 1.42 indicates — the between-subgroup variation is contributing to the gap, which is consistent with pilot pin alignment variation between die strokes/setups, (2) the die adjustment should reduce between-subgroup variation more than within-subgroup, bringing Ppk closer to Cpk, (3) after the die fix, a new 125-piece capability study should be run (not just an extension of the original data), (4) during the interim period, 100% inspection of this characteristic is recommended as containment.",
+            "fail": "Does not interpret the Cpk vs. Ppk difference. Does not recommend 100% inspection as interim containment. Does not specify a full new capability study after the fix."
+          }
+        }
+      ]
+    },
+    {
+      "id": "QNC-026",
+      "name": "Process validation deviation discovered retroactively in pharmaceutical manufacturing",
+      "difficulty": "hard",
+      "category": "regulatory-compliance",
+      "context": {
+        "situation": "Your pharmaceutical contract manufacturing facility (FDA-registered, 21 CFR 211) completed a process validation for a tablet compression process 14 months ago. The validated parameters include compression force 15kN ±2kN, turret speed 40rpm, and tablet weight 500mg ±5%. During routine calibration, the load cell on the tablet press is found to have a +1.8kN bias — readings have been 1.8kN higher than actual. This means the nominal 15kN setting was actually delivering 13.2kN of compression force. The validated range of 13-17kN (indicated) was actually 11.2-15.2kN (actual). The process validation PQ data showed consistent operation at 14.5-15.5kN indicated, which was actually 12.7-13.7kN actual. 48 commercial lots of a prescription drug product were manufactured during the 14-month period. All lots passed dissolution testing and content uniformity testing. The product is distributed to 300+ pharmacies nationwide.",
+        "available_data": {
+          "process": "Tablet compression",
+          "product": "Prescription drug product (oral solid dosage)",
+          "load_cell_bias": "+1.8kN (readings 1.8kN higher than actual)",
+          "validated_range_indicated": "13-17kN",
+          "validated_range_actual": "11.2-15.2kN",
+          "typical_operating_point_indicated": "14.5-15.5kN",
+          "typical_operating_point_actual": "12.7-13.7kN",
+          "lots_manufactured": 48,
+          "validation_age_months": 14,
+          "dissolution_testing": "All lots passing",
+          "content_uniformity": "All lots passing",
+          "distribution": "300+ pharmacies nationwide",
+          "regulatory": "FDA 21 CFR 211 (cGMP for pharmaceuticals)"
+        }
+      },
+      "task": "Assess the impact on process validation, determine the product risk, outline the regulatory strategy, and recommend corrective actions.",
+      "evaluation_criteria": [
+        {
+          "criterion": "validation_impact_assessment",
+          "weight": 0.30,
+          "rubric": {
+            "pass": "Correctly assesses: the process validation is technically compromised because the documented parameters do not reflect actual operating conditions. However, the process was operating consistently at actual forces of 12.7-13.7kN, which may or may not be within the original validation acceptance criteria. Key question: does the product quality data (dissolution, content uniformity, hardness, friability) support that the actual operating point produces conforming product? If yes, the validation conclusion (the process produces consistent, conforming product) may still be valid — the documentation just doesn't accurately reflect the conditions. A bridging validation study documenting the actual operating range with the corrected load cell may be sufficient rather than a full revalidation.",
+            "fail": "Declares the validation completely invalid requiring full revalidation and a halt to production (disproportionate if product quality data supports the process). Or declares no impact because 'the product tests are passing' (ignoring the documentation and regulatory implications)."
+          }
+        },
+        {
+          "criterion": "product_risk_assessment",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Assesses product risk through the quality data: (1) all 48 lots passed dissolution testing — this is the primary indicator that tablets will perform in the patient, regardless of the compression force used to make them, (2) all lots passed content uniformity — dose consistency is confirmed, (3) reviews hardness and friability data (if available) to confirm the lower-than-documented compression force still produced mechanically acceptable tablets, (4) notes that the actual operating range (12.7-13.7kN) was relatively narrow and consistent, indicating a stable process even if the documented range was wrong, (5) concludes that patient safety risk is LOW based on product quality data, but documentation risk is HIGH.",
+            "fail": "Does not evaluate the product quality data in the risk assessment. Assumes high patient risk without evidence. Or ignores the risk entirely."
+          }
+        },
+        {
+          "criterion": "regulatory_strategy",
+          "weight": 0.25,
+          "rubric": {
+            "pass": "Outlines the regulatory approach: (1) file a deviation report documenting the calibration finding and the impact assessment, (2) assess whether any of the 48 lots require a field alert or recall — given that all lots pass dissolution and CU, a recall is not warranted based on product quality data, (3) document this assessment and have it reviewed by regulatory affairs, (4) conduct a bridging validation study at the corrected operating parameters to confirm the process produces equivalent results, (5) proactively disclose to FDA at the next inspection — present the deviation, the risk assessment, the product quality data supporting the 48 lots, and the corrective actions. Proactive disclosure demonstrates a functional quality system.",
+            "fail": "No regulatory strategy. Does not consider whether a field action is needed. Does not prepare for FDA disclosure. Recommends a voluntary recall of 48 lots of conforming product (disproportionate and would create drug shortage)."
+          }
+        },
+        {
+          "criterion": "corrective_actions",
+          "weight": 0.20,
+          "rubric": {
+            "pass": "Addresses both immediate and systemic: (1) immediate: recalibrate the load cell and verify the corrected reading, (2) bridging validation: run a validation study at the corrected parameters to document the actual process capability, (3) systemic: implement a calibration impact assessment procedure — any calibration adjustment exceeding a defined threshold triggers a review of process validation status and product quality assessment, (4) review calibration intervals for all critical process equipment in the tablet compression suite, (5) CAPA addressing the gap in the calibration-to-validation linkage.",
+            "fail": "Corrective action is 'recalibrate the load cell' only. Does not address the systemic gap between calibration and validation programs. Does not bridge-validate the actual operating parameters."
+          }
+        }
+      ]
+    }
+  ]
+}
