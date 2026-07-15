@@ -1,0 +1,38 @@
+<view class="container sub-page">
+  <view class="sub-hero">
+    <view class="sub-label">我的优惠券</view>
+    <view class="sub-value">{{heroCount}} 张</view>
+    <view class="sub-desc">到店由店主核销。未使用内区分可用与不可用。</view>
+  </view>
+
+  <view class="coupon-tabs">
+    <block wx:for="{{tabs}}" wx:key="key">
+      <view
+        class="coupon-tab {{activeTab === item.key ? 'active' : ''}}"
+        data-tab="{{item.key}}"
+        bindtap="onTabChange"
+      >{{item.label}}</view>
+    </block>
+  </view>
+
+  <view class="list-card" wx:if="{{coupons.length}}">
+    <block wx:for="{{coupons}}" wx:key="id">
+      <view class="list-row {{item.dimmed ? 'coupon-dimmed' : ''}}">
+        <view class="list-main">
+          <view class="list-title">{{item.name}}</view>
+          <view class="list-meta">{{item.meta}}</view>
+          <view class="list-meta" wx:if="{{item.validRange}}">有效期 {{item.validRange}}</view>
+        </view>
+        <view class="coupon-side">
+          <view class="coupon-amount">{{item.benefitText}}</view>
+          <view
+            wx:if="{{item.statusText}}"
+            class="status-chip {{activeTab === 'unused' && item.available ? 'ok' : ''}}"
+          >{{item.statusText}}</view>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <view class="empty-tip" wx:elif="{{!loading}}">{{emptyTip || '暂无优惠券'}}</view>
+</view>

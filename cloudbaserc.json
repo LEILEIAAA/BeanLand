@@ -1,0 +1,31 @@
+{
+  "envId": "cloudbase-d8gzrj9d3f09c5171",
+  "functionRoot": "cloudfunctions",
+  "functions": [
+    { "name": "adminFindMember", "timeout": 15, "runtime": "Nodejs16.13", "handler": "index.main" },
+    { "name": "adminListAppointments", "timeout": 15, "runtime": "Nodejs16.13", "handler": "index.main" },
+    { "name": "adminRecharge", "timeout": 20, "runtime": "Nodejs16.13", "handler": "index.main" },
+    { "name": "adminUpdateAppointment", "timeout": 15, "runtime": "Nodejs16.13", "handler": "index.main" },
+    { "name": "cancelAppointment", "timeout": 15, "runtime": "Nodejs16.13", "handler": "index.main" },
+    { "name": "createAppointment", "timeout": 20, "runtime": "Nodejs16.13", "handler": "index.main" },
+    { "name": "ensureMember", "timeout": 15, "runtime": "Nodejs16.13", "handler": "index.main" },
+    { "name": "getMyMember", "timeout": 10, "runtime": "Nodejs16.13", "handler": "index.main" },
+    { "name": "getPhoneNumber", "timeout": 15, "runtime": "Nodejs16.13", "handler": "index.main" },
+    { "name": "listMyAppointments", "timeout": 15, "runtime": "Nodejs16.13", "handler": "index.main" },
+    { "name": "listMyTransactions", "timeout": 15, "runtime": "Nodejs16.13", "handler": "index.main" },
+    { "name": "listMyCoupons", "timeout": 15, "runtime": "Nodejs16.13", "handler": "index.main" },
+    { "name": "adminListMemberCoupons", "timeout": 15, "runtime": "Nodejs16.13", "handler": "index.main" },
+    { "name": "adminRedeemCoupon", "timeout": 15, "runtime": "Nodejs16.13", "handler": "index.main" },
+    { "name": "adminIssueCoupon", "timeout": 15, "runtime": "Nodejs16.13", "handler": "index.main" },
+    { "name": "createRechargeOrder", "timeout": 20, "runtime": "Nodejs16.13", "handler": "index.main" },
+    { "name": "payRechargeNotify", "timeout": 20, "runtime": "Nodejs16.13", "handler": "index.main" },
+    { "name": "getRechargeOrder", "timeout": 10, "runtime": "Nodejs16.13", "handler": "index.main" },
+    { "name": "purchasePackage", "timeout": 20, "runtime": "Nodejs16.13", "handler": "index.main" },
+    { "name": "createPackageOrder", "timeout": 20, "runtime": "Nodejs16.13", "handler": "index.main" },
+    { "name": "payPackageNotify", "timeout": 20, "runtime": "Nodejs16.13", "handler": "index.main" },
+    { "name": "getPackageOrder", "timeout": 10, "runtime": "Nodejs16.13", "handler": "index.main" },
+    { "name": "listMyWorks", "timeout": 15, "runtime": "Nodejs16.13", "handler": "index.main" },
+    { "name": "createWork", "timeout": 15, "runtime": "Nodejs16.13", "handler": "index.main" },
+    { "name": "deleteWork", "timeout": 15, "runtime": "Nodejs16.13", "handler": "index.main" }
+  ]
+}

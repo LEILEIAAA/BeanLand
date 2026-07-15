@@ -1,4 +1,5 @@
 {
+  "cloud": true,
   "pages": [
     "pages/home/index",
     "pages/packages/index",
@@ -6,15 +7,48 @@
     "pages/appointment/index",
     "pages/route/index",
     "pages/member/index",
+    "pages/member/register/index",
+    "pages/member/records/index",
+    "pages/member/coupons/index",
+    "pages/member/stamps/index",
+    "pages/member/works/index",
+    "pages/member/appointments/index",
     "pages/recharge/index",
     "pages/admin/dashboard/index",
-    "pages/admin/appointments/index"
+    "pages/admin/appointments/index",
+    "pages/admin/timer/index",
+    "pages/admin/recharge/index",
+    "pages/admin/coupons/index"
   ],
   "window": {
-    "navigationBarTitleText": "Bean 拼豆手作",
+    "navigationBarTitleText": "Bean Land",
     "navigationBarBackgroundColor": "#FFFFFF",
     "navigationBarTextStyle": "black",
     "backgroundColor": "#FFFFFF"
+  },
+  "tabBar": {
+    "color": "#8B8B8B",
+    "selectedColor": "#111827",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/activities/index",
+        "text": "活动"
+      },
+      {
+        "pagePath": "pages/packages/index",
+        "text": "套餐"
+      },
+      {
+        "pagePath": "pages/member/index",
+        "text": "会员"
+      }
+    ]
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json"
