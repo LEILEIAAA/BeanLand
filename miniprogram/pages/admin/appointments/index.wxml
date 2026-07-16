@@ -1,13 +1,15 @@
 <view class="container">
   <view class="hero admin-hero">
-    <view class="eyebrow">预约 + 座位计时</view>
-    <view class="title">一页管理今天的到店节奏</view>
-    <view class="subtitle">确认预约、分配桌号、开始计时、续时补费、结束体验都集中在这里。</view>
+    <view class="eyebrow">店主看板</view>
+    <view class="title">预约管理</view>
+    <view class="subtitle">确认选座后可直接去开台；开台成功自动转为已到店。预约开始后保留 15 分钟，超时未到自动标为未到店。</view>
+    <view class="btn btn-secondary" style="margin-top: 16rpx;" bindtap="goTimer">打开座位管理</view>
   </view>
 
   <view class="section">
-    <view class="section-title">今日预约与计时</view>
-    <view class="subtitle">按时间流转查看状态，不再在多个页面间切换。</view>
+    <view class="section-title">预约列表</view>
+    <view class="subtitle" wx:if="{{loading}}">加载中…</view>
+    <view class="subtitle" wx:elif="{{!appointments.length}}">暂无预约</view>
   </view>
 
   <block wx:for="{{appointments}}" wx:key="id">
@@ -15,35 +17,24 @@
       <view class="card-topline">
         <view>
           <view class="card-title">{{item.name}} · {{item.people}} 人</view>
-          <view class="card-meta">{{item.packageName}} · {{item.time}}</view>
+          <view class="card-meta">{{item.date}} {{item.time}}</view>
+          <view class="card-meta" wx:if="{{item.phone}}">手机 {{item.phone}}</view>
         </view>
-        <view class="status-badge">{{item.status}}</view>
-      </view>
-
-      <view class="spark-line">
-        <view class="spark-step current"></view>
-        <view class="spark-step {{item.sessionStatus === '体验中' ? 'active' : ''}}"></view>
-        <view class="spark-step {{item.sessionStatus === '即将超时' ? 'warning' : ''}}"></view>
+        <view class="status-badge">{{item.statusLabel}}</view>
       </view>
 
       <view class="tag-row">
-        <view class="tag">来源：{{item.source}}</view>
-        <view class="tag">桌号：{{item.tableCode}}</view>
-        <view class="tag status-success">剩余 {{item.remaining}}</view>
-        <view class="tag status-warning">{{item.sessionStatus}}</view>
+        <view class="tag" wx:if="{{item.source}}">来源：{{item.source}}</view>
+        <view class="tag" wx:if="{{item.tableCode}}">桌号：{{item.tableCode}}</view>
+        <view class="tag" wx:if="{{item.seatLabel}}">座位：{{item.seatLabel}}</view>
       </view>
 
-      <view class="button-row">
-        <view class="btn btn-secondary">确认预约</view>
-        <view class="btn btn-secondary">分配桌号</view>
+      <view class="action-row" wx:if="{{item.canConfirm || item.canReject}}">
+        <view class="btn-mini btn-mini-primary" wx:if="{{item.canConfirm}}" data-id="{{item.id}}" bindtap="goConfirm">确认选座</view>
+        <view class="btn-mini btn-mini-ghost" wx:if="{{item.canReject}}" data-id="{{item.id}}" bindtap="reject">拒绝</view>
       </view>
-      <view class="button-row">
-        <view class="btn btn-primary">开始计时</view>
-        <view class="btn btn-secondary">补费续时</view>
-      </view>
-      <view class="button-row">
-        <view class="btn btn-secondary">免费延长</view>
-        <view class="btn btn-primary">结束体验</view>
+      <view class="action-row" wx:if="{{item.canOpen}}">
+        <view class="btn-mini btn-mini-primary" data-id="{{item.id}}" bindtap="goOpen">去开台</view>
       </view>
     </view>
   </block>
