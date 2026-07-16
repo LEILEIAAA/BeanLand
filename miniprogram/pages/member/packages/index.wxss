@@ -1,0 +1,74 @@
+@import "../_sub.wxss";
+
+.coupon-tabs {
+  display: flex;
+  gap: 12rpx;
+  margin-bottom: 24rpx;
+}
+
+.coupon-tab {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  border-radius: 999rpx;
+  background: rgba(15, 23, 42, 0.04);
+  color: #6b7280;
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.coupon-tab.active {
+  background: #111827;
+  color: #fff;
+}
+
+.pkg-row {
+  align-items: flex-start;
+}
+
+.pkg-title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.pkg-title-row .list-title {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.pkg-title-row .status-chip {
+  margin-top: 0;
+  padding: 4rpx 12rpx;
+  font-size: 20rpx;
+  line-height: 1.4;
+}
+
+.pkg-side {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 14rpx;
+  padding-top: 2rpx;
+}
+
+.pkg-refund-btn {
+  min-height: 52rpx;
+  padding: 0 20rpx;
+  font-size: 22rpx;
+}
+
+.btn-ghost {
+  min-height: 56rpx;
+  padding: 0 18rpx;
+  border-radius: 999rpx;
+  background: #f1f5f9;
+  color: #374151;
+  font-size: 22rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

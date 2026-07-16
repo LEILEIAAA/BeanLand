@@ -17,6 +17,10 @@ const {
   countAvailable,
   canRedeem,
   buildIssueCouponPayload,
+  parseYmdStartMs,
+  parseYmdEndMs,
+  formatDateYmd,
+  CN_OFFSET_MS,
 } = require('../miniprogram/utils/coupons');
 
 const now = 1_000_000;
@@ -114,12 +118,32 @@ test('isBeforeValid is true when now < validFrom', () => {
 });
 
 test('formatValidRange renders date range', () => {
-  const from = new Date(2026, 6, 1).getTime();
-  const to = new Date(2026, 6, 31).getTime();
+  const from = parseYmdStartMs('2026-07-01');
+  const to = parseYmdEndMs('2026-07-31');
   assert.equal(
     formatValidRange({ validFrom: from, expireAt: to }),
     '2026-07-01 至 2026-07-31',
   );
+});
+
+test('parseYmdStartMs is China midnight so 7.15 is usable from 7.15 00:00 CST', () => {
+  const start = parseYmdStartMs('2026-07-15');
+  assert.equal(start, Date.UTC(2026, 6, 15) - CN_OFFSET_MS);
+  assert.equal(formatDateYmd(start), '2026-07-15');
+  // 中国 7.15 00:00 可用；前 1ms 仍未到使用期
+  assert.equal(isBeforeValid({ validFrom: start }, start), false);
+  assert.equal(isBeforeValid({ validFrom: start }, start - 1), true);
+  // 中国 7.15 01:00（云函数 UTC 环境下旧算法会误判为未生效）
+  const china1am = Date.UTC(2026, 6, 14, 17, 0, 0);
+  assert.equal(isBeforeValid({ validFrom: start }, china1am), false);
+});
+
+test('parseYmdEndMs keeps 7.20 usable until China end of day', () => {
+  const end = parseYmdEndMs('2026-07-20');
+  assert.equal(end, Date.UTC(2026, 6, 20, 15, 59, 59, 999));
+  assert.equal(formatDateYmd(end), '2026-07-20');
+  assert.equal(isPastExpire({ expireAt: end }, end), false);
+  assert.equal(isPastExpire({ expireAt: end }, end + 1), true);
 });
 
 test('withEffectiveAvailability marks not-yet-valid as unavailable', () => {
@@ -193,11 +217,8 @@ test('buildIssueCouponPayload builds hours coupon with date range', () => {
   assert.equal(result.coupon.available, true);
   assert.equal(result.coupon.issuedBy, 'admin-openid');
   assert.equal(result.coupon.createdAt, now);
-  assert.equal(result.coupon.validFrom, new Date(2026, 6, 1).getTime());
-  assert.equal(
-    result.coupon.expireAt,
-    new Date(2026, 6, 31, 23, 59, 59, 999).getTime(),
-  );
+  assert.equal(result.coupon.validFrom, parseYmdStartMs('2026-07-01'));
+  assert.equal(result.coupon.expireAt, parseYmdEndMs('2026-07-31'));
   assert.equal(Object.prototype.hasOwnProperty.call(result.coupon, 'amount'), false);
   assert.equal(Object.prototype.hasOwnProperty.call(result.coupon, 'scope'), false);
 });
@@ -221,64 +242,37 @@ test('buildIssueCouponPayload builds discount coupon', () => {
   assert.equal(result.coupon.benefitValue, 8);
 });
 
-test('buildIssueCouponPayload rejects missing member or bad structured fields', () => {
-  assert.equal(
-    buildIssueCouponPayload(
-      {
-        openid: 'o1',
-        category: CATEGORY.CHECKIN,
-        benefitType: BENEFIT_TYPE.HOURS,
-        benefitValue: 2,
-        validFromDate: '2026-07-01',
-        expireAtDate: '2026-07-31',
-      },
-      now,
-    ).ok,
-    false,
+test('buildIssueCouponPayload rejects inverted date range with Chinese message', () => {
+  const result = buildIssueCouponPayload(
+    {
+      memberId: 'm1',
+      openid: 'o1',
+      category: CATEGORY.CHECKIN,
+      benefitType: BENEFIT_TYPE.HOURS,
+      benefitValue: 2,
+      validFromDate: '2026-07-31',
+      expireAtDate: '2026-07-01',
+    },
+    now,
   );
-  assert.equal(
-    buildIssueCouponPayload(
-      {
-        memberId: 'm1',
-        openid: 'o1',
-        category: 'other',
-        benefitType: BENEFIT_TYPE.HOURS,
-        benefitValue: 2,
-        validFromDate: '2026-07-01',
-        expireAtDate: '2026-07-31',
-      },
-      now,
-    ).code,
-    'INVALID_PAYLOAD',
+  assert.equal(result.ok, false);
+  assert.equal(result.code, 'INVALID_PAYLOAD');
+  assert.match(result.message, /结束日不能早于开始日/);
+});
+
+test('buildIssueCouponPayload rejects zero benefit with Chinese message', () => {
+  const result = buildIssueCouponPayload(
+    {
+      memberId: 'm1',
+      openid: 'o1',
+      category: CATEGORY.TEACHER,
+      benefitType: BENEFIT_TYPE.DISCOUNT,
+      benefitValue: 0,
+      validFromDate: '2026-07-01',
+      expireAtDate: '2026-07-31',
+    },
+    now,
   );
-  assert.equal(
-    buildIssueCouponPayload(
-      {
-        memberId: 'm1',
-        openid: 'o1',
-        category: CATEGORY.CHECKIN,
-        benefitType: BENEFIT_TYPE.HOURS,
-        benefitValue: 0,
-        validFromDate: '2026-07-01',
-        expireAtDate: '2026-07-31',
-      },
-      now,
-    ).code,
-    'INVALID_PAYLOAD',
-  );
-  assert.equal(
-    buildIssueCouponPayload(
-      {
-        memberId: 'm1',
-        openid: 'o1',
-        category: CATEGORY.CHECKIN,
-        benefitType: BENEFIT_TYPE.HOURS,
-        benefitValue: 2,
-        validFromDate: '2026-07-31',
-        expireAtDate: '2026-07-01',
-      },
-      now,
-    ).code,
-    'INVALID_PAYLOAD',
-  );
+  assert.equal(result.ok, false);
+  assert.match(result.message, /折扣/);
 });

@@ -1,0 +1,80 @@
+[
+  {
+    "id": "mayday",
+    "name": "五月天主题拼豆",
+    "price": 0.01,
+    "capacity": 28,
+    "registeredCount": 0,
+    "status": "recruiting",
+    "startAt": 1784354400000,
+    "scheduleText": "开业首周 D1–D2",
+    "timeText": "下午场 / 晚场（以社群通知为准）",
+    "audience": "五月天粉丝、年轻女性、喜欢主题手作的朋友",
+    "content": "主题色卡与歌单氛围下完成一件小作品，可上粉丝作品墙；不使用受版权保护的官方图案，以情绪色与自选灵感为主。",
+    "includes": [
+      "主题图纸/色卡灵感",
+      "基础材料",
+      "歌单氛围",
+      "作品合影"
+    ],
+    "notice": "一人一报；具体开场时间以本页日程与社群通知为准。开始前 24 小时外可全额取消，24 小时内取消扣实付 30%。"
+  },
+  {
+    "id": "squid-game",
+    "name": "大学生鱿鱼游戏",
+    "price": 0.01,
+    "capacity": 24,
+    "registeredCount": 0,
+    "status": "recruiting",
+    "startAt": 1784613600000,
+    "scheduleText": "开业首周 D4–D5",
+    "timeText": "约 90 分钟 / 场",
+    "audience": "大学生、朋友组队",
+    "content": "三关迷你季：123 木头人热身 → 豆糖饼主秀 → 色路决赛。紧张好看、适合出片。",
+    "includes": [
+      "指定小图纸",
+      "公共豆盘",
+      "关卡主持",
+      "前三名无限时权益"
+    ],
+    "notice": "报名费可抵扣当日拼豆消费；前三名获无限时体验。犯规惩罚为暂停/旁观，不拆作品。开始前 24 小时外可全额取消，24 小时内取消扣实付 30%。"
+  },
+  {
+    "id": "craft-meetup",
+    "name": "拼豆交流会",
+    "price": 0.01,
+    "capacity": 30,
+    "registeredCount": 0,
+    "status": "recruiting",
+    "startAt": 1784890800000,
+    "scheduleText": "开业首周 D7",
+    "timeText": "晚间场（以社群通知为准）",
+    "audience": "拼豆爱好者、开业首周到店用户",
+    "content": "带上最得意的作品参加展示与评选，互相交流图纸与技巧，认识同好。",
+    "includes": [
+      "作品展示位",
+      "评选环节",
+      "同好交流",
+      "合影"
+    ],
+    "notice": "欢迎携带五月天 / 鱿鱼局作品参赛；现场也可轻度补豆打磨。开始前 24 小时外可全额取消，24 小时内取消扣实付 30%。"
+  },
+  {
+    "id": "birthday",
+    "name": "生日会 / 团建 / 包场",
+    "price": 0.01,
+    "capacity": 40,
+    "registeredCount": 0,
+    "status": "consulting",
+    "scheduleText": "档期协商",
+    "timeText": "按包场场次协商",
+    "audience": "生日聚会、团建、朋友包场",
+    "content": "整场空间定制：流程、人数、主题与材料方案与店主确认后执行。",
+    "includes": [
+      "整场空间",
+      "材料方案协商",
+      "流程定制"
+    ],
+    "notice": "本页不开放在线报名，请联系店主确认档期与报价。"
+  }
+]

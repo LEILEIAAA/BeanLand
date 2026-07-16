@@ -1,0 +1,7 @@
+[
+  {
+    "_id": "main",
+    "subMchId": "请填写微信支付商户号",
+    "note": "导入云库集合 pay_config；也可改 cloudfunctions/*/payConfig.js 的 subMchId"
+  }
+]

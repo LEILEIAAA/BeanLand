@@ -1,0 +1,58 @@
+<view class="container sub-page">
+  <view class="sub-hero">
+    <view class="page-title">套餐核销</view>
+    <view class="sub-desc">查找会员后核销未使用套餐，并进入座位开台。</view>
+  </view>
+
+  <view class="list-card">
+    <view class="field">
+      <view class="field-label">会员手机号</view>
+      <view class="field-row">
+        <input
+          class="field-input field-input-flex"
+          type="number"
+          maxlength="11"
+          placeholder="11 位手机号"
+          value="{{phone}}"
+          bindinput="onPhoneInput"
+        />
+        <view class="btn btn-secondary search-btn" bindtap="onSearch">查找</view>
+      </view>
+    </view>
+
+    <block wx:for="{{members}}" wx:key="_id">
+      <view class="member-row {{selectedId === item._id ? 'active' : ''}}" data-id="{{item._id}}" bindtap="onPickMember">
+        <view class="list-title">{{item.nickName || '未命名'}} · {{item.phone}}</view>
+        <view class="list-meta">余额 ¥{{item.totalBalance}} · {{item.tier}}</view>
+      </view>
+    </block>
+
+    <view class="field" wx:if="{{selectedLabel}}">
+      <view class="field-label">当前选中</view>
+      <view class="selected-box">{{selectedLabel}}</view>
+    </view>
+  </view>
+
+  <view wx:if="{{selectedId}}">
+    <view class="list-card" wx:if="{{orders.length}}">
+      <block wx:for="{{orders}}" wx:key="id">
+        <view class="list-row">
+          <view class="list-main">
+            <view class="list-title">{{item.name}}</view>
+            <view class="list-meta">{{item.meta}}</view>
+          </view>
+          <view class="coupon-side">
+            <view class="coupon-amount">¥{{item.payText}}</view>
+            <view
+              class="redeem-btn {{redeemingId === item.id ? 'redeem-btn-busy' : ''}}"
+              data-id="{{item.id}}"
+              data-name="{{item.name}}"
+              bindtap="onRedeem"
+            >核销并开台</view>
+          </view>
+        </view>
+      </block>
+    </view>
+    <view class="empty-tip" wx:elif="{{!loadingOrders}}">该会员暂无可核销套餐</view>
+  </view>
+</view>

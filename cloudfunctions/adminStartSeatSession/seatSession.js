@@ -140,6 +140,10 @@ function buildEndSessionFields(session, endedAt) {
     endedAt: end,
     totalMinutes,
     overtimeMinutes: Math.max(0, totalMinutes - duration),
+    // 结束时会清空 seatIds，此处快照原座位供历史复盘展示
+    seatIdsSnapshot: Array.isArray(session && session.seatIds)
+      ? [...session.seatIds]
+      : [],
     updatedAt: end,
   };
 }
@@ -161,6 +165,9 @@ function buildStartSessionRecord({
   seatIds,
   tableCode,
   durationMinutes,
+  packageOrderId,
+  packageName,
+  consumedAmount,
   now,
 }) {
   const duration = Number(durationMinutes);
@@ -177,6 +184,9 @@ function buildStartSessionRecord({
     startedAt,
     expectedEndAt: startedAt + duration * 60 * 1000,
     status: 'active',
+    packageOrderId: packageOrderId || '',
+    packageName: packageName || '',
+    consumedAmount: Number(consumedAmount) || 0,
     createdAt: startedAt,
     updatedAt: startedAt,
   };
@@ -256,11 +266,22 @@ function normalizeTimeSlots(row) {
 function addReservationSlot(bySeat, seatId, timeSlot) {
   if (!seatId || !timeSlot) return;
   if (!bySeat[seatId]) {
-    bySeat[seatId] = { timeSlots: [] };
+    bySeat[seatId] = { timeSlots: [], memberIds: [] };
   }
   const slots = bySeat[seatId].timeSlots;
   if (!slots.includes(timeSlot)) {
     slots.push(timeSlot);
+  }
+}
+
+function addReservationMember(bySeat, seatId, memberId) {
+  if (!seatId || !memberId) return;
+  if (!bySeat[seatId]) {
+    bySeat[seatId] = { timeSlots: [], memberIds: [] };
+  }
+  const ids = bySeat[seatId].memberIds || (bySeat[seatId].memberIds = []);
+  if (!ids.includes(memberId)) {
+    ids.push(memberId);
   }
 }
 
@@ -275,12 +296,18 @@ function formatReservationSlotLabel(timeSlots) {
   return slots.join('、');
 }
 
+function isReleasedReservationStatus(status) {
+  return /取消|拒绝|完成|cancelled|rejected|completed|no_show|未到店/i.test(
+    String(status || ''),
+  );
+}
+
 function reservationPhaseFromStatus(status) {
   const s = String(status || '');
-  if (/取消|拒绝|完成|cancelled|rejected|completed/i.test(s)) return '';
+  if (isReleasedReservationStatus(s)) return '';
   if (/arrived|已到店/i.test(s)) return 'arrived';
   if (/confirmed|已确认/i.test(s)) return 'confirmed';
-  if (/pending|待确认/i.test(s)) return '';
+  if (/pending|待确认|待商家确认/i.test(s)) return '';
   return '';
 }
 
@@ -292,16 +319,15 @@ function markSeatPhase(bySeat, seatId, phase) {
   }
 }
 
-/** 从预约单 / 占用记录汇总「座位 → 预约时段」；arrived 标 readyToOpen */
+/** 从预约单 / 占用记录汇总「座位 → 预约时段 + 预约会员」；arrived 标 readyToOpen */
 function buildReservationsBySeatId({ appointments = [], occupancies = [], today }) {
   const bySeat = {};
-  for (const row of occupancies || []) {
-    const type = row.type || 'reserved';
-    if (type !== 'reserved' && type !== 'arrived') continue;
-    if (today && row.date && row.date !== today) continue;
-    for (const slot of normalizeTimeSlots(row)) {
-      addReservationSlot(bySeat, row.seatId, slot);
-      markSeatPhase(bySeat, row.seatId, type === 'arrived' ? 'arrived' : 'confirmed');
+  const memberByAppointmentId = {};
+  const releasedAppointmentIds = new Set();
+  for (const appt of appointments || []) {
+    const apptId = appt._id || appt.id || '';
+    if (apptId && isReleasedReservationStatus(appt.status)) {
+      releasedAppointmentIds.add(apptId);
     }
   }
   for (const appt of appointments || []) {
@@ -309,6 +335,11 @@ function buildReservationsBySeatId({ appointments = [], occupancies = [], today 
     if (today && date && date !== today) continue;
     const phase = reservationPhaseFromStatus(appt.status);
     if (!phase) continue;
+    const memberId = appt.memberId || '';
+    const apptId = appt._id || appt.id || '';
+    if (apptId && memberId) {
+      memberByAppointmentId[apptId] = memberId;
+    }
     const seatIds = Array.isArray(appt.seatIds) ? appt.seatIds : [];
     const slots = normalizeTimeSlots(appt);
     for (const seatId of seatIds) {
@@ -316,6 +347,26 @@ function buildReservationsBySeatId({ appointments = [], occupancies = [], today 
         addReservationSlot(bySeat, seatId, slot);
       }
       markSeatPhase(bySeat, seatId, phase);
+      if (memberId) {
+        addReservationMember(bySeat, seatId, memberId);
+      }
+    }
+  }
+  for (const row of occupancies || []) {
+    const type = row.type || 'reserved';
+    if (type !== 'reserved' && type !== 'arrived') continue;
+    if (today && row.date && row.date !== today) continue;
+    if (row.appointmentId && releasedAppointmentIds.has(row.appointmentId)) {
+      continue;
+    }
+    const memberId =
+      row.memberId || memberByAppointmentId[row.appointmentId] || '';
+    for (const slot of normalizeTimeSlots(row)) {
+      addReservationSlot(bySeat, row.seatId, slot);
+      markSeatPhase(bySeat, row.seatId, type === 'arrived' ? 'arrived' : 'confirmed');
+      if (memberId) {
+        addReservationMember(bySeat, row.seatId, memberId);
+      }
     }
   }
   for (const seatId of Object.keys(bySeat)) {
@@ -329,12 +380,35 @@ function buildReservationsBySeatId({ appointments = [], occupancies = [], today 
   return bySeat;
 }
 
-/** 开台前：选中预约座时的可读提示 */
-function formatReservedOpenPrompt(seatIds, reservationsBySeatId) {
+function buildSeatOpeningMemberMap(memberIds, seatIds) {
+  const members = Array.isArray(memberIds) ? memberIds : [];
+  const seats = Array.isArray(seatIds) ? seatIds : [];
+  const map = {};
+  if (members.length === 1) {
+    for (const seatId of seats) {
+      map[seatId] = members[0];
+    }
+    return map;
+  }
+  for (let i = 0; i < Math.min(members.length, seats.length); i += 1) {
+    map[seats[i]] = members[i];
+  }
+  return map;
+}
+
+function isSeatReservedByMember(info, memberId) {
+  if (!info || !memberId) return false;
+  return (info.memberIds || []).includes(memberId);
+}
+
+/** 开台前：选中预约座时的可读提示；预约人本人开台则跳过对应座位 */
+function formatReservedOpenPrompt(seatIds, reservationsBySeatId, memberIds) {
+  const openingBySeat = buildSeatOpeningMemberMap(memberIds, seatIds);
   const lines = [];
   for (const seatId of seatIds || []) {
     const info = reservationsBySeatId && reservationsBySeatId[seatId];
     if (!info || !(info.timeSlots || []).length) continue;
+    if (isSeatReservedByMember(info, openingBySeat[seatId])) continue;
     lines.push(`${seatId}：${info.slotLabel || info.timeSlots.join('、')}`);
   }
   if (!lines.length) return '';

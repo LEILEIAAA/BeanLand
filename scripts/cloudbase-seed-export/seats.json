@@ -1,0 +1,258 @@
+[
+  {
+    "id": "F1-A1",
+    "tableCode": "F1-A",
+    "area": "F1一楼·左墙",
+    "index": 1,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F1-A2",
+    "tableCode": "F1-A",
+    "area": "F1一楼·左墙",
+    "index": 2,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F1-A3",
+    "tableCode": "F1-A",
+    "area": "F1一楼·左墙",
+    "index": 3,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F1-A4",
+    "tableCode": "F1-A",
+    "area": "F1一楼·左墙",
+    "index": 4,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F1-A5",
+    "tableCode": "F1-A",
+    "area": "F1一楼·左墙",
+    "index": 5,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F1-A6",
+    "tableCode": "F1-A",
+    "area": "F1一楼·左墙",
+    "index": 6,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F1-B1",
+    "tableCode": "F1-B",
+    "area": "F1一楼·窗边",
+    "index": 1,
+    "capacity": 2,
+    "maintenance": false
+  },
+  {
+    "id": "F1-B2",
+    "tableCode": "F1-B",
+    "area": "F1一楼·窗边",
+    "index": 2,
+    "capacity": 2,
+    "maintenance": false
+  },
+  {
+    "id": "F1-C1",
+    "tableCode": "F1-C",
+    "area": "F1一楼·长桌",
+    "index": 1,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F1-C2",
+    "tableCode": "F1-C",
+    "area": "F1一楼·长桌",
+    "index": 2,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F1-C3",
+    "tableCode": "F1-C",
+    "area": "F1一楼·长桌",
+    "index": 3,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F1-C4",
+    "tableCode": "F1-C",
+    "area": "F1一楼·长桌",
+    "index": 4,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F1-C5",
+    "tableCode": "F1-C",
+    "area": "F1一楼·长桌",
+    "index": 5,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F1-C6",
+    "tableCode": "F1-C",
+    "area": "F1一楼·长桌",
+    "index": 6,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F2-A1",
+    "tableCode": "F2-A",
+    "area": "F2二楼·左墙",
+    "index": 1,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F2-A2",
+    "tableCode": "F2-A",
+    "area": "F2二楼·左墙",
+    "index": 2,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F2-A3",
+    "tableCode": "F2-A",
+    "area": "F2二楼·左墙",
+    "index": 3,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F2-A4",
+    "tableCode": "F2-A",
+    "area": "F2二楼·左墙",
+    "index": 4,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F2-A5",
+    "tableCode": "F2-A",
+    "area": "F2二楼·左墙",
+    "index": 5,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F2-A6",
+    "tableCode": "F2-A",
+    "area": "F2二楼·左墙",
+    "index": 6,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F2-B1",
+    "tableCode": "F2-B",
+    "area": "F2二楼·右墙",
+    "index": 1,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F2-B2",
+    "tableCode": "F2-B",
+    "area": "F2二楼·右墙",
+    "index": 2,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F2-B3",
+    "tableCode": "F2-B",
+    "area": "F2二楼·右墙",
+    "index": 3,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F2-B4",
+    "tableCode": "F2-B",
+    "area": "F2二楼·右墙",
+    "index": 4,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F2-B5",
+    "tableCode": "F2-B",
+    "area": "F2二楼·右墙",
+    "index": 5,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F2-B6",
+    "tableCode": "F2-B",
+    "area": "F2二楼·右墙",
+    "index": 6,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F2-C1",
+    "tableCode": "F2-C",
+    "area": "F2二楼·长桌",
+    "index": 1,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F2-C2",
+    "tableCode": "F2-C",
+    "area": "F2二楼·长桌",
+    "index": 2,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F2-C3",
+    "tableCode": "F2-C",
+    "area": "F2二楼·长桌",
+    "index": 3,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F2-C4",
+    "tableCode": "F2-C",
+    "area": "F2二楼·长桌",
+    "index": 4,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F2-C5",
+    "tableCode": "F2-C",
+    "area": "F2二楼·长桌",
+    "index": 5,
+    "capacity": 6,
+    "maintenance": false
+  },
+  {
+    "id": "F2-C6",
+    "tableCode": "F2-C",
+    "area": "F2二楼·长桌",
+    "index": 6,
+    "capacity": 6,
+    "maintenance": false
+  }
+]

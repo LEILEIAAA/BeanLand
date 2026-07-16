@@ -1,0 +1,32 @@
+<view class="container sub-page">
+  <view class="works-toolbar">
+    <view class="btn btn-primary" bindtap="onUpload">上传作品</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="works-hint">加载中…</view>
+
+  <block wx:elif="{{works.length}}">
+    <view class="works-grid">
+      <view class="works-cell" wx:for="{{works}}" wx:key="_id">
+        <image
+          class="works-img"
+          src="{{item.imageFileID}}"
+          mode="aspectFill"
+          data-file="{{item.imageFileID}}"
+          bindtap="onPreview"
+        />
+        <view class="works-meta">
+          <text class="works-caption">{{item.caption || '无备注'}}</text>
+          <text class="works-date">{{item.dateLabel}}</text>
+        </view>
+        <view class="works-del" data-id="{{item._id}}" catchtap="onDelete">删除</view>
+      </view>
+    </view>
+  </block>
+
+  <view wx:else class="works-empty">
+    <view class="works-empty-title">还没有作品</view>
+    <view class="works-empty-desc">到店拼完拍一张，留在这里</view>
+    <view class="btn btn-primary" bindtap="onUpload">上传作品</view>
+  </view>
+</view>

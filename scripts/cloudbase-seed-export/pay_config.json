@@ -1,0 +1,7 @@
+[
+  {
+    "_id": "main",
+    "subMchId": "1748234500",
+    "note": "微信支付商户号；createRechargeOrder 优先读本文件/云库，其次读函数内 payConfig"
+  }
+]

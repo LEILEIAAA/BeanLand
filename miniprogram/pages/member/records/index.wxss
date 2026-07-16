@@ -1,0 +1,53 @@
+@import "../_sub.wxss";
+
+.records-row {
+  align-items: flex-start;
+}
+
+.records-row .list-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.tx-type {
+  margin-bottom: 6rpx;
+  font-size: 20rpx;
+  font-weight: 600;
+  letter-spacing: 2rpx;
+  line-height: 1.2;
+  color: #a8a29e;
+}
+
+.tx-type-recharge {
+  color: #16a34a;
+}
+
+.tx-type-package {
+  color: #78716c;
+}
+
+.tx-type-activity {
+  color: #ea580c;
+}
+
+.tx-type-package_refund,
+.tx-type-activity_cancel {
+  color: #94a3b8;
+}
+
+.records-row .list-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #18181b;
+  line-height: 1.35;
+  word-break: break-all;
+}
+
+.records-row .list-meta {
+  margin-top: 8rpx;
+}
+
+.records-row .list-amount {
+  margin-top: 2rpx;
+  font-variant-numeric: tabular-nums;
+}

@@ -1,0 +1,45 @@
+<view class="container sub-page">
+  <view class="sub-hero">
+    <view class="sub-label">转账代充</view>
+    <view class="sub-value">店长录入</view>
+    <view class="sub-desc">用户转账后，用手机号查找会员并录入本金/赠送。需 admins 白名单。</view>
+  </view>
+
+  <view class="list-card">
+    <view class="field">
+      <view class="field-label">会员手机号</view>
+      <input class="field-input" type="number" maxlength="11" placeholder="与会员中心填写一致" value="{{phone}}" bindinput="onPhoneInput" />
+      <view class="btn btn-secondary" bindtap="onSearch">查找</view>
+    </view>
+
+    <block wx:for="{{members}}" wx:key="_id">
+      <view class="member-row {{selectedId === item._id ? 'active' : ''}}" data-id="{{item._id}}" bindtap="onPickMember">
+        <view class="list-title">{{item.nickName || '未命名'}} · {{item.phone}}</view>
+        <view class="list-meta">余额 ¥{{item.totalBalance}} · {{item.tier}} · 累计充 ¥{{item.totalRecharge}}</view>
+      </view>
+    </block>
+
+    <view class="field" wx:if="{{selectedLabel}}">
+      <view class="field-label">当前选中</view>
+      <view class="list-meta">{{selectedLabel}}</view>
+    </view>
+
+    <view class="field" wx:if="{{plans.length}}">
+      <view class="field-label">充值档位</view>
+      <picker mode="selector" range="{{plans}}" range-key="id" value="{{planIndex}}" bindchange="onPlanChange">
+        <view class="field-input">充 {{plans[planIndex].rechargeAmount}} 送 {{plans[planIndex].bonusAmount}}</view>
+      </picker>
+    </view>
+
+    <view class="field">
+      <view class="field-label">本金</view>
+      <input class="field-input" type="digit" value="{{rechargeAmount}}" bindinput="onRechargeInput" />
+    </view>
+    <view class="field">
+      <view class="field-label">赠送</view>
+      <input class="field-input" type="digit" value="{{bonusAmount}}" bindinput="onBonusInput" />
+    </view>
+
+    <view class="btn btn-primary {{submitting ? 'disabled' : ''}}" bindtap="onSubmit">确认入账</view>
+  </view>
+</view>

@@ -1,19 +1,124 @@
-<view class="container">
-  <view class="section-title">选择适合你的拼豆体验</view>
-  <view class="subtitle">所有套餐都会展示体验时长、超时规则和适合人群，到店前先确认更安心。</view>
+<view class="container packages-page tab-page">
+  <view class="menu-head">
+    <view class="menu-head-row">
+      <view class="menu-head-main">
+        <view class="menu-kicker">Menu</view>
+        <view class="menu-title">今天拼哪一档</view>
+      </view>
+      <view class="menu-count">
+        <text class="menu-count-num">{{packageCount}}</text>
+        <text class="menu-count-unit">档在售</text>
+      </view>
+    </view>
+    <view class="menu-tags">
+      <text class="menu-tag">{{dayHint}}</text>
+      <text class="menu-tag is-promo" wx:if="{{promoBanner}}">{{promoBanner}}</text>
+    </view>
+  </view>
 
   <block wx:for="{{packages}}" wx:key="id">
-    <view class="card">
-      <view class="card-title">{{item.name}}</view>
-      <view class="card-meta">{{item.targetAudience}}</view>
-      <view class="price">¥{{item.price}}</view>
-      <view class="tag-row">
-        <view class="tag">{{item.durationMinutes}} 分钟</view>
-        <view class="tag">{{item.overtimeRule}}</view>
+    <view class="pkg-card {{item.id === 'opening-trio' ? 'is-hot' : ''}}">
+      <view class="pkg-ribbon {{item.ribbonTone ? 'tone-' + item.ribbonTone : ''}}" wx:if="{{item.badge}}">
+        <text class="pkg-ribbon-text">{{item.badge}}</text>
+      </view>
+      <view class="pkg-card-top">
+        <view class="pkg-index">{{item.dropNo}}</view>
+      </view>
+      <view class="pkg-name">{{item.name}}</view>
+      <view class="pkg-meta">{{item.targetAudience}}</view>
+
+      <view class="pkg-price-board">
+        <view class="pkg-price-row {{item.isTodayWeekend ? 'is-today' : ''}}">
+          <view class="pkg-price-head">
+            <text class="pkg-price-label">周末</text>
+            <text class="pkg-price-pick" wx:if="{{item.isTodayWeekend}}">今日</text>
+          </view>
+          <text class="pkg-price-value">¥{{item.weekendPriceText}}</text>
+        </view>
+        <view class="pkg-price-row {{!item.isTodayWeekend ? 'is-today' : ''}}">
+          <view class="pkg-price-head">
+            <text class="pkg-price-label">工作日</text>
+            <text class="pkg-price-pick" wx:if="{{!item.isTodayWeekend}}">今日</text>
+          </view>
+          <text class="pkg-price-value">¥{{item.weekdayPriceText}}</text>
+        </view>
+      </view>
+
+      <view class="pkg-sale" wx:if="{{item.promoActive}}">
+        <text class="pkg-sale-label">今日按{{item.dayTypeLabel}}结算打8折后</text>
+        <text class="pkg-sale-value">¥{{item.salePriceText}}</text>
+        <text class="pkg-sale-base">¥{{item.dayPriceText}}</text>
+      </view>
+      <view class="pkg-sale" wx:else>
+        <text class="pkg-sale-label">今日按{{item.dayTypeLabel}}结算</text>
+        <text class="pkg-sale-value">¥{{item.salePriceText}}</text>
+      </view>
+
+      <view class="pkg-includes" wx:if="{{item.includeChips.length}}">
+        <block wx:for="{{item.includeChips}}" wx:for-item="chip" wx:key="*this">
+          <text class="pkg-chip">{{chip}}</text>
+        </block>
       </view>
       <view class="button-row">
-        <view class="btn btn-primary" data-id="{{item.id}}" bindtap="book">预约这个套餐</view>
+        <view class="btn btn-primary {{paying ? 'btn-disabled' : ''}}" data-id="{{item.id}}" bindtap="buy">
+          {{paying ? '支付中…' : '立即购买'}}
+        </view>
       </view>
     </view>
   </block>
+
+  <view class="buy-mask" wx:if="{{sheetOpen}}" catchtouchmove="noop" bindtap="closeSheet">
+    <view class="buy-sheet" catchtap="noop">
+      <view class="buy-sheet-title">确认购买</view>
+      <view class="buy-sheet-name" wx:if="{{selectedPackage}}">{{selectedPackage.name}}</view>
+      <view class="buy-sheet-meta" wx:if="{{dayMeta}}">{{dayMeta}}</view>
+
+      <view class="buy-row settle">
+        <text class="buy-label">{{settleLabel}}</text>
+        <text class="buy-value">¥{{quote.listPrice}}</text>
+      </view>
+
+      <view class="buy-section-label">优惠券</view>
+      <view wx:if="{{couponBlocked}}" class="coupon-blocked">{{couponBlockedTip}}</view>
+      <block wx:elif="{{couponOptions.length > 1}}">
+        <view
+          wx:for="{{couponOptions}}"
+          wx:key="key"
+          class="coupon-option {{item.selected ? 'selected' : ''}}"
+          data-id="{{item.id || 'none'}}"
+          bindtap="selectCoupon"
+        >
+          <view class="coupon-name">{{item.name}}</view>
+          <view class="coupon-meta">{{item.amountText}}</view>
+        </view>
+      </block>
+      <view wx:else class="coupon-empty">暂无可用优惠券</view>
+
+      <view class="buy-section-label">支付方式</view>
+      <view class="pay-method-row">
+        <view
+          class="pay-method {{payMethod === 'balance' ? 'selected' : ''}}"
+          data-method="balance"
+          bindtap="selectPayMethod"
+        >余额（¥{{balance}}）</view>
+        <view
+          class="pay-method {{payMethod === 'wechat' ? 'selected' : ''}}"
+          data-method="wechat"
+          bindtap="selectPayMethod"
+        >微信支付</view>
+      </view>
+
+      <view class="buy-row total">
+        <text class="buy-label">实付</text>
+        <text class="buy-value emphasis">¥{{quote.payAmount}}</text>
+      </view>
+      <view class="buy-tip" wx:if="{{!quote.needPayment}}">优惠券已全额抵扣，确认后直接核销</view>
+
+      <view class="buy-actions">
+        <view class="btn btn-primary {{paying ? 'btn-disabled' : ''}}" bindtap="confirmPay">
+          {{paying ? '支付中…' : (payMethod === 'wechat' && quote.needPayment ? '微信支付' : '确认支付')}}
+        </view>
+      </view>
+    </view>
+  </view>
 </view>

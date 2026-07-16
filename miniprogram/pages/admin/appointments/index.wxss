@@ -51,3 +51,140 @@
 .btn {
   flex: 1 1 46%;
 }
+
+.action-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 20rpx;
+}
+
+.btn-mini {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56rpx;
+  padding: 0 28rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  font-weight: 700;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+
+.btn-mini-primary {
+  color: #fff;
+  background: #1c1917;
+  box-shadow: 0 6rpx 16rpx rgba(28, 25, 23, 0.12);
+}
+
+.btn-mini-ghost {
+  color: #1c1917;
+  background: #fff;
+  border: 1rpx solid rgba(28, 25, 23, 0.12);
+}
+
+.reject-reason {
+  color: #9a3412;
+  font-weight: 600;
+}
+
+.reject-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(24, 24, 27, 0.45);
+}
+
+.reject-sheet {
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 36rpx 32rpx calc(36rpx + env(safe-area-inset-bottom));
+  border-radius: 36rpx 36rpx 0 0;
+  background: #fff;
+  box-shadow: 0 -12rpx 40rpx rgba(24, 24, 27, 0.12);
+}
+
+.reject-sheet-title {
+  font-size: 36rpx;
+  font-weight: 800;
+  color: #18181b;
+}
+
+.reject-sheet-meta {
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  color: #78716c;
+  line-height: 1.4;
+}
+
+.reject-section-label {
+  margin-top: 28rpx;
+  margin-bottom: 14rpx;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #57534e;
+}
+
+.reject-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.reject-chip {
+  padding: 12rpx 22rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #1c1917;
+  background: #f5f5f4;
+  border: 1rpx solid transparent;
+}
+
+.reject-chip.is-on {
+  color: #9a3412;
+  background: #ffedd5;
+  border-color: rgba(249, 115, 22, 0.35);
+}
+
+.reject-input {
+  width: 100%;
+  min-height: 160rpx;
+  padding: 20rpx 22rpx;
+  box-sizing: border-box;
+  border-radius: 20rpx;
+  background: #fafaf9;
+  border: 1rpx solid rgba(28, 25, 23, 0.08);
+  font-size: 28rpx;
+  line-height: 1.45;
+  color: #1c1917;
+}
+
+.reject-tip {
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  color: #a8a29e;
+}
+
+.reject-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 28rpx;
+}
+
+.reject-btn {
+  flex: 1;
+  min-height: 80rpx;
+}
+
+.btn-disabled {
+  opacity: 0.55;
+  pointer-events: none;
+}

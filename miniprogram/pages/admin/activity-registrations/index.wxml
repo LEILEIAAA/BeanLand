@@ -1,0 +1,41 @@
+<view class="container">
+  <view class="hero admin-hero">
+    <view class="eyebrow">店主看板</view>
+    <view class="title">活动报名管理</view>
+    <view class="subtitle">今日新增已支付报名：{{todayPaidCount}}。与预约名单分开。</view>
+  </view>
+
+  <view class="tag-row section filter-row">
+    <view class="filter-tag {{filterStatus === '' ? 'is-on' : ''}}" data-status="" bindtap="setFilter">全部</view>
+    <view class="filter-tag {{filterStatus === 'paid' ? 'is-on' : ''}}" data-status="paid" bindtap="setFilter">已报名</view>
+    <view class="filter-tag {{filterStatus === 'refund_pending' ? 'is-on' : ''}}" data-status="refund_pending" bindtap="setFilter">待退款</view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">报名列表</view>
+    <view class="subtitle" wx:if="{{loading}}">加载中…</view>
+    <view class="subtitle" wx:elif="{{!list.length}}">暂无报名记录</view>
+  </view>
+
+  <block wx:for="{{list}}" wx:key="_id">
+    <view class="card combined-card">
+      <view class="card-topline">
+        <view>
+          <view class="card-title">{{item.activityName}}</view>
+          <view class="card-meta">{{item.name}} · {{item.phone}}</view>
+          <view class="card-meta" wx:if="{{item.paidAtLabel}}">报名时间 {{item.paidAtLabel}}</view>
+        </view>
+        <view class="status-badge {{item.status === 'refund_pending' ? 'warn' : ''}}">{{item.statusLabel}}</view>
+      </view>
+
+      <view class="tag-row">
+        <view class="tag">¥{{item.amount}}</view>
+        <view class="tag">{{item.channelLabel}}</view>
+      </view>
+
+      <view class="action-row" wx:if="{{item.canConfirmRefund}}">
+        <view class="btn-mini btn-mini-primary" data-id="{{item._id}}" bindtap="confirmRefund">确认退款</view>
+      </view>
+    </view>
+  </block>
+</view>

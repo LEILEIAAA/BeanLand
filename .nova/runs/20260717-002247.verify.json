@@ -1,0 +1,12 @@
+{
+  "id": "20260717-002247",
+  "ok": true,
+  "results": [
+    {
+      "command": "node --test tests/money.test.js",
+      "ok": true,
+      "exitCode": 0,
+      "tail": "  duration_ms: 1.5067\n  type: 'test'\n  ...\n1..1\n# tests 1\n# suites 0\n# pass 1\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 90.3823"
+    }
+  ]
+}

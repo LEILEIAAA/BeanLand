@@ -1,3 +1,35 @@
-.btn {
-  flex: 1;
+@import "../member/_sub.wxss";
+
+.plan-card {
+  margin-bottom: 20rpx;
+  padding: 28rpx;
+  border-radius: 28rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 12rpx 32rpx rgba(15, 23, 42, 0.04);
+}
+
+.plan-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20rpx;
+  margin-bottom: 22rpx;
+}
+
+.plan-title {
+  font-size: 30rpx;
+  font-weight: 800;
+}
+
+.plan-meta {
+  margin-top: 8rpx;
+  color: #9ca3af;
+  font-size: 22rpx;
+}
+
+.plan-price {
+  font-size: 36rpx;
+  font-weight: 800;
+  letter-spacing: -1rpx;
 }

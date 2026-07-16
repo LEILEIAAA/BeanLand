@@ -1,3 +1,8 @@
+const {
+  formatSlotSpan,
+  calculateExpectedEndFromSlots,
+} = require('./timeSlots');
+
 function pad(value) {
   return String(value).padStart(2, '0');
 }
@@ -125,11 +130,21 @@ function spendBalance(member, amount, reason) {
 }
 
 function createAppointmentSummary(appointment) {
-  const expectedEndTime = calculateExpectedEndTime(
-    appointment.appointmentDate,
-    appointment.timeSlot,
-    appointment.durationMinutes,
-  );
+  const selectedSlots = Array.isArray(appointment.timeSlots) && appointment.timeSlots.length
+    ? appointment.timeSlots
+    : appointment.timeSlot
+      ? [appointment.timeSlot]
+      : [];
+  const timeSlotLabel = selectedSlots.length
+    ? formatSlotSpan(selectedSlots)
+    : appointment.timeSlot;
+  const expectedEndTime = selectedSlots.length
+    ? calculateExpectedEndFromSlots(appointment.appointmentDate, selectedSlots)
+    : calculateExpectedEndTime(
+      appointment.appointmentDate,
+      appointment.timeSlot,
+      appointment.durationMinutes,
+    );
   const tags = [`${appointment.peopleCount} 人`, appointment.packageName];
 
   if (appointment.isMeituan) {
@@ -140,13 +155,29 @@ function createAppointmentSummary(appointment) {
     tags.push(`券码 ${appointment.meituanCode}`);
   }
 
+  const seatIds = appointment.seatIds || [];
+  const tableCode = appointment.tableCode || (seatIds[0] ? seatIds[0].split('-')[0] : '');
+  const seatLabel = seatIds.length ? seatIds.join('、') : '';
+
+  if (tableCode) {
+    tags.push(`桌 ${tableCode}`);
+  }
+
+  if (seatLabel) {
+    tags.push(seatLabel);
+  }
+
   return {
     title: `${appointment.name}的预约`,
     packageName: appointment.packageName,
     appointmentDate: appointment.appointmentDate,
-    timeSlot: appointment.timeSlot,
+    timeSlot: timeSlotLabel,
+    timeSlots: selectedSlots,
     peopleCount: appointment.peopleCount,
     expectedEndTime,
+    tableCode,
+    seatIds,
+    seatLabel,
     tags,
   };
 }

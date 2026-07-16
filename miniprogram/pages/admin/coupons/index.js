@@ -20,10 +20,98 @@ const BENEFIT_OPTIONS = [
   { value: BENEFIT_TYPE.DISCOUNT, label: '折扣优惠' },
 ];
 
+function pad2(n) {
+  return String(n).padStart(2, '0');
+}
+
+function formatYmd(date) {
+  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
+}
+
 function todayYmd() {
-  const d = new Date();
-  const pad = (n) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  return formatYmd(new Date());
+}
+
+function addDaysYmd(ymd, days) {
+  const text = String(ymd || '').trim();
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(text);
+  const base = match
+    ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
+    : new Date();
+  base.setDate(base.getDate() + Number(days || 0));
+  return formatYmd(base);
+}
+
+function buildYearOptions() {
+  const year = new Date().getFullYear();
+  const years = [];
+  for (let y = year - 1; y <= year + 3; y += 1) {
+    years.push(String(y));
+  }
+  return years;
+}
+
+function daysInMonth(year, month) {
+  return new Date(Number(year), Number(month), 0).getDate();
+}
+
+function buildDayOptions(year, month) {
+  const total = daysInMonth(year, month);
+  const days = [];
+  for (let d = 1; d <= total; d += 1) {
+    days.push(pad2(d));
+  }
+  return days;
+}
+
+function parseYmdParts(ymd) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(ymd || '').trim());
+  if (!match) {
+    const now = new Date();
+    return {
+      year: String(now.getFullYear()),
+      month: pad2(now.getMonth() + 1),
+      day: pad2(now.getDate()),
+    };
+  }
+  return { year: match[1], month: match[2], day: match[3] };
+}
+
+function buildDateColumns(ymd) {
+  const years = buildYearOptions();
+  const months = Array.from({ length: 12 }, (_, i) => pad2(i + 1));
+  const parts = parseYmdParts(ymd);
+  let yearIndex = years.indexOf(parts.year);
+  if (yearIndex < 0) yearIndex = years.indexOf(String(new Date().getFullYear()));
+  if (yearIndex < 0) yearIndex = 0;
+  let monthIndex = months.indexOf(parts.month);
+  if (monthIndex < 0) monthIndex = 0;
+  const year = years[yearIndex];
+  const month = months[monthIndex];
+  const days = buildDayOptions(year, month);
+  let dayIndex = days.indexOf(parts.day);
+  if (dayIndex < 0) dayIndex = Math.min(Number(parts.day) - 1, days.length - 1);
+  if (dayIndex < 0) dayIndex = 0;
+  return {
+    range: [years, months, days],
+    index: [yearIndex, monthIndex, dayIndex],
+    value: `${year}-${month}-${days[dayIndex]}`,
+  };
+}
+
+function ymdFromMulti(range, index) {
+  const year = range[0][index[0]];
+  const month = range[1][index[1]];
+  const days = buildDayOptions(year, month);
+  const dayIndex = Math.min(index[2], days.length - 1);
+  return `${year}-${month}-${days[dayIndex]}`;
+}
+
+function withSelected(options, selectedValue) {
+  return options.map((item) => ({
+    ...item,
+    selected: item.value === selectedValue,
+  }));
 }
 
 function formatCouponMeta(item) {
@@ -55,6 +143,20 @@ function previewName(data) {
   return buildCouponName(category, benefitType, value);
 }
 
+function initialDateState() {
+  const today = todayYmd();
+  const from = buildDateColumns(today);
+  const to = buildDateColumns(today);
+  return {
+    issueValidFrom: from.value,
+    issueExpireAt: to.value,
+    validFromRange: from.range,
+    validFromIndex: from.index,
+    expireAtRange: to.range,
+    expireAtIndex: to.index,
+  };
+}
+
 Page({
   data: {
     phone: '',
@@ -64,19 +166,52 @@ Page({
     coupons: [],
     loadingCoupons: false,
     redeemingId: '',
-    categoryOptions: CATEGORY_OPTIONS,
-    benefitOptions: BENEFIT_OPTIONS,
-    categoryIndex: 0,
-    benefitIndex: 0,
+    categoryOptions: withSelected(CATEGORY_OPTIONS, CATEGORY.CHECKIN),
+    benefitOptions: withSelected(BENEFIT_OPTIONS, BENEFIT_TYPE.HOURS),
     issueCategory: CATEGORY.CHECKIN,
     issueBenefitType: BENEFIT_TYPE.HOURS,
     issueBenefitValue: '',
-    issueValidFrom: todayYmd(),
-    issueExpireAt: todayYmd(),
+    ...initialDateState(),
     issuePreviewName: '',
     benefitValueLabel: '赠送小时数',
     benefitValuePlaceholder: '如：2',
     issuing: false,
+    opTabs: [
+      { key: 'redeem', label: '核销' },
+      { key: 'issue', label: '发放' },
+    ],
+    opTab: 'redeem',
+  },
+  onOpTabChange(event) {
+    const { tab } = event.currentTarget.dataset;
+    if (!tab || tab === this.data.opTab) return;
+    this.hideKeyboard();
+    this.setData({ opTab: tab });
+  },
+  hideKeyboard() {
+    if (typeof wx !== 'undefined' && wx.hideKeyboard) {
+      wx.hideKeyboard({ complete: () => {} });
+    }
+  },
+  notifyAdmin(content, title) {
+    wx.showModal({
+      title: title || '操作不合规',
+      content: String(content || '请检查后重试'),
+      showCancel: false,
+      confirmText: '知道了',
+    });
+  },
+  syncDatePickers(validFrom, expireAt) {
+    const from = buildDateColumns(validFrom || todayYmd());
+    const to = buildDateColumns(expireAt || from.value);
+    this.setData({
+      issueValidFrom: from.value,
+      issueExpireAt: to.value,
+      validFromRange: from.range,
+      validFromIndex: from.index,
+      expireAtRange: to.range,
+      expireAtIndex: to.index,
+    });
   },
   onPhoneInput(event) {
     this.setData({ phone: event.detail.value });
@@ -84,27 +219,27 @@ Page({
   refreshPreview() {
     this.setData({ issuePreviewName: previewName(this.data) });
   },
-  onCategoryChange(event) {
-    const index = Number(event.detail.value);
-    const option = CATEGORY_OPTIONS[index];
-    if (!option) return;
+  onSelectCategory(event) {
+    this.hideKeyboard();
+    const { value } = event.currentTarget.dataset;
+    if (!value || value === this.data.issueCategory) return;
     this.setData(
       {
-        categoryIndex: index,
-        issueCategory: option.value,
+        issueCategory: value,
+        categoryOptions: withSelected(CATEGORY_OPTIONS, value),
       },
       () => this.refreshPreview(),
     );
   },
-  onBenefitChange(event) {
-    const index = Number(event.detail.value);
-    const option = BENEFIT_OPTIONS[index];
-    if (!option) return;
-    const isHours = option.value === BENEFIT_TYPE.HOURS;
+  onSelectBenefit(event) {
+    this.hideKeyboard();
+    const { value } = event.currentTarget.dataset;
+    if (!value || value === this.data.issueBenefitType) return;
+    const isHours = value === BENEFIT_TYPE.HOURS;
     this.setData(
       {
-        benefitIndex: index,
-        issueBenefitType: option.value,
+        issueBenefitType: value,
+        benefitOptions: withSelected(BENEFIT_OPTIONS, value),
         benefitValueLabel: isHours ? '赠送小时数' : '折扣（折）',
         benefitValuePlaceholder: isHours ? '如：2' : '如：8',
       },
@@ -114,11 +249,89 @@ Page({
   onBenefitValueInput(event) {
     this.setData({ issueBenefitValue: event.detail.value }, () => this.refreshPreview());
   },
+  onBenefitValueBlur(event) {
+    const raw = String((event.detail && event.detail.value) || this.data.issueBenefitValue || '').trim();
+    if (!raw) return;
+    const value = Number(raw);
+    if (!Number.isFinite(value) || value <= 0) {
+      this.notifyAdmin(
+        this.data.issueBenefitType === BENEFIT_TYPE.DISCOUNT
+          ? '折扣必须大于 0，例如填写 8 表示 8 折'
+          : '赠送小时数必须大于 0',
+        '数值不合规',
+      );
+      this.setData({ issueBenefitValue: '', issuePreviewName: '' });
+    }
+  },
+  onValidFromColumnChange(event) {
+    const { column, value } = event.detail;
+    const index = this.data.validFromIndex.slice();
+    index[column] = value;
+    const years = this.data.validFromRange[0];
+    const months = this.data.validFromRange[1];
+    const year = years[index[0]];
+    const month = months[index[1]];
+    const days = buildDayOptions(year, month);
+    if (index[2] > days.length - 1) index[2] = days.length - 1;
+    this.setData({
+      validFromIndex: index,
+      validFromRange: [years, months, days],
+    });
+  },
   onValidFromChange(event) {
-    this.setData({ issueValidFrom: event.detail.value });
+    const index = (event.detail && event.detail.value) || this.data.validFromIndex;
+    const value = ymdFromMulti(this.data.validFromRange, index);
+    const built = buildDateColumns(value);
+    const needAdjust =
+      !!this.data.issueExpireAt && this.data.issueExpireAt < built.value;
+    const expireAt = needAdjust ? built.value : this.data.issueExpireAt || built.value;
+    this.syncDatePickers(built.value, expireAt);
+    if (needAdjust) {
+      this.notifyAdmin(
+        `开始日（${built.value}）晚于原结束日，已自动将结束日调整为 ${built.value}`,
+        '有效期已自动校正',
+      );
+    }
+  },
+  onExpireAtColumnChange(event) {
+    const { column, value } = event.detail;
+    const index = this.data.expireAtIndex.slice();
+    index[column] = value;
+    const years = this.data.expireAtRange[0];
+    const months = this.data.expireAtRange[1];
+    const year = years[index[0]];
+    const month = months[index[1]];
+    const days = buildDayOptions(year, month);
+    if (index[2] > days.length - 1) index[2] = days.length - 1;
+    this.setData({
+      expireAtIndex: index,
+      expireAtRange: [years, months, days],
+    });
   },
   onExpireAtChange(event) {
-    this.setData({ issueExpireAt: event.detail.value });
+    const index = (event.detail && event.detail.value) || this.data.expireAtIndex;
+    const value = ymdFromMulti(this.data.expireAtRange, index);
+    const built = buildDateColumns(value);
+    if (this.data.issueValidFrom && built.value < this.data.issueValidFrom) {
+      this.notifyAdmin(
+        `结束日（${built.value}）不能早于开始日（${this.data.issueValidFrom}），请重新选择`,
+        '有效期不合规',
+      );
+      this.syncDatePickers(this.data.issueValidFrom, this.data.issueValidFrom);
+      return;
+    }
+    this.setData({
+      issueExpireAt: built.value,
+      expireAtRange: built.range,
+      expireAtIndex: built.index,
+    });
+  },
+  onQuickExpire(event) {
+    this.hideKeyboard();
+    const days = Number(event.currentTarget.dataset.days);
+    if (!Number.isFinite(days)) return;
+    const from = this.data.issueValidFrom || todayYmd();
+    this.syncDatePickers(from, addDaysYmd(from, days));
   },
   async onSearch() {
     const phone = String(this.data.phone || '').trim();
@@ -146,6 +359,7 @@ Page({
         members: list,
         selectedId: first._id,
         selectedLabel: `${first.nickName || '未命名'} · ${first.phone || phone}`,
+        opTab: 'redeem',
       });
       await this.loadCoupons(first._id);
     } catch (error) {
@@ -189,6 +403,8 @@ Page({
     if (this.data.issuing || !this.data.selectedId) return;
 
     const benefitValue = Number(String(this.data.issueBenefitValue || '').trim());
+    const validFromDate = this.data.issueValidFrom;
+    const expireAtDate = this.data.issueExpireAt;
     const preview = buildIssueCouponPayload(
       {
         memberId: this.data.selectedId,
@@ -196,19 +412,19 @@ Page({
         category: this.data.issueCategory,
         benefitType: this.data.issueBenefitType,
         benefitValue,
-        validFromDate: this.data.issueValidFrom,
-        expireAtDate: this.data.issueExpireAt,
+        validFromDate,
+        expireAtDate,
       },
       Date.now(),
     );
     if (!preview.ok) {
-      wx.showToast({ title: preview.message || '请检查发放信息', icon: 'none' });
+      this.notifyAdmin(preview.message || '请检查发放信息', '无法发放');
       return;
     }
 
     wx.showModal({
       title: '确认发放',
-      content: `${preview.coupon.name} · ${this.data.issueValidFrom} 至 ${this.data.issueExpireAt}`,
+      content: `${preview.coupon.name} · ${validFromDate} 至 ${expireAtDate}`,
       success: async (res) => {
         if (!res.confirm) return;
         this.setData({ issuing: true });
@@ -218,22 +434,21 @@ Page({
             category: this.data.issueCategory,
             benefitType: this.data.issueBenefitType,
             benefitValue,
-            validFromDate: this.data.issueValidFrom,
-            expireAtDate: this.data.issueExpireAt,
+            validFromDate,
+            expireAtDate,
           });
           if (!result || !result.ok) {
-            wx.showToast({
-              title: (result && result.message) || '发放失败',
-              icon: 'none',
-            });
+            this.notifyAdmin(
+              (result && result.message) || '发放失败，请稍后重试',
+              '无法发放',
+            );
             return;
           }
           wx.showToast({ title: '发放成功', icon: 'success' });
           this.setData({
             issueBenefitValue: '',
             issuePreviewName: '',
-            issueValidFrom: todayYmd(),
-            issueExpireAt: todayYmd(),
+            ...initialDateState(),
           });
           await this.loadCoupons(this.data.selectedId);
         } catch (error) {

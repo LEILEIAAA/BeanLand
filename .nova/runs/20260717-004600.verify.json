@@ -1,0 +1,12 @@
+{
+  "id": "20260717-004600",
+  "ok": true,
+  "results": [
+    {
+      "command": "node --test tests/seats.test.js",
+      "ok": true,
+      "exitCode": 0,
+      "tail": "  duration_ms: 0.1689\n  type: 'suite'\n  ...\n1..9\n# tests 15\n# suites 9\n# pass 15\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 91.2294"
+    }
+  ]
+}

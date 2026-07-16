@@ -1,19 +1,151 @@
-<view class="container">
-  <view class="section-title">座位计时</view>
-  <view class="subtitle">开业关键能力：分配桌号、开始计时、续时补费、结束体验。</view>
+<view class="page">
+  <view class="assign-banner" wx:if="{{pageMode === 'assign'}}">
+    <view class="assign-banner-title">{{assignBanner.title}}</view>
+    <view class="assign-banner-sub">{{assignBanner.subtitle}}</view>
+    <view class="assign-banner-tip">点空闲座位排座；体验中/有预约仅展示状态与时段</view>
+  </view>
 
-  <block wx:for="{{sessions}}" wx:key="tableCode">
-    <view class="card">
-      <view class="card-title">{{item.tableCode}} · {{item.name}}</view>
-      <view class="card-meta">{{item.packageName}} · {{item.start}}-{{item.end}}</view>
-      <view class="tag-row">
-        <view class="tag">{{item.remaining}}</view>
-        <view class="tag status-warning">{{item.status}}</view>
+  <view class="map-stage">
+    <view class="filter-row">
+      <block wx:for="{{statusFilters}}" wx:key="key">
+        <view
+          class="filter-chip {{item.active ? 'is-on' : ''}}"
+          data-key="{{item.key}}"
+          bindtap="onStatusFilterTap"
+        >{{item.label}} {{item.count}}</view>
+      </block>
+    </view>
+
+    <view class="map-empty" wx:if="{{!seatGroups.length}}">当前筛选下暂无座位</view>
+
+    <block wx:for="{{seatGroups}}" wx:key="tableCode">
+      <view class="table-block">
+        <view class="table-title">{{item.area}} · {{item.tableCode}}</view>
+        <view class="seat-row">
+          <block wx:for="{{item.seats}}" wx:for-item="seat" wx:key="id">
+            <view
+              class="seat seat-{{seat.status}} {{seat.selected ? 'is-selected' : ''}} {{seat.pickLocked ? 'is-locked' : ''}}"
+              data-id="{{seat.id}}"
+              data-status="{{seat.status}}"
+              data-session-id="{{seat.sessionId}}"
+              bindtap="toggleSeat"
+            >
+              <view class="seat-id">{{seat.pickOrderText}} {{seat.id}}</view>
+              <view class="seat-status">{{seat.statusLabel}}</view>
+              <view class="seat-time-main" wx:if="{{seat.primaryTimeText}}">
+                <view class="icon-clock"></view>
+                <text>{{seat.primaryTimeText}}</text>
+              </view>
+              <view class="seat-time-sub {{seat.isOvertime ? 'is-warn' : ''}}" wx:if="{{seat.secondaryTimeText}}">
+                <block wx:if="{{seat.status === 'reserved'}}">
+                  <text>{{seat.secondaryTimeText}}</text>
+                </block>
+                <block wx:else>
+                  <view class="icon-remaining" wx:if="{{seat.secondaryKind === 'remaining'}}">
+                    <view class="bar"></view>
+                    <view class="bar"></view>
+                    <view class="bar"></view>
+                  </view>
+                  <view class="icon-overtime" wx:else></view>
+                  <text>{{seat.secondaryTimeText}}</text>
+                </block>
+              </view>
+            </view>
+          </block>
+        </view>
       </view>
-      <view class="button-row">
-        <view class="btn btn-secondary">免费延长</view>
-        <view class="btn btn-primary">结束体验</view>
+    </block>
+  </view>
+
+  <view class="dock-spacer"></view>
+
+  <view class="start-dock" wx:if="{{pageMode === 'assign'}}">
+    <view class="assign-progress-track">
+      <view class="assign-progress-fill" style="width: {{selectProgress}}%;"></view>
+    </view>
+    <view class="dock-meta">{{countHint}}</view>
+    <view class="dock-meta" wx:if="{{selectedSeatLabel}}">{{selectedSeatLabel}}</view>
+    <view class="dock-row assign-actions">
+      <view
+        class="dock-ghost"
+        wx:if="{{selectedSeatIds.length}}"
+        bindtap="clearAssignSelection"
+      >清空</view>
+      <view
+        class="dock-start {{canConfirm && !busy ? 'is-ready' : ''}}"
+        bindtap="confirmAssign"
+      >确认排座</view>
+    </view>
+  </view>
+
+  <view class="start-dock" wx:else>
+    <view class="dock-row member-select">
+      <input
+        class="dock-input"
+        placeholder="搜会员加入开台"
+        value="{{memberKeyword}}"
+        bindinput="onMemberKeywordInput"
+        bindfocus="onMemberFocus"
+        confirm-type="search"
+      />
+      <picker mode="selector" range="{{durationLabels}}" value="{{durationIndex}}" bindchange="onDurationChange">
+        <view class="dock-duration">{{durationLabels[durationIndex]}}</view>
+      </picker>
+      <view
+        class="dock-start {{canStart ? 'is-ready' : ''}}"
+        bindtap="startSession"
+      >开台</view>
+    </view>
+
+    <view class="member-dropdown" wx:if="{{memberDropdownOpen && (memberSearching || members.length)}}">
+      <view class="card-meta" wx:if="{{memberSearching}}">搜索中…</view>
+      <block wx:elif="{{members.length}}">
+        <block wx:for="{{members}}" wx:key="id">
+          <view
+            class="member-item {{item.alreadySelected ? 'is-on' : ''}}"
+            data-id="{{item.id}}"
+            bindtap="selectMember"
+          >{{item.label}}</view>
+        </block>
+      </block>
+    </view>
+
+    <view class="chip-row" wx:if="{{selectedMembers.length}}">
+      <block wx:for="{{selectedMembers}}" wx:key="id">
+        <view class="chip" data-id="{{item.id}}" bindtap="removeMember">#{{index + 1}} {{item.label}} ×</view>
+      </block>
+    </view>
+
+    <view class="dock-meta">{{countHint}}</view>
+    <block wx:if="{{pairPreview.length}}">
+      <view class="pair-line" wx:for="{{pairPreview}}" wx:key="index">{{item.text}}</view>
+    </block>
+  </view>
+
+  <view class="sheet-mask" wx:if="{{sessionSheetOpen}}" bindtap="closeSessionSheet"></view>
+  <view class="session-sheet" wx:if="{{sessionSheetOpen}}" catchtap="">
+    <view class="sheet-handle"></view>
+    <view class="sheet-title">座位详情</view>
+    <view class="sheet-main">{{sessionSheet.tableCode}} · {{sessionSheet.memberLabel}}</view>
+    <view class="card-meta">座位 {{sessionSheet.seatLabel}}</view>
+    <view class="tag-row">
+      <view class="tag tag-elapsed">
+        <view class="icon-clock"></view>
+        <text>{{sessionSheet.primaryTimeText}}</text>
+      </view>
+      <view class="tag {{sessionSheet.isOvertime ? 'tag-warn' : ''}} tag-secondary">
+        <view class="icon-remaining" wx:if="{{sessionSheet.secondaryKind === 'remaining'}}">
+          <view class="bar"></view>
+          <view class="bar"></view>
+          <view class="bar"></view>
+        </view>
+        <view class="icon-overtime" wx:else></view>
+        <text>{{sessionSheet.secondaryTimeText}}</text>
       </view>
     </view>
-  </block>
+    <view class="sheet-actions">
+      <view class="btn btn-secondary sheet-btn" bindtap="closeSessionSheet">关闭</view>
+      <view class="btn btn-primary sheet-btn" data-id="{{sessionSheet.id}}" bindtap="stopFromSheet">停止计时</view>
+    </view>
+  </view>
 </view>

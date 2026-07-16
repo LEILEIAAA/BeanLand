@@ -36,7 +36,16 @@ function getPackages() {
   return withSeedFallback(() => readCollection('packages'), seed.packages, 'packages');
 }
 
-function getActivities() {
+async function getActivities() {
+  try {
+    const result = await callFunction('listActivities', {});
+    const body = (result && result.result) || result;
+    if (body && body.ok && Array.isArray(body.list) && body.list.length) {
+      return body.list;
+    }
+  } catch (error) {
+    console.warn('[api] listActivities failed', error);
+  }
   return withSeedFallback(() => readCollection('activities'), seed.activities, 'activities');
 }
 
@@ -110,23 +119,34 @@ function getStampRules() {
 }
 
 async function getOccupancies(date, timeSlot) {
+  const { mergeOccupancyDocs, isLiveFloorOccupancy } = require('./seats');
   try {
-    const result = await db()
-      .collection('seat_occupancies')
-      .where({
-        date,
-        timeSlot,
-      })
-      .limit(200)
-      .get();
-    return unwrapDocs(result);
+    const database = db();
+    const _ = database.command;
+    const [slotResult, liveResult] = await Promise.all([
+      database
+        .collection('seat_occupancies')
+        .where({
+          date,
+          timeSlot,
+        })
+        .limit(200)
+        .get(),
+      database
+        .collection('seat_occupancies')
+        .where(_.or([{ type: 'in_use' }, { type: 'maintenance' }]))
+        .limit(200)
+        .get(),
+    ]);
+    return mergeOccupancyDocs(unwrapDocs(slotResult), unwrapDocs(liveResult));
   } catch (error) {
     if (!ALLOW_SEED_FALLBACK) {
       throw error;
     }
     console.warn('[api] seat_occupancies failed, fallback to seed', error);
     return (seed.seatOccupancies || []).filter(
-      (row) => row.date === date && row.timeSlot === timeSlot,
+      (row) =>
+        (row.date === date && row.timeSlot === timeSlot) || isLiveFloorOccupancy(row),
     );
   }
 }
@@ -211,6 +231,26 @@ async function getPackageOrder(payload) {
   return (result && result.result) || result;
 }
 
+async function listMyPackageOrders(payload) {
+  const result = await callFunction('listMyPackageOrders', payload || {});
+  return (result && result.result) || result;
+}
+
+async function adminListMemberPackages(payload) {
+  const result = await callFunction('adminListMemberPackages', payload || {});
+  return (result && result.result) || result;
+}
+
+async function adminRedeemPackage(payload) {
+  const result = await callFunction('adminRedeemPackage', payload || {});
+  return (result && result.result) || result;
+}
+
+async function refundPackageOrder(payload) {
+  const result = await callFunction('refundPackageOrder', payload || {});
+  return (result && result.result) || result;
+}
+
 async function listMyWorks(payload) {
   const result = await callFunction('listMyWorks', payload || {});
   return (result && result.result) || result;
@@ -246,6 +286,127 @@ async function adminIssueCoupon(payload) {
   return (result && result.result) || result;
 }
 
+async function createActivityRegistration(payload) {
+  const result = await callFunction('createActivityRegistration', payload || {});
+  return (result && result.result) || result;
+}
+
+async function cancelActivityRegistration(payload) {
+  const result = await callFunction('cancelActivityRegistration', payload || {});
+  return (result && result.result) || result;
+}
+
+async function listMyActivityRegistrations() {
+  const result = await callFunction('listMyActivityRegistrations', {});
+  return (result && result.result) || result;
+}
+
+async function adminListActivityRegistrations(payload) {
+  const result = await callFunction('adminListActivityRegistrations', payload || {});
+  return (result && result.result) || result;
+}
+
+async function adminConfirmActivityRefund(payload) {
+  const result = await callFunction('adminConfirmActivityRefund', payload || {});
+  return (result && result.result) || result;
+}
+
+async function adminListSeatBoard(payload) {
+  try {
+    const result = await callFunction('adminListSeatBoard', payload || {});
+    return (result && result.result) || result;
+  } catch (error) {
+    const errMsg = (error && (error.errMsg || error.message)) || '';
+    return {
+      ok: false,
+      code: 'CALL_FAILED',
+      message: /not found|FUNCTION_NOT_FOUND|不存在/i.test(errMsg)
+        ? '云函数未部署：adminListSeatBoard'
+        : errMsg || '座位板接口失败',
+    };
+  }
+}
+
+async function adminStartSeatSession(payload) {
+  try {
+    const result = await callFunction('adminStartSeatSession', payload || {});
+    return (result && result.result) || result;
+  } catch (error) {
+    return {
+      ok: false,
+      code: 'CALL_FAILED',
+      message: (error && (error.errMsg || error.message)) || '开台接口失败',
+    };
+  }
+}
+
+async function adminEndSeatSession(payload) {
+  try {
+    const result = await callFunction('adminEndSeatSession', payload || {});
+    return (result && result.result) || result;
+  } catch (error) {
+    return {
+      ok: false,
+      code: 'CALL_FAILED',
+      message: (error && (error.errMsg || error.message)) || '结束接口失败',
+    };
+  }
+}
+
+async function adminExtendSeatSession(payload) {
+  try {
+    const result = await callFunction('adminExtendSeatSession', payload || {});
+    return (result && result.result) || result;
+  } catch (error) {
+    return {
+      ok: false,
+      code: 'CALL_FAILED',
+      message: (error && (error.errMsg || error.message)) || '延长接口失败',
+    };
+  }
+}
+
+async function adminListSeatSessions(payload) {
+  try {
+    const result = await callFunction('adminListSeatSessions', payload || {});
+    return (result && result.result) || result;
+  } catch (error) {
+    return {
+      ok: false,
+      code: 'CALL_FAILED',
+      message: (error && (error.errMsg || error.message)) || '计时记录接口失败',
+      list: [],
+    };
+  }
+}
+
+async function listMySeatSessions(payload) {
+  try {
+    const result = await callFunction('listMySeatSessions', payload || {});
+    return (result && result.result) || result;
+  } catch (error) {
+    return {
+      ok: false,
+      code: 'CALL_FAILED',
+      message: (error && (error.errMsg || error.message)) || '到店记录接口失败',
+      list: [],
+    };
+  }
+}
+
+async function adminSetSeatMaintenance(payload) {
+  try {
+    const result = await callFunction('adminSetSeatMaintenance', payload || {});
+    return (result && result.result) || result;
+  } catch (error) {
+    return {
+      ok: false,
+      code: 'CALL_FAILED',
+      message: (error && (error.errMsg || error.message)) || '维护接口失败',
+    };
+  }
+}
+
 module.exports = {
   ALLOW_SEED_FALLBACK,
   buildOccupancyId,
@@ -278,7 +439,23 @@ module.exports = {
   purchasePackage,
   createPackageOrder,
   getPackageOrder,
+  listMyPackageOrders,
+  adminListMemberPackages,
+  adminRedeemPackage,
+  refundPackageOrder,
   listMyWorks,
   createWork,
   deleteWork,
+  createActivityRegistration,
+  cancelActivityRegistration,
+  listMyActivityRegistrations,
+  adminListActivityRegistrations,
+  adminConfirmActivityRefund,
+  adminListSeatBoard,
+  adminStartSeatSession,
+  adminEndSeatSession,
+  adminExtendSeatSession,
+  adminSetSeatMaintenance,
+  adminListSeatSessions,
+  listMySeatSessions,
 };

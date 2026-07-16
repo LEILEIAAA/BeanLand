@@ -1,15 +1,25 @@
 <view class="container sub-page">
   <view class="sub-hero">
-    <view class="sub-label">优惠券核销 / 发放</view>
-    <view class="sub-value">店长操作</view>
-    <view class="sub-desc">先选主类型与折扣类型，再填变量。到店活动券，无需适用范围。</view>
+    <view class="page-title">优惠券核销 / 发放</view>
+    <view class="sub-desc">先查会员。默认进入核销；需要发券时再切到发放。</view>
   </view>
 
   <view class="list-card">
     <view class="field">
       <view class="field-label">会员手机号</view>
-      <input class="field-input" type="number" maxlength="11" placeholder="与会员中心一致" value="{{phone}}" bindinput="onPhoneInput" />
-      <view class="btn btn-secondary" bindtap="onSearch">查找</view>
+      <view class="field-row">
+        <input
+          class="field-input field-input-flex"
+          type="number"
+          maxlength="11"
+          placeholder="11 位手机号"
+          placeholder-class="field-placeholder"
+          value="{{phone}}"
+          bindinput="onPhoneInput"
+          hold-keyboard="{{false}}"
+        />
+        <view class="btn btn-secondary search-btn" bindtap="onSearch">查找</view>
+      </view>
     </view>
 
     <block wx:for="{{members}}" wx:key="_id">
@@ -21,73 +31,129 @@
 
     <view class="field" wx:if="{{selectedLabel}}">
       <view class="field-label">当前选中</view>
-      <view class="list-meta">{{selectedLabel}}</view>
+      <view class="selected-box">{{selectedLabel}}</view>
     </view>
   </view>
 
-  <block wx:if="{{selectedId}}">
-    <view class="section-title" style="margin-top: 28rpx;">发放优惠券</view>
-    <view class="list-card">
-      <view class="field">
-        <view class="field-label">主类型</view>
-        <picker mode="selector" range="{{categoryOptions}}" range-key="label" value="{{categoryIndex}}" bindchange="onCategoryChange">
-          <view class="field-input">{{categoryOptions[categoryIndex].label}}</view>
-        </picker>
-      </view>
-      <view class="field">
-        <view class="field-label">折扣类型</view>
-        <picker mode="selector" range="{{benefitOptions}}" range-key="label" value="{{benefitIndex}}" bindchange="onBenefitChange">
-          <view class="field-input">{{benefitOptions[benefitIndex].label}}</view>
-        </picker>
-      </view>
-      <view class="field">
-        <view class="field-label">{{benefitValueLabel}}</view>
-        <input class="field-input" type="digit" placeholder="{{benefitValuePlaceholder}}" value="{{issueBenefitValue}}" bindinput="onBenefitValueInput" />
-      </view>
-      <view class="field">
-        <view class="field-label">有效期开始</view>
-        <picker mode="date" value="{{issueValidFrom}}" bindchange="onValidFromChange">
-          <view class="field-input">{{issueValidFrom}}</view>
-        </picker>
-      </view>
-      <view class="field">
-        <view class="field-label">有效期结束</view>
-        <picker mode="date" value="{{issueExpireAt}}" bindchange="onExpireAtChange">
-          <view class="field-input">{{issueExpireAt}}</view>
-        </picker>
-      </view>
-      <view class="field" wx:if="{{issuePreviewName}}">
-        <view class="field-label">券名预览</view>
-        <view class="list-meta">{{issuePreviewName}}</view>
-      </view>
-      <view class="btn btn-primary {{issuing ? 'disabled' : ''}}" bindtap="onIssue">确认发放</view>
-    </view>
-
-    <view class="section-title" style="margin-top: 28rpx;">未使用优惠券</view>
-
-    <view class="list-card" wx:if="{{coupons.length}}">
-      <block wx:for="{{coupons}}" wx:key="id">
-        <view class="list-row {{item.available ? '' : 'coupon-dimmed'}}">
-          <view class="list-main">
-            <view class="list-title">{{item.name}}</view>
-            <view class="list-meta">{{item.meta}}</view>
-            <view class="list-meta" wx:if="{{item.validRange}}">有效期 {{item.validRange}}</view>
-          </view>
-          <view class="coupon-side">
-            <view class="coupon-amount">{{item.benefitText}}</view>
-            <view
-              class="btn btn-secondary redeem-btn {{item.available ? '' : 'disabled'}}"
-              data-id="{{item.id}}"
-              data-available="{{item.available}}"
-              data-name="{{item.name}}"
-              data-benefit="{{item.benefitText}}"
-              bindtap="onRedeem"
-            >{{item.available ? '核销' : item.statusText}}</view>
-          </view>
-        </view>
+  <view class="op-panel" hidden="{{!selectedId}}">
+    <view class="coupon-tabs">
+      <block wx:for="{{opTabs}}" wx:key="key">
+        <view
+          class="coupon-tab {{opTab === item.key ? 'active' : ''}}"
+          data-tab="{{item.key}}"
+          bindtap="onOpTabChange"
+        >{{item.label}}</view>
       </block>
     </view>
 
-    <view class="empty-tip" wx:elif="{{!loadingCoupons}}">该会员暂无未使用优惠券</view>
-  </block>
+    <!-- 核销优先：默认展示 -->
+    <view hidden="{{opTab !== 'redeem'}}">
+      <view class="list-card" wx:if="{{coupons.length}}">
+        <block wx:for="{{coupons}}" wx:key="id">
+          <view class="list-row {{item.available ? '' : 'coupon-dimmed'}}">
+            <view class="list-main">
+              <view class="list-title">{{item.name}}</view>
+              <view class="list-meta">{{item.meta}}</view>
+              <view class="list-meta" wx:if="{{item.validRange}}">有效期 {{item.validRange}}</view>
+            </view>
+            <view class="coupon-side">
+              <view class="coupon-amount">{{item.benefitText}}</view>
+              <view
+                class="redeem-btn {{item.available ? '' : 'redeem-btn-disabled'}}"
+                data-id="{{item.id}}"
+                data-available="{{item.available}}"
+                data-name="{{item.name}}"
+                data-benefit="{{item.benefitText}}"
+                bindtap="onRedeem"
+              >{{item.available ? '核销' : item.statusText}}</view>
+            </view>
+          </view>
+        </block>
+      </view>
+      <view class="empty-tip" wx:elif="{{!loadingCoupons}}">该会员暂无未使用优惠券</view>
+    </view>
+
+    <!-- 发放：hidden 常驻，避免原生 picker 后挂载点不开 -->
+    <view hidden="{{opTab !== 'issue'}}">
+      <view class="list-card">
+        <view class="field">
+          <view class="field-label">主类型</view>
+          <view class="chip-row">
+            <block wx:for="{{categoryOptions}}" wx:key="value">
+              <view
+                class="chip {{item.selected ? 'chip-active' : ''}}"
+                data-value="{{item.value}}"
+                bindtap="onSelectCategory"
+              >{{item.label}}</view>
+            </block>
+          </view>
+        </view>
+        <view class="field">
+          <view class="field-label">折扣类型</view>
+          <view class="chip-row">
+            <block wx:for="{{benefitOptions}}" wx:key="value">
+              <view
+                class="chip {{item.selected ? 'chip-active' : ''}}"
+                data-value="{{item.value}}"
+                bindtap="onSelectBenefit"
+              >{{item.label}}</view>
+            </block>
+          </view>
+        </view>
+        <view class="field">
+          <view class="field-label">{{benefitValueLabel}}</view>
+          <input
+            class="field-input"
+            type="digit"
+            placeholder="{{benefitValuePlaceholder}}"
+            placeholder-class="field-placeholder"
+            value="{{issueBenefitValue}}"
+            bindinput="onBenefitValueInput"
+            bindblur="onBenefitValueBlur"
+            hold-keyboard="{{false}}"
+          />
+        </view>
+        <view class="field">
+          <view class="field-label">有效期开始</view>
+          <picker
+            mode="multiSelector"
+            range="{{validFromRange}}"
+            value="{{validFromIndex}}"
+            bindcolumnchange="onValidFromColumnChange"
+            bindchange="onValidFromChange"
+          >
+            <view class="picker-trigger">
+              <text class="picker-value">{{issueValidFrom}}</text>
+              <text class="picker-extra">选择日期</text>
+            </view>
+          </picker>
+        </view>
+        <view class="field">
+          <view class="field-label">有效期结束</view>
+          <picker
+            mode="multiSelector"
+            range="{{expireAtRange}}"
+            value="{{expireAtIndex}}"
+            bindcolumnchange="onExpireAtColumnChange"
+            bindchange="onExpireAtChange"
+          >
+            <view class="picker-trigger">
+              <text class="picker-value">{{issueExpireAt}}</text>
+              <text class="picker-extra">选择日期</text>
+            </view>
+          </picker>
+          <view class="chip-row date-quick-row">
+            <view class="chip chip-soft" data-days="7" bindtap="onQuickExpire">+7 天</view>
+            <view class="chip chip-soft" data-days="15" bindtap="onQuickExpire">+15 天</view>
+            <view class="chip chip-soft" data-days="30" bindtap="onQuickExpire">+30 天</view>
+          </view>
+        </view>
+        <view class="field" wx:if="{{issuePreviewName}}">
+          <view class="field-label">券名预览</view>
+          <view class="preview-box">{{issuePreviewName}}</view>
+        </view>
+        <view class="btn btn-primary {{issuing ? 'disabled' : ''}}" bindtap="onIssue">确认发放</view>
+      </view>
+    </view>
+  </view>
 </view>

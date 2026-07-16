@@ -180,6 +180,32 @@ function groupSeatsByTable(seats) {
   return groups;
 }
 
+function isSlotScopedOccupancy(item) {
+  return Boolean(item && item.date && item.timeSlot);
+}
+
+function isLiveFloorOccupancy(item) {
+  if (!item) return false;
+  if (item.type !== 'in_use' && item.type !== 'maintenance') return false;
+  return !isSlotScopedOccupancy(item);
+}
+
+function mergeOccupancyDocs(...groups) {
+  const byId = new Map();
+  let auto = 0;
+  for (const group of groups) {
+    for (const row of group || []) {
+      if (!row) continue;
+      const key =
+        row._id != null && row._id !== ''
+          ? String(row._id)
+          : `anon_${auto++}_${row.type || ''}_${row.seatId || ''}`;
+      byId.set(key, row);
+    }
+  }
+  return [...byId.values()];
+}
+
 function buildOccupancySets(occupancies, date, timeSlot) {
   const bookedSeatIds = new Set();
   const inUseSeatIds = new Set();
@@ -188,7 +214,8 @@ function buildOccupancySets(occupancies, date, timeSlot) {
   const inUse = {};
 
   for (const item of occupancies) {
-    if (item.date !== date || item.timeSlot !== timeSlot) {
+    const liveFloor = isLiveFloorOccupancy(item);
+    if (!liveFloor && (item.date !== date || item.timeSlot !== timeSlot)) {
       continue;
     }
 
@@ -254,6 +281,8 @@ module.exports = {
   getSeatAdminStatus,
   assertCanBookSeats,
   groupSeatsByTable,
+  isLiveFloorOccupancy,
+  mergeOccupancyDocs,
   buildOccupancySets,
   buildOccupancyUnion,
 };

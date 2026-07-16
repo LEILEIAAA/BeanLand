@@ -140,6 +140,10 @@ function buildEndSessionFields(session, endedAt) {
     endedAt: end,
     totalMinutes,
     overtimeMinutes: Math.max(0, totalMinutes - duration),
+    // 结束时会清空 seatIds，此处快照原座位供历史复盘展示
+    seatIdsSnapshot: Array.isArray(session && session.seatIds)
+      ? [...session.seatIds]
+      : [],
     updatedAt: end,
   };
 }
@@ -161,6 +165,9 @@ function buildStartSessionRecord({
   seatIds,
   tableCode,
   durationMinutes,
+  packageOrderId,
+  packageName,
+  consumedAmount,
   now,
 }) {
   const duration = Number(durationMinutes);
@@ -177,6 +184,9 @@ function buildStartSessionRecord({
     startedAt,
     expectedEndAt: startedAt + duration * 60 * 1000,
     status: 'active',
+    packageOrderId: packageOrderId || '',
+    packageName: packageName || '',
+    consumedAmount: Number(consumedAmount) || 0,
     createdAt: startedAt,
     updatedAt: startedAt,
   };
@@ -286,9 +296,15 @@ function formatReservationSlotLabel(timeSlots) {
   return slots.join('、');
 }
 
+function isReleasedReservationStatus(status) {
+  return /取消|拒绝|完成|cancelled|rejected|completed|no_show|未到店/i.test(
+    String(status || ''),
+  );
+}
+
 function reservationPhaseFromStatus(status) {
   const s = String(status || '');
-  if (/取消|拒绝|完成|cancelled|rejected|completed|no_show|未到店/i.test(s)) return '';
+  if (isReleasedReservationStatus(s)) return '';
   if (/arrived|已到店/i.test(s)) return 'arrived';
   if (/confirmed|已确认/i.test(s)) return 'confirmed';
   if (/pending|待确认|待商家确认/i.test(s)) return '';
@@ -307,6 +323,13 @@ function markSeatPhase(bySeat, seatId, phase) {
 function buildReservationsBySeatId({ appointments = [], occupancies = [], today }) {
   const bySeat = {};
   const memberByAppointmentId = {};
+  const releasedAppointmentIds = new Set();
+  for (const appt of appointments || []) {
+    const apptId = appt._id || appt.id || '';
+    if (apptId && isReleasedReservationStatus(appt.status)) {
+      releasedAppointmentIds.add(apptId);
+    }
+  }
   for (const appt of appointments || []) {
     const date = appt.appointmentDate || appt.date;
     if (today && date && date !== today) continue;
@@ -333,6 +356,9 @@ function buildReservationsBySeatId({ appointments = [], occupancies = [], today 
     const type = row.type || 'reserved';
     if (type !== 'reserved' && type !== 'arrived') continue;
     if (today && row.date && row.date !== today) continue;
+    if (row.appointmentId && releasedAppointmentIds.has(row.appointmentId)) {
+      continue;
+    }
     const memberId =
       row.memberId || memberByAppointmentId[row.appointmentId] || '';
     for (const slot of normalizeTimeSlots(row)) {

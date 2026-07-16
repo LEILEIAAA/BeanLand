@@ -1,0 +1,12 @@
+{
+  "id": "20260716-234228",
+  "ok": true,
+  "results": [
+    {
+      "command": "node scripts/check-tabbar-nav.js",
+      "ok": true,
+      "exitCode": 0,
+      "tail": "OK tabBar= 首页:pages/home/index | 活动:pages/activities/index | 套餐:pages/packages/index | 会员:pages/member/index\nOK appointment page kept; no switchTab to appointment\nOK tabBar hides while package sheet open"
+    }
+  ]
+}

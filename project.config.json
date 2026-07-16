@@ -11,9 +11,10 @@
     "minified": true
   },
   "compileType": "miniprogram",
-  "libVersion": "latest",
-  "appid": "touristappid",
+  "libVersion": "3.5.5",
+  "appid": "wx12fb4262addc801e",
   "projectname": "bean-shop-miniprogram",
   "miniprogramRoot": "miniprogram/",
+  "cloudfunctionRoot": "cloudfunctions/",
   "condition": {}
 }

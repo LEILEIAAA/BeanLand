@@ -1,1 +1,7 @@
 @import "../_sub.wxss";
+
+.reject-reason {
+  margin-top: 6rpx;
+  color: #9a3412;
+  font-weight: 600;
+}

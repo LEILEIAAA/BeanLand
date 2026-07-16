@@ -1,3 +1,11 @@
+const MERCHANT_PHONE = '18267171841';
+
+function resolveStorePhone(raw) {
+  const phone = String(raw || '').trim();
+  if (!phone || phone === '待填写') return MERCHANT_PHONE;
+  return phone;
+}
+
 const api = require('../../../utils/api');
 const { STATUS_LABEL } = require('../../../utils/appointmentRegistration');
 const { formatSlotSpan } = require('../../../utils/timeSlots');
@@ -10,6 +18,7 @@ function displayRow(item) {
       : [];
   const timeLabel = slots.length > 1 ? formatSlotSpan(slots) : (slots[0] || '');
   const status = item.status || 'pending';
+  const rejectReason = String(item.rejectReason || '').trim();
   return {
     id: item._id || item.id,
     title: '开拼预约',
@@ -18,7 +27,10 @@ function displayRow(item) {
     peopleCount: item.peopleCount || 0,
     status,
     statusLabel: STATUS_LABEL[status] || status,
+    rejectReason,
+    showRejectReason: status === 'rejected' && !!rejectReason,
     canCancel: status === 'pending',
+    showContactCancel: status === 'confirmed',
   };
 }
 
@@ -26,10 +38,21 @@ Page({
   data: {
     appointments: [],
     loading: false,
+    storePhone: MERCHANT_PHONE,
   },
 
   onShow() {
+    this.loadStorePhone();
     this.loadList();
+  },
+
+  async loadStorePhone() {
+    try {
+      const store = await api.getStore();
+      this.setData({ storePhone: resolveStorePhone(store && store.phone) });
+    } catch (error) {
+      this.setData({ storePhone: MERCHANT_PHONE });
+    }
   },
 
   async loadList() {
@@ -43,10 +66,6 @@ Page({
     } finally {
       this.setData({ loading: false });
     }
-  },
-
-  goBook() {
-    wx.navigateTo({ url: '/pages/appointment/index' });
   },
 
   async cancel(event) {
@@ -71,5 +90,24 @@ Page({
     } catch (error) {
       wx.showToast({ title: '取消失败', icon: 'none' });
     }
+  },
+
+  contactCancel() {
+    const phone = resolveStorePhone(this.data.storePhone);
+    wx.showModal({
+      title: '联系商家取消',
+      content: `请致电商家说明取消预约：\n${phone}`,
+      confirmText: '拨打',
+      cancelText: '关闭',
+      success: (res) => {
+        if (res.confirm) {
+          wx.makePhoneCall({ phoneNumber: phone });
+        }
+      },
+    });
+  },
+
+  goBook() {
+    wx.navigateTo({ url: '/pages/appointment/index' });
   },
 });

@@ -16,7 +16,7 @@
 | Day 1 | 项目骨架、业务常量、核心计算逻辑、页面路由 | 已完成基础版 | 单元测试、文件结构检查 |
 | Day 2 | 用户端首页、套餐、活动、预约、路线页面可用 | 待深化 | 小程序开发者工具预览、表单测试 |
 | Day 3 | 后台预约、套餐、活动管理 MVP | 未开始 | 管理端流程走查 |
-| Day 4 | 会员、储值、余额流水、充值记录 | 未开始 | 余额流水测试 |
+| Day 4 | 会员、储值、余额流水、充值记录 | 进行中（注册+微信/代充订单已实现，待部署联调） | 余额流水测试 + 真机支付 |
 | Day 5 | 座位计时、消费核销、续时补费 | 未开始 | 计时与订单测试 |
 | Day 6 | 数据看板、内容完善、开业配置 | 未开始 | 开业检查清单 |
 | Day 7 | 联调、验收、试运行、版本冻结 | 未开始 | 全流程验收 |
@@ -44,15 +44,23 @@
 
 ## 进行中
 
-- 继续深化用户端页面交互，并补齐后台管理的状态流转逻辑。
+- 座位预约制度首版已落地：时段 × 座位、同桌连座、用户三态选座、店主四态座位图；后续接云库唯一约束与真实计时联动。
+
+## 最近完成（2026-07-14）
+
+- 规格：`docs/superpowers/specs/2026-07-14-seat-based-appointment-design.md`
+- 计划：`docs/superpowers/plans/2026-07-14-seat-based-appointment.md`
+- 核心：`miniprogram/utils/seats.js` + `tests/seats.test.js`（9 项规则测试）
+- 用户端预约页支持选座；店主 timer 页展示四态座位图
+- 验证：`node --test tests/seats.test.js tests/business.test.js` → 16 pass / 0 fail
 
 ## 阻塞与风险
 
 | 风险 | 影响 | 处理方式 |
 |---|---|---|
-| 当前不是 Git 仓库 | 无法阶段性 commit | 先用进度文档记录变更；如需版本管理，后续初始化 Git |
-| 未提供微信小程序 AppID | 无法真机预览与提交审核 | `project.config.json` 先使用测试配置，后续替换 AppID |
-| 暂未接入云开发或后端 | 数据暂为本地配置和页面状态 | 先保证经营流程与核心逻辑，后续接入云数据库 |
+| 云集合未导入 / 云函数未部署 | 读走 seed fallback；写函数返回 PHASE0_STUB | 开发者工具完成导入与部署 |
+| `ALLOW_SEED_FALLBACK=true` | 生产可能掩盖空库 | Phase 1 联调后改为 false |
+| 美团官方自动核销未接入 | 需商家端人工核销 | 按设计记账 + 打标 |
 
 ## 验证记录
 
@@ -63,11 +71,21 @@
 | 2026-07-05 | `node --test tests/business.test.js` | 通过，6 通过 / 0 失败 | 核心业务逻辑测试通过 |
 | 2026-07-05 | IDE 诊断检查 | 无 linter errors | 检查 `miniprogram/`、`tests/business.test.js` 与进度文档 |
 | 2026-07-05 | `node --test tests/business.test.js` | 通过，6 通过 / 0 失败 | Day 2 修改后回归验证通过 |
+| 2026-07-14 | `node --test tests/seats.test.js tests/business.test.js` | 通过，16 通过 / 0 失败 | 座位预约规则 + 摘要回归 |
+| 2026-07-15 | `node --test tests/cloudbaseIds.test.js tests/seats.test.js tests/business.test.js` | 通过，19 通过 / 0 失败 | 云开发 Phase 0 + 回归 |
+| 2026-07-15 | `node --test` | 通过，49 pass / 0 fail | 连续时段多选 + 全量回归 |
+
+## 最近完成（2026-07-15）
+
+- 会员注册页：点头像进入，分步完成头像/昵称/手机号，齐了自动返回会员页
+- 充值前校验手机号；云函数 `getPhoneNumber`
+- **连续时段多选**：方案 A 无缝 2h；预约页可连选；同座占用并集；结束时间取末场
+- 规格：`docs/superpowers/specs/2026-07-15-contiguous-time-slots-design.md`
 
 ## 下一步
 
-1. 使用微信开发者工具打开项目，预览基础页面路由和样式。
-2. 深化预约页：增加备注、手机号校验、来源选项、提交后状态页。
-3. 深化后台预约管理：增加状态流转函数和测试。
-4. 深化会员储值：接入充值流水、消费流水和扣款顺序展示。
-5. 深化座位计时：接入开始计时、免费延长、补费续时、结束体验逻辑。
+1. 配置并部署微信支付：`pay_config.subMchId` + 云开发支付 + 部署 `createRechargeOrder` / `payRechargeNotify` / `getRechargeOrder` / `adminRecharge`
+2. 部署注册相关：`getPhoneNumber` + `ensureMember`；开通手机号快速验证
+3. 真机走：会员注册 → 微信支付充值 → 余额/流水；店长代充写 `recharge_orders`
+4. 套餐购买（余额 / 微信 + 优惠券）——前端与云函数已落地，待部署联调；预约占座仍独立
+5. 云库若已导入旧时段，重新导入 `time_slots` / `seat_occupancies`

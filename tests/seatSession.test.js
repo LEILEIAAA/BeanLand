@@ -248,10 +248,43 @@ describe('calcSessionTime / buildEndSessionFields', () => {
     assert.equal(onTime.status, 'ended');
     assert.equal(onTime.totalMinutes, 120);
     assert.equal(onTime.overtimeMinutes, 0);
+    // 结束时快照座位供历史复盘
+    assert.deepEqual(onTime.seatIdsSnapshot, ['F1-A1', 'F1-A2']);
 
     const late = buildEndSessionFields(session, expectedEndAt + 25 * 60 * 1000);
     assert.equal(late.totalMinutes, 145);
     assert.equal(late.overtimeMinutes, 25);
+  });
+
+  it('carries package consumption fields onto start record', () => {
+    const withPkg = buildStartSessionRecord({
+      memberId: 'm1',
+      memberOpenid: 'o1',
+      memberPhone: '13800138000',
+      memberNickname: '小豆',
+      seatIds: ['F1-A1'],
+      tableCode: 'F1-A',
+      durationMinutes: 120,
+      packageOrderId: 'ord1',
+      packageName: '双人畅玩',
+      consumedAmount: 88,
+      now: startedAt,
+    });
+    assert.equal(withPkg.packageOrderId, 'ord1');
+    assert.equal(withPkg.packageName, '双人畅玩');
+    assert.equal(withPkg.consumedAmount, 88);
+
+    const noPkg = buildStartSessionRecord({
+      memberId: 'm1',
+      memberOpenid: 'o1',
+      seatIds: ['F1-A1'],
+      tableCode: 'F1-A',
+      durationMinutes: 120,
+      now: startedAt,
+    });
+    assert.equal(noPkg.packageOrderId, '');
+    assert.equal(noPkg.packageName, '');
+    assert.equal(noPkg.consumedAmount, 0);
   });
 
   it('keeps duration options and remaining helper', () => {
@@ -385,5 +418,62 @@ describe('buildReservationsBySeatId / formatReservedOpenPrompt', () => {
       occupancies: [],
     });
     assert.equal(bySeat['F1-B1'], undefined);
+  });
+
+  it('ignores leftover reserved occupancies for released appointments', () => {
+    const { buildReservationsBySeatId } = require('../miniprogram/utils/seatSession');
+    const bySeat = buildReservationsBySeatId({
+      today: '2026-07-16',
+      appointments: [
+        {
+          _id: 'appt-noshow',
+          appointmentDate: '2026-07-16',
+          timeSlots: ['10:00-12:00', '12:00-14:00', '14:00-16:00', '16:00-18:00'],
+          seatIds: ['F1-A1', 'F1-A2'],
+          status: 'no_show',
+        },
+        {
+          _id: 'appt-cancelled',
+          appointmentDate: '2026-07-16',
+          timeSlots: ['12:00-14:00'],
+          seatIds: ['F1-B1'],
+          status: 'cancelled',
+        },
+      ],
+      occupancies: [
+        {
+          type: 'reserved',
+          date: '2026-07-16',
+          timeSlot: '10:00-12:00',
+          seatId: 'F1-A1',
+          appointmentId: 'appt-noshow',
+        },
+        {
+          type: 'reserved',
+          date: '2026-07-16',
+          timeSlot: '16:00-18:00',
+          seatId: 'F1-A2',
+          appointmentId: 'appt-noshow',
+        },
+        {
+          type: 'reserved',
+          date: '2026-07-16',
+          timeSlot: '12:00-14:00',
+          seatId: 'F1-B1',
+          appointmentId: 'appt-cancelled',
+        },
+        {
+          type: 'reserved',
+          date: '2026-07-16',
+          timeSlot: '18:00-20:00',
+          seatId: 'F1-C1',
+          appointmentId: 'appt-active',
+        },
+      ],
+    });
+    assert.equal(bySeat['F1-A1'], undefined);
+    assert.equal(bySeat['F1-A2'], undefined);
+    assert.equal(bySeat['F1-B1'], undefined);
+    assert.equal(bySeat['F1-C1'].slotLabel, '18:00-20:00');
   });
 });

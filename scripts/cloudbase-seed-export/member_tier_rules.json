@@ -1,0 +1,14 @@
+[
+  {
+    "_id": "main",
+    "spendRatio": 0.6,
+    "vip": {
+      "minRecharge": 500,
+      "minSpent": 300
+    },
+    "svip": {
+      "minRecharge": 1000,
+      "minSpent": 600
+    }
+  }
+]

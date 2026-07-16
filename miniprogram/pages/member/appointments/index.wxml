@@ -2,7 +2,7 @@
   <view class="sub-hero">
     <view class="sub-label">我的预约</view>
     <view class="sub-value">{{appointments.length}} 条</view>
-    <view class="sub-desc">商家确认后请按时到店。预约开始后座位保留 15 分钟，超时未到将自动取消，以免影响其他客人。待商家确认状态可自行取消。</view>
+    <view class="sub-desc">商家确认后请按时到店。预约开始后座位保留 15 分钟，超时未到将自动取消，以免影响其他客人。待商家确认可自行取消；已确认如需取消请联系商家。</view>
   </view>
 
   <view class="list-card" style="margin-bottom: 28rpx;" wx:if="{{appointments.length}}">
@@ -11,6 +11,7 @@
         <view class="list-main">
           <view class="list-title">{{item.title}}</view>
           <view class="list-meta">{{item.date}} {{item.timeSlot}} · {{item.peopleCount}} 人</view>
+          <view class="list-meta reject-reason" wx:if="{{item.showRejectReason}}">拒绝原因：{{item.rejectReason}}</view>
         </view>
         <view class="status-chip {{item.status === 'cancelled' || item.status === 'rejected' || item.status === 'no_show' ? '' : 'ok'}}">
           {{item.statusLabel}}
@@ -18,6 +19,9 @@
       </view>
       <view class="btn btn-secondary" style="margin: 0 0 20rpx;" wx:if="{{item.canCancel}}" data-id="{{item.id}}" bindtap="cancel">
         取消预约
+      </view>
+      <view class="btn btn-secondary" style="margin: 0 0 20rpx;" wx:if="{{item.showContactCancel}}" bindtap="contactCancel">
+        联系商家取消
       </view>
     </block>
   </view>

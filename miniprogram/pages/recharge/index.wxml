@@ -1,23 +1,31 @@
-<view class="container">
-  <view class="section-title">会员储值</view>
-  <view class="subtitle">第一版支持到店充值 / 后台录入，本金余额与赠送余额分开记录。</view>
+<view class="container sub-page">
+  <view class="sub-hero">
+    <view class="sub-label">会员储值</view>
+    <view class="sub-value">微信支付</view>
+    <view class="sub-desc">选档后调起微信支付，到账写入云端余额。也可到店由店长代充录入。</view>
+  </view>
 
   <block wx:for="{{rechargePlans}}" wx:key="id">
-    <view class="card">
-      <view class="card-title">充 {{item.rechargeAmount}} 送 {{item.bonusAmount}}</view>
-      <view class="price">到账 ¥{{item.arrivalAmount}}</view>
-      <view class="card-meta">适合：{{item.audience}}</view>
-      <view class="tag-row">
-        <view class="tag status-success">本金 + 赠送分开记账</view>
+    <view class="plan-card">
+      <view class="plan-top">
+        <view>
+          <view class="plan-title">充 {{item.rechargeAmount}} 送 {{item.bonusAmount}}</view>
+          <view class="plan-meta">适合：{{item.audience}}</view>
+        </view>
+        <view class="plan-price">实付 ¥{{item.rechargeAmount}}</view>
       </view>
-      <view class="button-row">
-        <view class="btn btn-primary" data-id="{{item.id}}" bindtap="choose">选择此档位</view>
+      <view class="btn btn-primary {{paying ? 'btn-disabled' : ''}}" data-id="{{item.id}}" bindtap="choose">
+        {{paying ? '支付中…' : '微信支付'}}
       </view>
     </view>
   </block>
 
-  <view class="card">
-    <view class="card-title">储值说明</view>
-    <view class="card-meta">赠送余额不可提现，可用于体验、续时、升级、配件和活动报名。</view>
+  <view class="list-card">
+    <view class="list-row">
+      <view class="list-main">
+        <view class="list-title">储值说明</view>
+        <view class="list-meta">实付为本金；赠送记入赠金且不可提现。到账后可用于体验、续时、升级、配件和活动报名。店长代充入口在店主看板。</view>
+      </view>
+    </view>
   </view>
 </view>

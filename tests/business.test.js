@@ -62,7 +62,7 @@ test('createAppointmentSummary includes expected end time and meituan fields', (
     name: '小豆',
     packageName: '双人主题套餐',
     appointmentDate: '2026-07-10',
-    timeSlot: '18:30-20:30',
+    timeSlot: '18:00-20:00',
     peopleCount: 2,
     durationMinutes: 120,
     isMeituan: true,
@@ -70,7 +70,40 @@ test('createAppointmentSummary includes expected end time and meituan fields', (
   });
 
   assert.equal(summary.title, '小豆的预约');
-  assert.equal(summary.expectedEndTime.display, '2026-07-10 20:30');
+  assert.equal(summary.expectedEndTime.display, '2026-07-10 20:00');
   assert.equal(summary.tags.includes('美团来源'), true);
   assert.equal(summary.tags.includes('券码 MT123'), true);
+});
+
+test('createAppointmentSummary includes table and seats', () => {
+  const summary = createAppointmentSummary({
+    name: '小豆',
+    packageName: '双人主题套餐',
+    appointmentDate: '2026-07-10',
+    timeSlot: '12:00-14:00',
+    peopleCount: 2,
+    durationMinutes: 120,
+    isMeituan: false,
+    tableCode: 'W1',
+    seatIds: ['W1-3', 'W1-4'],
+  });
+
+  assert.equal(summary.tableCode, 'W1');
+  assert.deepEqual(summary.seatIds, ['W1-3', 'W1-4']);
+  assert.equal(summary.seatLabel, 'W1-3、W1-4');
+});
+
+test('createAppointmentSummary spans multiple contiguous slots', () => {
+  const summary = createAppointmentSummary({
+    name: '小豆',
+    packageName: '双人主题套餐',
+    appointmentDate: '2026-07-10',
+    timeSlots: ['14:00-16:00', '16:00-18:00'],
+    peopleCount: 2,
+    durationMinutes: 120,
+  });
+
+  assert.equal(summary.timeSlot, '14:00-18:00');
+  assert.deepEqual(summary.timeSlots, ['14:00-16:00', '16:00-18:00']);
+  assert.equal(summary.expectedEndTime.display, '2026-07-10 18:00');
 });

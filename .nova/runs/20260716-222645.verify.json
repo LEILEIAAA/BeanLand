@@ -1,0 +1,12 @@
+{
+  "id": "20260716-222645",
+  "ok": true,
+  "results": [
+    {
+      "command": "node --test tests/appointmentRegistration.test.js tests/seatSession.test.js tests/settleNoShow.test.js",
+      "ok": true,
+      "exitCode": 0,
+      "tail": "  duration_ms: 2.0012\n  type: 'suite'\n  ...\n1..21\n# tests 31\n# suites 6\n# pass 31\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 113.6237"
+    }
+  ]
+}

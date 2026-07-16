@@ -1,0 +1,148 @@
+[
+  {
+    "id": "opening-trio",
+    "name": "三人同行一人免单",
+    "price": 0.01,
+    "weekendPrice": 0.01,
+    "weekdayPrice": 0.01,
+    "targetAudience": "开业期间 7.18-7.24 限时专享 · 无限时",
+    "durationMinutes": 0,
+    "overtimeRule": "当日不限时",
+    "includedItems": [
+      "三人入场",
+      "付两人价",
+      "材料齐全",
+      "合影服务"
+    ],
+    "isRecommended": true,
+    "badge": "开业限定",
+    "skipOpeningDiscount": true,
+    "status": "on_sale"
+  },
+  {
+    "id": "weekend-solo",
+    "name": "单人无限时",
+    "price": 0.01,
+    "weekendPrice": 0.01,
+    "weekdayPrice": 0.01,
+    "targetAudience": "单人到店畅拼",
+    "durationMinutes": 0,
+    "overtimeRule": "当日不限时",
+    "includedItems": [
+      "拼豆材料",
+      "图纸任选",
+      "现场指导",
+      "成品熨烫"
+    ],
+    "isRecommended": true,
+    "status": "on_sale"
+  },
+  {
+    "id": "solo-2h",
+    "name": "单人2小时",
+    "price": 0.01,
+    "weekendPrice": 0.01,
+    "weekdayPrice": 0.01,
+    "targetAudience": "轻体验 · 可升级无限时",
+    "durationMinutes": 120,
+    "overtimeRule": "到点结束",
+    "includedItems": [
+      "拼豆材料",
+      "图纸任选",
+      "现场指导"
+    ],
+    "isRecommended": true,
+    "skipOpeningDiscount": true,
+    "status": "on_sale"
+  },
+  {
+    "id": "solo-1h",
+    "name": "单人1小时",
+    "price": 0.01,
+    "weekendPrice": 0.01,
+    "weekdayPrice": 0.01,
+    "targetAudience": "尝鲜试玩",
+    "durationMinutes": 60,
+    "overtimeRule": "到点结束",
+    "includedItems": [
+      "拼豆材料",
+      "图纸任选",
+      "现场指导"
+    ],
+    "isRecommended": false,
+    "skipOpeningDiscount": true,
+    "status": "on_sale"
+  },
+  {
+    "id": "weekend-duo",
+    "name": "双人无限时",
+    "price": 0.01,
+    "weekendPrice": 0.01,
+    "weekdayPrice": 0.01,
+    "targetAudience": "闺蜜 / 情侣 / 同学同行",
+    "durationMinutes": 0,
+    "overtimeRule": "当日不限时",
+    "includedItems": [
+      "双人材料",
+      "图纸任选",
+      "合影拍照",
+      "成品包装"
+    ],
+    "isRecommended": true,
+    "status": "on_sale"
+  },
+  {
+    "id": "duo-2h",
+    "name": "双人2小时",
+    "price": 0.01,
+    "weekendPrice": 0.01,
+    "weekdayPrice": 0.01,
+    "targetAudience": "双人轻体验 · 可升级无限时",
+    "durationMinutes": 120,
+    "overtimeRule": "到点结束",
+    "includedItems": [
+      "双人材料",
+      "图纸任选",
+      "现场指导"
+    ],
+    "isRecommended": true,
+    "skipOpeningDiscount": true,
+    "status": "on_sale"
+  },
+  {
+    "id": "duo-1h",
+    "name": "双人1小时",
+    "price": 0.01,
+    "weekendPrice": 0.01,
+    "weekdayPrice": 0.01,
+    "targetAudience": "双人尝鲜试玩",
+    "durationMinutes": 60,
+    "overtimeRule": "到点结束",
+    "includedItems": [
+      "双人材料",
+      "图纸任选",
+      "现场指导"
+    ],
+    "isRecommended": false,
+    "skipOpeningDiscount": true,
+    "status": "on_sale"
+  },
+  {
+    "id": "weekend-family",
+    "name": "亲子无限时",
+    "price": 0.01,
+    "weekendPrice": 0.01,
+    "weekdayPrice": 0.01,
+    "targetAudience": "1 大 1 小亲子",
+    "durationMinutes": 0,
+    "overtimeRule": "当日不限时",
+    "includedItems": [
+      "亲子材料",
+      "儿童友好图纸",
+      "安全指导",
+      "合影拍照"
+    ],
+    "isRecommended": true,
+    "status": "on_sale"
+  }
+]

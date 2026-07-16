@@ -1,0 +1,12 @@
+{
+  "id": "20260717-004310",
+  "ok": true,
+  "results": [
+    {
+      "command": "node --test tests/transactionTitle.test.js",
+      "ok": true,
+      "exitCode": 0,
+      "tail": "  duration_ms: 0.1265\n  type: 'test'\n  ...\n1..5\n# tests 5\n# suites 0\n# pass 5\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 71.5473"
+    }
+  ]
+}

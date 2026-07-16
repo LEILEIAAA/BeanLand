@@ -5,6 +5,7 @@ const {
   STATUS,
   STATUS_LABEL,
   HOLD_MINUTES,
+  REJECT_REASON_PRESETS,
   assertCanRegister,
   assertCanTransition,
   buildRegistrationDoc,
@@ -16,6 +17,9 @@ const {
   resolveNoShowDeadline,
   shouldMarkNoShow,
   buildNoShowFields,
+  buildAdminCancelFields,
+  assertRejectReason,
+  buildRejectFields,
 } = require('../miniprogram/utils/appointmentRegistration');
 
 test('allowedRegisterDates returns today and tomorrow only', () => {
@@ -100,7 +104,18 @@ test('assertCanTransition enforces status machine', () => {
   assert.equal(assertCanTransition(STATUS.pending, 'arrive').ok, false);
   assert.equal(assertCanTransition(STATUS.confirmed, 'arrive').ok, true);
   assert.equal(assertCanTransition(STATUS.confirmed, 'cancel').ok, false);
+  assert.equal(assertCanTransition(STATUS.confirmed, 'adminCancel').ok, true);
+  assert.equal(assertCanTransition(STATUS.pending, 'adminCancel').ok, false);
   assert.equal(assertCanTransition(STATUS.arrived, 'arrive').ok, false);
+});
+
+test('buildAdminCancelFields marks merchant cancelled and clears seats', () => {
+  const fields = buildAdminCancelFields(8000);
+  assert.equal(fields.status, STATUS.cancelled);
+  assert.equal(fields.cancelledAt, 8000);
+  assert.equal(fields.cancelReason, 'merchant');
+  assert.deepEqual(fields.seatIds, []);
+  assert.equal(fields.tableCode, '');
 });
 
 test('buildConfirmFields requires seat count match and writes confirmed', () => {
@@ -193,6 +208,35 @@ test('buildNoShowFields writes no_show with timeout reason', () => {
   assert.equal(fields.noShowAt, 9000);
   assert.equal(fields.cancelReason, 'timeout');
   assert.equal(fields.updatedAt, 9000);
+  assert.deepEqual(fields.seatIds, []);
+  assert.equal(fields.tableCode, '');
+});
+
+test('shouldReleaseArrivedHold after last slot end', () => {
+  const {
+    shouldReleaseArrivedHold,
+    resolveSlotEndMs,
+    buildCompletedFields,
+    STATUS,
+  } = require('../miniprogram/utils/appointmentRegistration');
+  const end = resolveSlotEndMs('2026-07-16', ['10:00-12:00', '16:00-18:00']);
+  assert.equal(end, new Date('2026-07-16T18:00:00+08:00').getTime());
+  const appt = {
+    status: STATUS.arrived,
+    appointmentDate: '2026-07-16',
+    timeSlots: ['10:00-12:00', '16:00-18:00'],
+    seatIds: ['F1-A1'],
+  };
+  assert.equal(shouldReleaseArrivedHold(appt, end - 1), false);
+  assert.equal(shouldReleaseArrivedHold(appt, end), true);
+  assert.equal(
+    shouldReleaseArrivedHold({ ...appt, status: STATUS.confirmed }, end + 1),
+    false,
+  );
+  const done = buildCompletedFields(111);
+  assert.equal(done.status, STATUS.completed);
+  assert.deepEqual(done.seatIds, []);
+  assert.equal(done.tableCode, '');
 });
 
 test('assertCanTransition rejects actions on no_show', () => {
@@ -219,4 +263,29 @@ test('resolveArriveOnStart marks confirmed as arrived, skips already arrived', (
 
   const fromPending = resolveArriveOnStart(STATUS.pending, 5000);
   assert.equal(fromPending.ok, false);
+});
+
+test('REJECT_REASON_PRESETS has quick reasons without incomplete-info', () => {
+  assert.deepEqual(REJECT_REASON_PRESETS, ['时段已满', '人数超限', '临时闭店', '其他']);
+  assert.equal(REJECT_REASON_PRESETS.includes('信息不完整'), false);
+});
+
+test('assertRejectReason requires non-empty trimmed reason', () => {
+  assert.equal(assertRejectReason('').ok, false);
+  assert.equal(assertRejectReason('   ').ok, false);
+  const ok = assertRejectReason('  时段已满  ');
+  assert.equal(ok.ok, true);
+  assert.equal(ok.rejectReason, '时段已满');
+});
+
+test('buildRejectFields writes rejected status and reason', () => {
+  const result = buildRejectFields({ rejectReason: '临时闭店', now: 9000 });
+  assert.equal(result.ok, true);
+  assert.equal(result.fields.status, STATUS.rejected);
+  assert.equal(result.fields.rejectReason, '临时闭店');
+  assert.equal(result.fields.rejectedAt, 9000);
+  assert.equal(result.fields.updatedAt, 9000);
+
+  const empty = buildRejectFields({ rejectReason: '', now: 9000 });
+  assert.equal(empty.ok, false);
 });

@@ -4,21 +4,28 @@
     "pages/home/index",
     "pages/packages/index",
     "pages/activities/index",
+    "pages/activities/register/index",
     "pages/appointment/index",
     "pages/route/index",
     "pages/member/index",
     "pages/member/register/index",
     "pages/member/records/index",
     "pages/member/coupons/index",
+    "pages/member/packages/index",
     "pages/member/stamps/index",
     "pages/member/works/index",
     "pages/member/appointments/index",
+    "pages/member/activity-registrations/index",
+    "pages/member/seat-sessions/index",
     "pages/recharge/index",
     "pages/admin/dashboard/index",
     "pages/admin/appointments/index",
+    "pages/admin/activity-registrations/index",
     "pages/admin/timer/index",
+    "pages/admin/timer-history/index",
     "pages/admin/recharge/index",
-    "pages/admin/coupons/index"
+    "pages/admin/coupons/index",
+    "pages/admin/package-redeem/index"
   ],
   "window": {
     "navigationBarTitleText": "Bean Land",
@@ -27,26 +34,35 @@
     "backgroundColor": "#FFFFFF"
   },
   "tabBar": {
-    "color": "#8B8B8B",
-    "selectedColor": "#111827",
+    "custom": true,
+    "color": "#A8A29E",
+    "selectedColor": "#1C1917",
     "backgroundColor": "#FFFFFF",
-    "borderStyle": "black",
+    "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/home/index",
-        "text": "首页"
+        "text": "首页",
+        "iconPath": "assets/tab/home.png",
+        "selectedIconPath": "assets/tab/home-active.png"
       },
       {
         "pagePath": "pages/activities/index",
-        "text": "活动"
+        "text": "活动",
+        "iconPath": "assets/tab/activities.png",
+        "selectedIconPath": "assets/tab/activities-active.png"
       },
       {
         "pagePath": "pages/packages/index",
-        "text": "套餐"
+        "text": "套餐",
+        "iconPath": "assets/tab/packages.png",
+        "selectedIconPath": "assets/tab/packages-active.png"
       },
       {
         "pagePath": "pages/member/index",
-        "text": "会员"
+        "text": "会员",
+        "iconPath": "assets/tab/member.png",
+        "selectedIconPath": "assets/tab/member-active.png"
       }
     ]
   },

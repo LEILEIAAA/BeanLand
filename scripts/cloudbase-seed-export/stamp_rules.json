@@ -1,0 +1,18 @@
+[
+  {
+    "action": "到店完成一次体验",
+    "stampDelta": 1
+  },
+  {
+    "action": "带新朋友到店",
+    "stampDelta": 1
+  },
+  {
+    "action": "参加主题局",
+    "stampDelta": 1
+  },
+  {
+    "action": "美团用户转会员",
+    "stampDelta": 1
+  }
+]

@@ -1,0 +1,23 @@
+[
+  {
+    "id": "r100",
+    "rechargeAmount": 0.02,
+    "bonusAmount": 0.01,
+    "arrivalAmount": 0.03,
+    "audience": "调试档：本金+赠金（上线前改回）"
+  },
+  {
+    "id": "r300",
+    "rechargeAmount": 300,
+    "bonusAmount": 40,
+    "arrivalAmount": 340,
+    "audience": "闺蜜 / 亲子 / 复购用户"
+  },
+  {
+    "id": "r500",
+    "rechargeAmount": 500,
+    "bonusAmount": 80,
+    "arrivalAmount": 580,
+    "audience": "亲子课包 / 粉丝 / 高频用户"
+  }
+]

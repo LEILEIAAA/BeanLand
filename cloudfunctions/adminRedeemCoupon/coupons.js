@@ -56,11 +56,14 @@ function pad2(n) {
   return String(n).padStart(2, '0');
 }
 
+/** 业务自然日按中国时区 UTC+8，避免云函数 UTC 环境把「当天 0 点」算偏。 */
+const CN_OFFSET_MS = 8 * 60 * 60 * 1000;
+
 function formatDateYmd(ts) {
   const n = Number(ts);
   if (!Number.isFinite(n) || n <= 0) return '';
-  const d = new Date(n);
-  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+  const d = new Date(n + CN_OFFSET_MS);
+  return `${d.getUTCFullYear()}-${pad2(d.getUTCMonth() + 1)}-${pad2(d.getUTCDate())}`;
 }
 
 function formatValidRange(coupon) {
@@ -89,13 +92,15 @@ function parseYmdParts(ymd) {
 function parseYmdStartMs(ymd) {
   const parts = parseYmdParts(ymd);
   if (!parts) return NaN;
-  return new Date(parts.year, parts.month - 1, parts.day).getTime();
+  // 中国当天 00:00:00
+  return Date.UTC(parts.year, parts.month - 1, parts.day) - CN_OFFSET_MS;
 }
 
 function parseYmdEndMs(ymd) {
   const parts = parseYmdParts(ymd);
   if (!parts) return NaN;
-  return new Date(parts.year, parts.month - 1, parts.day, 23, 59, 59, 999).getTime();
+  // 中国当天 23:59:59.999
+  return Date.UTC(parts.year, parts.month - 1, parts.day, 15, 59, 59, 999);
 }
 
 function buildCouponName(category, benefitType, benefitValue) {
@@ -186,38 +191,48 @@ function buildIssueCouponPayload(input, now) {
     return {
       ok: false,
       code: 'INVALID_PAYLOAD',
-      message: 'memberId and openid required',
+      message: '请先选择会员',
     };
   }
   if (!CATEGORY_LABEL[category]) {
     return {
       ok: false,
       code: 'INVALID_PAYLOAD',
-      message: 'invalid category',
+      message: '请选择主类型',
     };
   }
   if (benefitType !== BENEFIT_TYPE.HOURS && benefitType !== BENEFIT_TYPE.DISCOUNT) {
     return {
       ok: false,
       code: 'INVALID_PAYLOAD',
-      message: 'invalid benefitType',
+      message: '请选择折扣类型',
     };
   }
   if (!Number.isFinite(benefitValue) || benefitValue <= 0) {
     return {
       ok: false,
       code: 'INVALID_PAYLOAD',
-      message: 'benefitValue must be > 0',
+      message:
+        benefitType === BENEFIT_TYPE.DISCOUNT
+          ? '请填写大于 0 的折扣（如 8 表示 8 折）'
+          : '请填写大于 0 的赠送小时数',
     };
   }
 
   const validFrom = parseYmdStartMs(validFromDate);
   const expireAt = parseYmdEndMs(expireAtDate);
-  if (!Number.isFinite(validFrom) || !Number.isFinite(expireAt) || validFrom > expireAt) {
+  if (!Number.isFinite(validFrom) || !Number.isFinite(expireAt)) {
     return {
       ok: false,
       code: 'INVALID_PAYLOAD',
-      message: 'validFromDate/expireAtDate invalid',
+      message: '请选择有效的开始日和结束日',
+    };
+  }
+  if (validFrom > expireAt) {
+    return {
+      ok: false,
+      code: 'INVALID_PAYLOAD',
+      message: '结束日不能早于开始日，请重新选择有效期',
     };
   }
 
@@ -263,4 +278,5 @@ module.exports = {
   buildIssueCouponPayload,
   parseYmdStartMs,
   parseYmdEndMs,
+  CN_OFFSET_MS,
 };

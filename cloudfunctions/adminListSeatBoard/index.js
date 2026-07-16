@@ -106,19 +106,26 @@ exports.main = async () => {
 
     await settleNoShowAppointments(db, appointments, now);
 
-    const settledIds = new Set(
+    const releasedIds = new Set(
       (appointments || [])
-        .filter((row) => row && row.status === 'no_show')
+        .filter(
+          (row) =>
+            row &&
+            /^(no_show|cancelled|rejected|completed)$/.test(String(row.status || '')),
+        )
         .map((row) => row._id || row.id)
         .filter(Boolean),
     );
     const activeReserved = (reservedOcc || []).filter(
-      (row) => !row.appointmentId || !settledIds.has(row.appointmentId),
+      (row) => !row.appointmentId || !releasedIds.has(row.appointmentId),
+    );
+    const activeArrived = (arrivedOcc || []).filter(
+      (row) => !row.appointmentId || !releasedIds.has(row.appointmentId),
     );
 
     const reservationsBySeatId = buildReservationsBySeatId({
       appointments,
-      occupancies: [...activeReserved, ...arrivedOcc],
+      occupancies: [...activeReserved, ...activeArrived],
       today,
     });
 

@@ -1,0 +1,45 @@
+.tab-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 90;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-around;
+  box-sizing: border-box;
+  height: calc(112rpx + env(safe-area-inset-bottom));
+  padding: 12rpx 8rpx env(safe-area-inset-bottom);
+  background: #ffffff;
+  border-top: none;
+  box-shadow: none;
+}
+
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4rpx;
+  padding-top: 4rpx;
+}
+
+.tab-icon {
+  width: 44rpx;
+  height: 44rpx;
+  display: block;
+}
+
+.tab-text {
+  font-size: 20rpx;
+  line-height: 1.2;
+  color: #a8a29e;
+  font-weight: 600;
+  letter-spacing: 0.5rpx;
+}
+
+.tab-item.is-active .tab-text {
+  color: #1c1917;
+  font-weight: 700;
+}

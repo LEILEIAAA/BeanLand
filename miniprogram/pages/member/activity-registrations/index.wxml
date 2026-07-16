@@ -1,0 +1,35 @@
+<view class="container sub-page">
+  <view class="sub-hero">
+    <view class="sub-label">我的活动报名</view>
+    <view class="sub-value">{{list.length}} 条</view>
+    <view class="sub-desc">这里是活动报名，不是座位预约。</view>
+  </view>
+
+  <view class="list-card" style="margin-bottom: 28rpx;" wx:if="{{list.length}}">
+    <block wx:for="{{list}}" wx:key="_id">
+      <view class="list-row">
+        <view class="list-main">
+          <view class="list-title">{{item.activityName}}</view>
+          <view class="list-meta">¥{{item.amount}} · {{item.channelLabel}} · {{item.statusLabel}}</view>
+        </view>
+        <view
+          class="status-chip {{item.status === 'paid' ? 'ok' : ''}}"
+          wx:if="{{item.status !== 'paid'}}"
+        >{{item.statusLabel}}</view>
+        <view
+          class="btn btn-secondary"
+          style="padding: 12rpx 20rpx; font-size: 24rpx;"
+          wx:if="{{item.status === 'paid'}}"
+          data-id="{{item._id}}"
+          bindtap="cancel"
+        >取消</view>
+      </view>
+    </block>
+  </view>
+
+  <view class="list-card" wx:else>
+    <view class="list-meta">还没有活动报名记录。</view>
+  </view>
+
+  <view class="btn btn-primary" style="margin-top: 28rpx;" bindtap="goBrowse">去活动页看看</view>
+</view>

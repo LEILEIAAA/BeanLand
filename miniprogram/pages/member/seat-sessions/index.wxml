@@ -1,0 +1,25 @@
+<view class="container sub-page">
+  <view wx:if="{{loading}}" class="ss-hint">加载中…</view>
+
+  <block wx:elif="{{sessions.length}}">
+    <view class="ss-list">
+      <view class="ss-card" wx:for="{{sessions}}" wx:key="id">
+        <view class="ss-row-top">
+          <view class="ss-seats">{{item.tableCode}} · {{item.seatLabel || '—'}}</view>
+          <view class="ss-status {{item.active ? 'active' : ''}}">{{item.statusLabel}}</view>
+        </view>
+        <view class="ss-date">{{item.dateLabel}}</view>
+        <view class="ss-time" wx:if="{{!item.active}}">
+          <text class="ss-duration">时长 {{item.durationLabel}}</text>
+          <text wx:if="{{item.isOvertime}}" class="ss-overtime">超时 {{item.overtimeLabel}}</text>
+        </view>
+        <view class="ss-foot" wx:if="{{item.packageName || item.amountLabel}}">
+          <text wx:if="{{item.packageName}}" class="ss-pkg">{{item.packageName}}</text>
+          <text wx:if="{{item.amountLabel}}" class="ss-amount">{{item.amountLabel}}</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <view wx:else class="ss-empty">{{emptyTip || '暂无记录'}}</view>
+</view>

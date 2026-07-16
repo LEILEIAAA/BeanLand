@@ -1,0 +1,146 @@
+<view class="container reg-page" wx:if="{{activity}}">
+  <view class="reg-hero">
+    <view class="hero-bands" aria-hidden="true">
+      <view class="band band-yellow"></view>
+      <view class="band band-orange"></view>
+      <view class="band band-pink"></view>
+      <view class="band band-blue"></view>
+      <view class="band band-green"></view>
+    </view>
+    <view class="reg-hero-copy">
+      <view class="reg-kicker-row">
+        <view class="reg-kicker" style="background: {{look.accent}}; color: {{look.ink}};">{{look.enLabel}}</view>
+        <view class="reg-status">{{statusLabel}}</view>
+      </view>
+      <view class="reg-title">{{activity.name}}</view>
+      <view class="reg-hero-desc">一人一报 · 与座位预约无关 · 已报 {{seatLabel}}</view>
+      <view class="reg-hero-foot">
+        <view class="reg-seat">
+          <text class="reg-seat-num">{{seatLabel}}</text>
+          <text class="reg-seat-label">名额</text>
+        </view>
+        <view class="reg-price-orb" style="background: {{look.accent}};">
+          <text class="reg-price" style="color: {{look.ink}};">¥{{activity.price}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="reg-highlights" wx:if="{{detail.highlights.length}}">
+    <block wx:for="{{detail.highlights}}" wx:key="key">
+      <view class="reg-hl">
+        <view class="reg-hl-label">{{item.label}}</view>
+        <view class="reg-hl-value">{{item.value}}</view>
+      </view>
+    </block>
+  </view>
+
+  <view class="reg-panel" wx:if="{{detail.audience || detail.content}}">
+    <view class="reg-panel-head">
+      <view class="reg-panel-kicker">About</view>
+      <view class="reg-panel-title">活动说明</view>
+    </view>
+    <view class="reg-block" wx:if="{{detail.audience}}">
+      <view class="reg-block-label">适合人群</view>
+      <view class="reg-block-text">{{detail.audience}}</view>
+    </view>
+    <view class="reg-block is-lead" wx:if="{{detail.content}}">
+      <view class="reg-block-label">活动内容</view>
+      <view class="reg-block-text">{{detail.content}}</view>
+    </view>
+  </view>
+
+  <view class="reg-panel" wx:if="{{detail.includes.length}}">
+    <view class="reg-panel-head">
+      <view class="reg-panel-kicker">Includes</view>
+      <view class="reg-panel-title">包含内容</view>
+    </view>
+    <view class="reg-chips">
+      <block wx:for="{{detail.includes}}" wx:key="*this">
+        <text class="reg-chip">{{item}}</text>
+      </block>
+    </view>
+  </view>
+
+  <view class="reg-notice" wx:if="{{detail.notice}}">
+    <view class="reg-notice-label">注意</view>
+    <view class="reg-notice-text">{{detail.notice}}</view>
+  </view>
+
+  <block wx:if="{{myRegistration}}">
+    <view class="list-card" style="margin-bottom: 28rpx;">
+      <view class="list-row">
+        <view class="list-main">
+          <view class="list-title">我的报名</view>
+          <view class="list-meta">{{myRegistration.statusLabel}} · {{myRegistration.payChannel === 'balance' ? '余额' : '微信'}}</view>
+        </view>
+        <view class="status-chip ok">{{myRegistration.statusLabel}}</view>
+      </view>
+    </view>
+    <view
+      class="btn btn-secondary"
+      wx:if="{{myRegistration.status === 'paid'}}"
+      bindtap="cancelMine"
+    >取消报名</view>
+  </block>
+
+  <block wx:elif="{{consulting}}">
+    <view class="list-card" style="margin-bottom: 28rpx;">
+      <view class="list-title">包场 / 咨询场</view>
+      <view class="list-meta" style="margin-top: 12rpx;">请联系店主确认档期，本页不开放在线报名。</view>
+    </view>
+  </block>
+
+  <block wx:elif="{{canRegister}}">
+    <view class="buy-section-label">优惠券</view>
+    <block wx:if="{{couponOptions.length > 1}}">
+      <view
+        wx:for="{{couponOptions}}"
+        wx:key="key"
+        class="coupon-option {{item.selected ? 'selected' : ''}}"
+        data-id="{{item.id || 'none'}}"
+        bindtap="selectCoupon"
+        style="margin-bottom: 16rpx;"
+      >
+        <view class="coupon-name">{{item.name}}</view>
+        <view class="coupon-meta">{{item.amountText}}</view>
+      </view>
+    </block>
+    <view wx:else class="coupon-empty" style="margin-bottom: 28rpx;">暂无可用优惠券</view>
+
+    <view class="buy-section-label">支付方式</view>
+    <view class="pay-method-row" style="margin-bottom: 28rpx;">
+      <view
+        class="pay-method {{payChannel === 'balance' ? 'selected' : ''}}"
+        data-channel="balance"
+        bindtap="selectPay"
+      >余额（¥{{balance}}）</view>
+      <view
+        class="pay-method {{payChannel === 'wechat' ? 'selected' : ''}}"
+        data-channel="wechat"
+        bindtap="selectPay"
+      >微信支付</view>
+    </view>
+
+    <view class="list-card" style="margin-bottom: 28rpx;" wx:if="{{quote}}">
+      <view class="list-row">
+        <view class="list-main">
+          <view class="list-title">实付</view>
+          <view class="list-meta" wx:if="{{quote.couponAmount}}">已抵 ¥{{quote.couponAmount}}</view>
+          <view class="list-meta" wx:elif="{{!quote.needPayment}}">优惠券已全额抵扣</view>
+        </view>
+        <view class="price">¥{{quote.payAmount}}</view>
+      </view>
+    </view>
+
+    <view class="btn btn-primary {{paying ? 'btn-disabled' : ''}}" bindtap="confirmRegister">
+      {{paying ? '处理中…' : (payChannel === 'wechat' && quote.needPayment ? '微信支付报名' : (quote.needPayment ? '余额报名' : '确认报名'))}}
+    </view>
+  </block>
+
+  <block wx:else>
+    <view class="list-card">
+      <view class="list-meta">当前不可报名（已满员或未开放）。</view>
+    </view>
+  </block>
+</view>

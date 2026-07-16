@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "generator": "nova-context/0.1",
+  "commit": "275325d2e36e",
+  "project": {
+    "name": "Bean",
+    "type": "frontend-app"
+  },
+  "governance": {
+    "mode": "guide",
+    "protocols": [],
+    "runtimes": [],
+    "validators": []
+  },
+  "modules": [],
+  "routes": [],
+  "entrypoints": {
+    "default": [],
+    "byTask": {}
+  },
+  "managed": [],
+  "generatedAt": "2026-07-16T14:21:32.235Z",
+  "sourceHash": "sha256-bb7405d9c7d87cc4f37fc1522bd518bb"
+}

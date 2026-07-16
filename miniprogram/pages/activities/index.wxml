@@ -1,15 +1,82 @@
-<view class="container">
-  <view class="section-title">开业活动与主题局</view>
-  <view class="subtitle">暑期学生、亲子、四人同行和五月天主题局都可以在这里报名或咨询。</view>
-
-  <block wx:for="{{activities}}" wx:key="id">
-    <view class="card">
-      <view class="card-title">{{item.name}}</view>
-      <view class="card-meta">上限 {{item.capacity}} 人 · 当前状态 {{item.status}}</view>
-      <view class="price">¥{{item.price}}</view>
-      <view class="button-row">
-        <view class="btn btn-primary" bindtap="join">报名 / 咨询</view>
+<view class="container activities-page tab-page">
+  <view class="act-hero">
+    <view class="hero-bands" aria-hidden="true">
+      <view class="band band-yellow"></view>
+      <view class="band band-orange"></view>
+      <view class="band band-pink"></view>
+      <view class="band band-blue"></view>
+      <view class="band band-green"></view>
+    </view>
+    <view class="act-hero-copy">
+      <view class="act-kicker">Opening Week</view>
+      <view class="act-title">开业首周有局</view>
+      <view class="act-sub">五月天破圈开场，接着大学生鱿鱼局，周末收个作品交流会。中间两天散场；包场咨询见海报墙末位。</view>
+      <view class="act-stats">
+        <text class="act-stat-num">{{featuredCount}}</text>
+        <text class="act-stat-label">场招募中</text>
       </view>
     </view>
-  </block>
+  </view>
+
+  <view class="act-week">
+    <view class="act-week-head">
+      <view class="act-week-kicker">Schedule</view>
+      <view class="act-week-title">开业首周日程</view>
+      <view class="act-week-hint">具体日期若有调整，以本页为准</view>
+    </view>
+    <block wx:for="{{openingWeek}}" wx:key="day">
+      <view class="act-week-row {{item.kind === 'rest' ? 'is-rest' : ''}}">
+        <view class="act-week-day">D{{item.day}}</view>
+        <view class="act-week-body">
+          <view class="act-week-name">{{item.title}}</view>
+          <view class="act-week-note">{{item.note}}</view>
+        </view>
+        <view class="act-week-status">{{item.status}}</view>
+      </view>
+    </block>
+  </view>
+
+  <scroll-view class="act-filters" scroll-x="{{true}}" enable-flex="{{true}}" show-scrollbar="{{false}}">
+    <block wx:for="{{filters}}" wx:key="id">
+      <view
+        class="act-chip {{activeFilter === item.id ? 'is-on' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="onFilterTap"
+      >{{item.label}}</view>
+    </block>
+  </scroll-view>
+
+  <view class="act-section-head">
+    <view class="act-section-kicker">Drops</view>
+    <view class="act-section-title">活动海报墙</view>
+  </view>
+
+  <view class="poster-stack" wx:if="{{activities.length}}">
+    <block wx:for="{{activities}}" wx:key="id">
+      <view class="poster-card {{item.shift}} act-poster" data-id="{{item.id}}" bindtap="join">
+        <view class="poster-media">
+          <image class="poster-cover" src="{{item.cover}}" mode="aspectFill" />
+          <view class="poster-scrim"></view>
+          <view class="poster-tag" style="background: {{item.accent}}; color: {{item.orbInk}};">{{item.enLabel}}</view>
+          <view class="poster-status">{{item.statusLabel}}</view>
+          <view class="poster-title">{{item.name}}</view>
+        </view>
+        <view class="poster-foot">
+          <view class="poster-meta-col">
+            <view class="poster-meta">#{{item.dropNo}} · {{item.seatLabel}} 已报</view>
+            <view class="poster-blurb">{{item.blurb}}</view>
+          </view>
+          <view class="poster-orb act-orb" style="background: {{item.accent}};">
+            <text class="poster-orb-price" style="color: {{item.orbInk}};">¥{{item.price}}</text>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <view class="act-empty" wx:else>
+    <view class="act-empty-title">这一类暂时没局</view>
+    <view class="act-empty-sub">换个筛选看看，或者直接咨询店主开一场。</view>
+    <view class="btn btn-primary act-empty-btn" bindtap="join">换个筛选</view>
+  </view>
 </view>

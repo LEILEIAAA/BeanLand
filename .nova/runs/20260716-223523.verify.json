@@ -1,0 +1,12 @@
+{
+  "id": "20260716-223523",
+  "ok": false,
+  "results": [
+    {
+      "command": "node -e \"const s=require('./miniprogram/data/seed'); if(!s.packages.every(p=>p.price===0.01)||!s.activities.every(a=>a.price===0.01)) process.exit(1); console.log('seed ok')\"",
+      "ok": false,
+      "exitCode": 1,
+      "tail": "Command failed: node -e \"const s=require('./miniprogram/data/seed'); if(!s.packages.every(p=>p.price===0.01)||!s.activities.every(a=>a.price===0.01)) process.exit(1); console.log('seed ok')\""
+    }
+  ]
+}

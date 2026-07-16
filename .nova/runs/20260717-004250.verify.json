@@ -1,0 +1,12 @@
+{
+  "id": "20260717-004250",
+  "ok": true,
+  "results": [
+    {
+      "command": "node --test tests/appointmentRegistration.test.js",
+      "ok": true,
+      "exitCode": 0,
+      "tail": "  duration_ms: 0.0951\n  type: 'test'\n  ...\n1..19\n# tests 19\n# suites 0\n# pass 19\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 109.5658"
+    }
+  ]
+}

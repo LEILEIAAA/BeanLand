@@ -1,0 +1,12 @@
+{
+  "id": "20260717-005259",
+  "ok": true,
+  "results": [
+    {
+      "command": "node --test tests/activityRegistration.test.js tests/packageRedeem.test.js tests/packagePurchase.test.js",
+      "ok": true,
+      "exitCode": 0,
+      "tail": "  duration_ms: 0.0909\n  type: 'test'\n  ...\n1..45\n# tests 45\n# suites 0\n# pass 45\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 122.1121"
+    }
+  ]
+}

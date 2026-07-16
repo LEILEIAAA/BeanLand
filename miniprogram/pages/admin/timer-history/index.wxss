@@ -1,0 +1,75 @@
+.hist-head {
+  padding: 8rpx 4rpx 24rpx;
+}
+.hist-title {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #1c1917;
+}
+.hist-sub {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #a8a29e;
+}
+.hist-hint,
+.hist-empty {
+  padding: 80rpx 0;
+  text-align: center;
+  color: #a8a29e;
+  font-size: 26rpx;
+}
+.hist-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+.hist-card {
+  background: #ffffff;
+  border-radius: 20rpx;
+  padding: 24rpx;
+  box-shadow: 0 2rpx 16rpx rgba(28, 25, 23, 0.05);
+}
+.hist-row-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.hist-member {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1c1917;
+}
+.hist-amount {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #b45309;
+}
+.hist-seats {
+  margin-top: 8rpx;
+  font-size: 26rpx;
+  color: #57534e;
+}
+.hist-meta {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: #a8a29e;
+}
+.hist-time {
+  margin-top: 12rpx;
+  display: flex;
+  gap: 24rpx;
+  font-size: 26rpx;
+}
+.hist-duration {
+  color: #1c1917;
+  font-weight: 600;
+}
+.hist-overtime {
+  color: #dc2626;
+  font-weight: 600;
+}
+.hist-pkg {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #78716c;
+}

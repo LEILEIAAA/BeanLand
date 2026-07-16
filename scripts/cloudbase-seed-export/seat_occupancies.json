@@ -1,0 +1,27 @@
+[
+  {
+    "date": "2026-07-17",
+    "timeSlot": "12:00-14:00",
+    "seatId": "F1-B1",
+    "type": "reserved"
+  },
+  {
+    "date": "2026-07-17",
+    "timeSlot": "12:00-14:00",
+    "seatId": "F1-B2",
+    "type": "reserved"
+  },
+  {
+    "date": "2026-07-17",
+    "timeSlot": "12:00-14:00",
+    "seatId": "F1-A1",
+    "type": "in_use",
+    "remainingMinutes": 58
+  },
+  {
+    "date": "2026-07-17",
+    "timeSlot": "12:00-14:00",
+    "seatId": "F2-B3",
+    "type": "maintenance"
+  }
+]

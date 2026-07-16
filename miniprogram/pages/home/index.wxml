@@ -1,105 +1,165 @@
-<view class="container">
-  <view class="hero hero-frost">
-    <view class="hero-bubble hero-bubble-a"></view>
-    <view class="hero-bubble hero-bubble-b"></view>
-    <view class="hero-bubble hero-bubble-c"></view>
-    <view class="hero-bubble hero-bubble-d"></view>
-    <view class="hero-bubble hero-bubble-e"></view>
+<view class="container home-atelier tab-page">
+  <view class="atelier-stage">
+    <swiper
+      class="atelier-swiper"
+      autoplay="{{true}}"
+      interval="4200"
+      duration="520"
+      circular="{{true}}"
+      indicator-dots="{{false}}"
+      current="{{heroIndex}}"
+      bindchange="onHeroChange"
+    >
+      <block wx:for="{{heroPhotos}}" wx:key="src">
+        <swiper-item>
+          <image class="atelier-photo" src="{{item.src}}" mode="aspectFill" />
+        </swiper-item>
+      </block>
+    </swiper>
+    <view class="atelier-scrim"></view>
 
-    <view class="hero-copy">
-      <view class="eyebrow">白底毛玻璃 · 五月天五球灵感</view>
-      <view class="title">{{store.name}}</view>
-      <view class="subtitle">{{store.slogan}}。适合学生、闺蜜、亲子和五月天粉丝一起到店体验。</view>
-      <view class="hero-balls">
-        <block wx:for="{{fiveBallPatterns}}" wx:key="key">
-          <view class="ball-card {{item.key}}">
-            <view class="ball-shell" style="background: {{item.color}};">
-              <view class="ball-face {{item.eyes}} {{item.mouth}}" style="--eye-color: {{item.eyeColor}};"></view>
+    <view class="hero-dots">
+      <block wx:for="{{heroPhotos}}" wx:key="src">
+        <view
+          class="hero-dot {{heroIndex === index ? 'active' : ''}}"
+          data-index="{{index}}"
+          bindtap="onHeroDotTap"
+        ></view>
+      </block>
+    </view>
+
+    <view class="atelier-footer">
+      <view class="atelier-copy">
+        <view class="atelier-caption">{{heroCaption}}</view>
+        <view class="atelier-brand">
+          <block wx:for="{{brandLetters}}" wx:key="key">
+            <text
+              class="brand-letter {{item.isSpace ? 'is-space' : ''}}"
+              style="color: {{item.color}};"
+            >{{item.char}}</text>
+          </block>
+        </view>
+        <view class="atelier-slogan">{{store.slogan}}</view>
+      </view>
+
+      <view class="hero-route">
+        <view class="route-pin"></view>
+        <text class="route-address">{{store.shortAddress}}</text>
+      </view>
+
+      <view class="hero-actions">
+        <view class="btn-atelier-primary" bindtap="goAppointment">预约开拼</view>
+        <view class="btn-atelier-route" bindtap="goRoute">
+          <view class="route-guide-icon"></view>
+          <text>到店路线</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section score-section">
+    <view class="score-head">
+      <view class="score-head-main">
+        <view class="score-kicker">Menu</view>
+        <view class="score-title">开业主推套餐</view>
+      </view>
+      <view class="score-more" bindtap="goPackages">全部</view>
+    </view>
+
+    <view class="menu-board">
+      <block wx:for="{{featuredPackages}}" wx:key="id">
+        <view
+          class="menu-item {{index === 0 ? 'is-lead' : ''}}"
+          data-id="{{item.id}}"
+          bindtap="goPackages"
+        >
+          <view class="menu-index" style="color: {{item.accent}};">{{item.lookNo}}</view>
+          <view class="menu-body">
+            <view class="menu-code-row">
+              <text class="menu-code">{{item.enLabel}}</text>
+              <text wx:if="{{index === 0}}" class="menu-badge" style="background: {{item.accent}};">主推</text>
+            </view>
+            <view class="menu-name">{{item.name}}</view>
+            <view class="menu-specs">
+              <text>{{item.durationLabel}}</text>
+              <text class="menu-specs-dot">·</text>
+              <text>{{item.audienceLabel}}</text>
+            </view>
+            <view class="menu-includes">
+              <block wx:for="{{item.includes}}" wx:for-item="inc" wx:key="*this">
+                <text class="menu-chip">{{inc}}</text>
+              </block>
             </view>
           </view>
-        </block>
-      </view>
-      <view class="button-row hero-actions">
-        <view class="btn btn-primary" bindtap="goAppointment">立即预约</view>
-        <view class="btn btn-secondary" bindtap="goRoute">到店路线</view>
-      </view>
-    </view>
-
-    <view class="hero-orbital">
-      <block wx:for="{{fiveBallPatterns}}" wx:key="key">
-        <view class="orbital-ball {{item.key}}"></view>
-      </block>
-    </view>
-  </view>
-
-  <view class="section">
-    <view class="grid-two">
-      <block wx:for="{{highlights}}" wx:key="title">
-        <view class="card glass-card">
-          <view class="card-title">{{item.title}}</view>
-          <view class="card-meta">{{item.meta}}</view>
+          <view class="menu-price-col">
+            <text class="menu-from">周末价</text>
+            <view class="menu-price">
+              <text class="menu-yen">¥</text>
+              <text class="menu-val">{{item.weekendPrice || item.price}}</text>
+            </view>
+            <text class="menu-weekday" wx:if="{{item.weekdayPrice}}">工作日 ¥{{item.weekdayPrice}}</text>
+          </view>
         </view>
       </block>
     </view>
   </view>
 
-  <view class="section">
-    <view class="section-header">
-      <view class="section-title">开业主推套餐</view>
-      <view class="card-meta tappable" bindtap="goPackages">查看全部</view>
+  <view class="section score-section">
+    <view class="score-head">
+      <view class="score-head-main">
+        <view class="score-kicker">Poster Cut</view>
+        <view class="score-title">近期活动</view>
+      </view>
+      <view class="score-more" bindtap="goActivities">全部</view>
     </view>
-    <block wx:for="{{featuredPackages}}" wx:key="id">
-      <view class="card glass-card">
-        <view class="card-title">{{item.name}}</view>
-        <view class="card-meta">{{item.targetAudience}} · {{item.durationMinutes}} 分钟</view>
-        <view class="price">¥{{item.price}}</view>
-        <view class="tag-row">
-          <view class="tag">{{item.overtimeRule}}</view>
-          <view class="tag status-success">{{item.isRecommended ? '推荐' : '常规'}}</view>
-        </view>
-      </view>
-    </block>
-  </view>
 
-  <view class="section">
-    <view class="section-header">
-      <view class="section-title">近期活动</view>
-      <view class="card-meta tappable" bindtap="goActivities">查看全部</view>
-    </view>
-    <block wx:for="{{activities}}" wx:key="id">
-      <view class="card glass-card">
-        <view class="card-title">{{item.name}}</view>
-        <view class="card-meta">限 {{item.capacity}} 人 · 报名价 ¥{{item.price}}</view>
-        <view class="tag-row">
-          <view class="tag">招募中</view>
-          <view class="tag status-warning">{{item.status}}</view>
+    <view class="poster-stack">
+      <block wx:for="{{activities}}" wx:key="id">
+        <view class="poster-card {{item.shift}}" bindtap="goActivities">
+          <view class="poster-media">
+            <image
+              wx:if="{{item.cover}}"
+              class="poster-cover"
+              src="{{item.cover}}"
+              mode="aspectFill"
+            />
+            <view wx:else class="poster-cover poster-fallback"></view>
+            <view class="poster-scrim"></view>
+            <view class="poster-tag" style="background: {{item.accent}}; color: {{item.orbInk}};">{{item.enLabel}}</view>
+            <view class="poster-status">{{item.statusLabel}}</view>
+            <view class="poster-title">{{item.name}}</view>
+          </view>
+          <view class="poster-foot">
+            <view class="poster-meta">#{{item.dropNo}} · {{item.capacity}} seats</view>
+            <view class="poster-orb" style="background: {{item.accent}};">
+              <text class="poster-orb-price" style="color: {{item.orbInk}};">¥{{item.price}}</text>
+            </view>
+          </view>
         </view>
-      </view>
-    </block>
-  </view>
-
-  <view class="section">
-    <view class="card glass-card loader-card">
-      <view class="card-title">加载中的灵动反馈</view>
-      <view class="card-meta">圆环与五球都采用轻微缩放与漂浮效果，等待时更有活力。</view>
-      <view class="loader-line">
-        <view class="loader"></view>
-        <view class="pulse pulse-1"></view>
-        <view class="pulse pulse-2"></view>
-        <view class="pulse pulse-3"></view>
-      </view>
+      </block>
     </view>
   </view>
 
-  <view class="custom-tabbar">
-    <block wx:for="{{tabs}}" wx:key="key">
-      <view class="tab-item {{activeTab === item.key ? 'active' : ''}}" data-path="{{item.path}}" data-key="{{item.key}}" bindtap="onTabTap">
-        <view class="tab-icon {{item.key}}">
-          <view class="tab-ball"></view>
-          <view class="tab-face"></view>
-        </view>
-        <view class="tab-label">{{item.label}}</view>
+  <view class="profile-mask" wx:if="{{showProfileGuide}}" catchtouchmove="preventMove">
+    <view class="profile-sheet">
+      <view class="profile-sheet-title">同步微信头像昵称</view>
+      <view class="profile-sheet-sub">已自动生成默认头像和 Bean artist 序号名；也可点一次换成微信资料。</view>
+      <button class="guide-avatar-btn" open-type="chooseAvatar" bindchooseavatar="onGuideChooseAvatar">
+        <image class="guide-avatar" src="{{guideAvatarUrl}}" mode="aspectFill" binderror="onGuideAvatarError" />
+        <view class="guide-avatar-tip">点按选择头像</view>
+      </button>
+      <view class="guide-nickname-display">{{guideNickName}}</view>
+      <input
+        class="guide-nickname"
+        type="nickname"
+        maxlength="32"
+        placeholder="点按可同步微信昵称"
+        bindblur="onGuideNicknameBlur"
+      />
+      <view class="button-row profile-sheet-actions">
+        <view class="btn btn-secondary" bindtap="skipProfileGuide">稍后再说</view>
+        <view class="btn btn-primary" bindtap="finishProfileGuide">完成同步</view>
       </view>
-    </block>
+    </view>
   </view>
 </view>

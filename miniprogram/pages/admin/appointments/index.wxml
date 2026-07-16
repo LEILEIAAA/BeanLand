@@ -2,7 +2,7 @@
   <view class="hero admin-hero">
     <view class="eyebrow">店主看板</view>
     <view class="title">预约管理</view>
-    <view class="subtitle">确认选座后可直接去开台；开台成功自动转为已到店。预约开始后保留 15 分钟，超时未到自动标为未到店。</view>
+    <view class="subtitle">确认选座后可直接去开台；开台成功自动转为已到店。开始后保留 15 分钟，超时标未到店；已确认可代为取消。</view>
     <view class="btn btn-secondary" style="margin-top: 16rpx;" bindtap="goTimer">打开座位管理</view>
   </view>
 
@@ -19,6 +19,7 @@
           <view class="card-title">{{item.name}} · {{item.people}} 人</view>
           <view class="card-meta">{{item.date}} {{item.time}}</view>
           <view class="card-meta" wx:if="{{item.phone}}">手机 {{item.phone}}</view>
+          <view class="card-meta reject-reason" wx:if="{{item.showRejectReason}}">拒绝原因：{{item.rejectReason}}</view>
         </view>
         <view class="status-badge">{{item.statusLabel}}</view>
       </view>
@@ -33,9 +34,45 @@
         <view class="btn-mini btn-mini-primary" wx:if="{{item.canConfirm}}" data-id="{{item.id}}" bindtap="goConfirm">确认选座</view>
         <view class="btn-mini btn-mini-ghost" wx:if="{{item.canReject}}" data-id="{{item.id}}" bindtap="reject">拒绝</view>
       </view>
-      <view class="action-row" wx:if="{{item.canOpen}}">
-        <view class="btn-mini btn-mini-primary" data-id="{{item.id}}" bindtap="goOpen">去开台</view>
+      <view class="action-row" wx:if="{{item.canOpen || item.canAdminCancel}}">
+        <view class="btn-mini btn-mini-primary" wx:if="{{item.canOpen}}" data-id="{{item.id}}" bindtap="goOpen">去开台</view>
+        <view class="btn-mini btn-mini-ghost" wx:if="{{item.canAdminCancel}}" data-id="{{item.id}}" bindtap="adminCancel">代为取消</view>
       </view>
     </view>
   </block>
+
+  <view class="reject-mask" wx:if="{{rejectSheetOpen}}" catchtouchmove="noop" bindtap="closeRejectSheet">
+    <view class="reject-sheet" catchtap="noop">
+      <view class="reject-sheet-title">拒绝预约</view>
+      <view class="reject-sheet-meta" wx:if="{{rejectTargetLabel}}">{{rejectTargetLabel}}</view>
+
+      <view class="reject-section-label">快捷原因</view>
+      <view class="reject-chip-row">
+        <view
+          wx:for="{{rejectPresets}}"
+          wx:key="*this"
+          class="reject-chip {{rejectReason === item ? 'is-on' : ''}}"
+          data-reason="{{item}}"
+          bindtap="selectRejectPreset"
+        >{{item}}</view>
+      </view>
+
+      <view class="reject-section-label">拒绝原因</view>
+      <textarea
+        class="reject-input"
+        maxlength="{{rejectMaxLen}}"
+        placeholder="请选择快捷原因或手输"
+        value="{{rejectReason}}"
+        bindinput="onRejectReasonInput"
+      />
+      <view class="reject-tip">必填，最多 {{rejectMaxLen}} 字</view>
+
+      <view class="reject-actions">
+        <view class="btn btn-secondary reject-btn" bindtap="closeRejectSheet">取消</view>
+        <view class="btn btn-primary reject-btn {{rejectSubmitting ? 'btn-disabled' : ''}}" bindtap="confirmReject">
+          {{rejectSubmitting ? '提交中…' : '确认拒绝'}}
+        </view>
+      </view>
+    </view>
+  </view>
 </view>

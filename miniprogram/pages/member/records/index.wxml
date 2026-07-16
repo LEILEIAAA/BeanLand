@@ -1,0 +1,31 @@
+<view class="container sub-page">
+  <view class="sub-hero">
+    <view class="sub-label">当前可用</view>
+    <view class="sub-balance-row">
+      <view class="sub-value">{{totalBalance}}</view>
+      <image class="unit-icon" src="/assets/icons/bean.png" mode="aspectFit" />
+    </view>
+  </view>
+
+  <view class="list-card">
+    <block wx:if="{{emptyTip}}">
+      <view class="list-row">
+        <view class="list-main">
+          <view class="list-meta">{{emptyTip}}</view>
+        </view>
+      </view>
+    </block>
+    <block wx:for="{{transactions}}" wx:key="id">
+      <view class="list-row records-row">
+        <view class="list-main">
+          <view class="tx-type tx-type-{{item.typeKey}}">{{item.typeLabel}}</view>
+          <view class="list-title">{{item.body}}</view>
+          <view class="list-meta">{{item.meta}} · 余额 ¥{{item.balanceAfterText}}</view>
+        </view>
+        <view class="list-amount {{item.amount > 0 ? 'plus' : 'minus'}}">
+          {{item.amount > 0 ? '+' : ''}}{{item.amountText}}
+        </view>
+      </view>
+    </block>
+  </view>
+</view>

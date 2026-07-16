@@ -1,0 +1,43 @@
+<view class="container sub-page">
+  <view class="sub-hero">
+    <view class="sub-label">我的套餐</view>
+    <view class="sub-value">{{heroCount}}</view>
+    <view class="sub-desc">到店出示给店主核销并开台。未核销可主动退款；过期未用将原路自动退款。</view>
+  </view>
+
+  <view class="coupon-tabs">
+    <block wx:for="{{tabs}}" wx:key="key">
+      <view
+        class="coupon-tab {{activeTab === item.key ? 'active' : ''}}"
+        data-tab="{{item.key}}"
+        bindtap="onTabChange"
+      >{{item.label}}</view>
+    </block>
+  </view>
+
+  <view class="list-card" wx:if="{{orders.length}}">
+    <block wx:for="{{orders}}" wx:key="id">
+      <view class="list-row pkg-row">
+        <view class="list-main">
+          <view class="pkg-title-row">
+            <view class="list-title">{{item.name}}</view>
+            <view class="status-chip {{item.ok ? 'ok' : ''}}">{{item.statusText}}</view>
+          </view>
+          <view class="list-meta">{{item.meta}}</view>
+          <view class="list-meta" wx:if="{{item.validRange}}">{{item.validRange}}</view>
+        </view>
+        <view class="pkg-side">
+          <view class="coupon-amount">¥{{item.payText}}</view>
+          <view
+            class="btn btn-ghost pkg-refund-btn"
+            wx:if="{{item.canRefund}}"
+            data-id="{{item.id}}"
+            bindtap="onRefund"
+          >{{activeTab === 'unused' ? '申请退款' : '重试退款'}}</view>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <view class="empty-tip" wx:elif="{{!loading}}">{{emptyTip || '暂无套餐'}}</view>
+</view>

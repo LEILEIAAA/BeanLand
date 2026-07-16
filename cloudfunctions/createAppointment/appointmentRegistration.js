@@ -7,6 +7,7 @@ const STATUS = {
   cancelled: 'cancelled',
   arrived: 'arrived',
   no_show: 'no_show',
+  completed: 'completed',
 };
 
 const STATUS_LABEL = {
@@ -16,15 +17,21 @@ const STATUS_LABEL = {
   cancelled: '已取消',
   arrived: '已到店',
   no_show: '未到店',
+  completed: '已完成',
 };
 
 /** 预约开始后座位保留分钟数，超时未到标未到店 */
 const HOLD_MINUTES = 15;
 
+/** 店主拒绝预约快捷原因（可再手改） */
+const REJECT_REASON_PRESETS = ['时段已满', '人数超限', '临时闭店', '其他'];
+const REJECT_REASON_MAX_LEN = 80;
+
 const TRANSITIONS = {
   confirm: [STATUS.pending],
   reject: [STATUS.pending],
   cancel: [STATUS.pending],
+  adminCancel: [STATUS.confirmed],
   arrive: [STATUS.confirmed],
 };
 
@@ -164,6 +171,38 @@ function buildConfirmFields({ seatIds, peopleCount, now }) {
   };
 }
 
+function normalizeRejectReason(reason) {
+  return String(reason || '')
+    .trim()
+    .replace(/\s+/g, ' ');
+}
+
+function assertRejectReason(reason) {
+  const text = normalizeRejectReason(reason);
+  if (!text) {
+    return { ok: false, reason: '请填写拒绝原因' };
+  }
+  if (text.length > REJECT_REASON_MAX_LEN) {
+    return { ok: false, reason: `拒绝原因不超过 ${REJECT_REASON_MAX_LEN} 字` };
+  }
+  return { ok: true, rejectReason: text };
+}
+
+function buildRejectFields({ rejectReason, now }) {
+  const gate = assertRejectReason(rejectReason);
+  if (!gate.ok) return gate;
+  const ts = Number(now) || 0;
+  return {
+    ok: true,
+    fields: {
+      status: STATUS.rejected,
+      rejectReason: gate.rejectReason,
+      rejectedAt: ts,
+      updatedAt: ts,
+    },
+  };
+}
+
 function occupancyDocId(date, timeSlot, seatId) {
   return `${date}_${timeSlot}_${seatId}`;
 }
@@ -239,6 +278,41 @@ function resolveNoShowDeadline(appointmentDate, timeSlots) {
   return startMs + HOLD_MINUTES * 60 * 1000;
 }
 
+/** 末段结束时间 → 毫秒；无效则 0 */
+function resolveSlotEndMs(appointmentDate, timeSlots) {
+  const slots = Array.isArray(timeSlots) ? timeSlots : [];
+  if (!appointmentDate || !slots.length) return 0;
+  const endLabel = String(slots[slots.length - 1] || '').split('-')[1];
+  if (!endLabel) return 0;
+  const [hour, minute] = endLabel.split(':').map(Number);
+  if (!Number.isInteger(hour) || !Number.isInteger(minute)) return 0;
+  const endMs = new Date(
+    `${appointmentDate}T${pad(hour)}:${pad(minute)}:00+08:00`,
+  ).getTime();
+  if (!Number.isFinite(endMs)) return 0;
+  return endMs;
+}
+
+/** 已到店但时段已结束、仍占座 → 应释放 */
+function shouldReleaseArrivedHold(appt, now) {
+  if (!appt || appt.status !== STATUS.arrived) return false;
+  const date = appt.appointmentDate || appt.date;
+  const endMs = resolveSlotEndMs(date, normalizeApptTimeSlots(appt));
+  if (!endMs) return false;
+  return Number(now) >= endMs;
+}
+
+function buildCompletedFields(now) {
+  const ts = Number(now) || 0;
+  return {
+    status: STATUS.completed,
+    seatIds: [],
+    tableCode: '',
+    completedAt: ts,
+    updatedAt: ts,
+  };
+}
+
 function shouldMarkNoShow(appt, now) {
   if (!appt || appt.status !== STATUS.confirmed) return false;
   const date = appt.appointmentDate || appt.date;
@@ -253,6 +327,21 @@ function buildNoShowFields(now) {
     status: STATUS.no_show,
     noShowAt: ts,
     cancelReason: 'timeout',
+    seatIds: [],
+    tableCode: '',
+    updatedAt: ts,
+  };
+}
+
+/** 店主代为取消已确认预约 */
+function buildAdminCancelFields(now) {
+  const ts = Number(now) || 0;
+  return {
+    status: STATUS.cancelled,
+    cancelledAt: ts,
+    cancelReason: 'merchant',
+    seatIds: [],
+    tableCode: '',
     updatedAt: ts,
   };
 }
@@ -261,6 +350,8 @@ module.exports = {
   STATUS,
   STATUS_LABEL,
   HOLD_MINUTES,
+  REJECT_REASON_PRESETS,
+  REJECT_REASON_MAX_LEN,
   allowedRegisterDates,
   addDaysIso,
   normalizePhone,
@@ -269,11 +360,17 @@ module.exports = {
   assertCanTransition,
   buildRegistrationDoc,
   buildConfirmFields,
+  assertRejectReason,
+  buildRejectFields,
   buildOccupancyDocs,
   occupancyDocId,
   deriveTableCode,
   resolveArriveOnStart,
   resolveNoShowDeadline,
+  resolveSlotEndMs,
   shouldMarkNoShow,
+  shouldReleaseArrivedHold,
   buildNoShowFields,
+  buildCompletedFields,
+  buildAdminCancelFields,
 };

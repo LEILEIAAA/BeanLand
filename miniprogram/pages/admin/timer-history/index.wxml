@@ -1,0 +1,31 @@
+<view class="container sub-page">
+  <view class="hist-head">
+    <view class="hist-title">计时复盘</view>
+    <view class="hist-sub">已结束的到店计时，含时长、超时与消费</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="hist-hint">加载中…</view>
+
+  <block wx:elif="{{sessions.length}}">
+    <view class="hist-list">
+      <view class="hist-card" wx:for="{{sessions}}" wx:key="id">
+        <view class="hist-row-top">
+          <view class="hist-member">{{item.memberLabel}}</view>
+          <view class="hist-amount" wx:if="{{item.amountLabel}}">{{item.amountLabel}}</view>
+        </view>
+        <view class="hist-seats">{{item.tableCode}} · {{item.seatLabel || '—'}}</view>
+        <view class="hist-meta">
+          <text>开始 {{item.dateLabel}}</text>
+          <text wx:if="{{item.endedLabel}}"> · 结束 {{item.endedLabel}}</text>
+        </view>
+        <view class="hist-time">
+          <text class="hist-duration">时长 {{item.durationLabel}}</text>
+          <text wx:if="{{item.isOvertime}}" class="hist-overtime">超时 {{item.overtimeLabel}}</text>
+        </view>
+        <view wx:if="{{item.packageName}}" class="hist-pkg">套餐：{{item.packageName}}</view>
+      </view>
+    </view>
+  </block>
+
+  <view wx:else class="hist-empty">{{emptyTip || '暂无记录'}}</view>
+</view>

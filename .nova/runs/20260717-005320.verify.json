@@ -1,0 +1,12 @@
+{
+  "id": "20260717-005320",
+  "ok": true,
+  "results": [
+    {
+      "command": "node --test tests/appointmentAssign.test.js tests/seats.test.js",
+      "ok": true,
+      "exitCode": 0,
+      "tail": "  duration_ms: 0.1415\n  type: 'suite'\n  ...\n1..14\n# tests 20\n# suites 14\n# pass 20\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 118.6692"
+    }
+  ]
+}
