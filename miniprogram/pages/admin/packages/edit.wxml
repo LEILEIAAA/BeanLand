@@ -1,0 +1,85 @@
+<scroll-view class="edit-scroll" scroll-y="{{true}}">
+  <view class="edit-body">
+    <view class="card form-card">
+    <view class="form-item">
+      <view class="form-label">套餐名称 <text class="req">*</text></view>
+      <input class="field-input" placeholder="如：单人无限时" value="{{form.name}}" data-field="name" bindinput="onInput" />
+    </view>
+
+    <view class="form-item" wx:if="{{isCreate}}">
+      <view class="form-label">套餐ID（选填，留空自动生成）</view>
+      <input class="field-input" placeholder="如：solo-1h" value="{{form.id}}" data-field="id" bindinput="onInput" />
+    </view>
+
+    <view class="form-hint">会员端展示「工作日价 / 周末价」，请直接填这两项。</view>
+    <view class="form-row">
+      <view class="form-item flex1">
+        <view class="form-label">工作日价 <text class="req">*</text></view>
+        <input class="field-input" type="digit" placeholder="0" value="{{form.weekdayPrice}}" data-field="weekdayPrice" bindinput="onInput" />
+      </view>
+      <view class="form-item flex1">
+        <view class="form-label">周末价</view>
+        <input class="field-input" type="digit" placeholder="留空同工作日价" value="{{form.weekendPrice}}" data-field="weekendPrice" bindinput="onInput" />
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">排序（越小越前）</view>
+      <input class="field-input" type="number" placeholder="10" value="{{form.sortOrder}}" data-field="sortOrder" bindinput="onInput" />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">适用人群 / 简介</view>
+      <input class="field-input" placeholder="如：单人到店畅拼" value="{{form.targetAudience}}" data-field="targetAudience" bindinput="onInput" />
+    </view>
+
+    <view class="form-row">
+      <view class="form-item flex1">
+        <view class="form-label">时长(分钟，0=不限时)</view>
+        <input class="field-input" type="number" placeholder="0" value="{{form.durationMinutes}}" data-field="durationMinutes" bindinput="onInput" />
+      </view>
+      <view class="form-item flex1">
+        <view class="form-label">超时规则</view>
+        <input class="field-input" placeholder="如：到点结束" value="{{form.overtimeRule}}" data-field="overtimeRule" bindinput="onInput" />
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">包含内容（每行一项）</view>
+      <textarea class="field-textarea" placeholder="拼豆材料&#10;图纸任选&#10;现场指导" value="{{form.includedItemsText}}" data-field="includedItemsText" bindinput="onInput" auto-height />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">角标文案（选填）</view>
+      <input class="field-input" placeholder="如：开业限定" value="{{form.badge}}" data-field="badge" bindinput="onInput" />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">角标配色</view>
+      <view class="badge-row">
+        <view
+          wx:for="{{badgeColorOptions}}"
+          wx:key="value"
+          class="badge-dot {{form.badgeColorIndex === index ? 'is-active' : ''}}"
+          style="background: {{item.bg}};"
+          data-index="{{index}}"
+          catchtap="onBadgeColorTap"
+        ></view>
+      </view>
+    </view>
+
+    <view class="switch-row">
+      <view class="form-label">不参与开业折扣</view>
+      <switch checked="{{form.skipOpeningDiscount}}" data-field="skipOpeningDiscount" bindchange="onSwitch" color="#1c1917" />
+    </view>
+    <view class="switch-row">
+      <view class="form-label">上架（会员端可见）</view>
+      <switch checked="{{form.onShelf}}" data-field="onShelf" bindchange="onSwitch" color="#1c1917" />
+    </view>
+    </view>
+  </view>
+</scroll-view>
+
+<view class="edit-footer">
+  <view class="btn btn-primary save-btn {{saving ? 'is-disabled' : ''}}" bindtap="onSave">保存</view>
+</view>

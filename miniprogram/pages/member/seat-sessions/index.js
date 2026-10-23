@@ -1,7 +1,9 @@
 const api = require('../../../utils/api');
 const { mapMemberSessionRow } = require('../../../utils/seatSessionHistory');
 
+const { shareBehavior } = require('../../../utils/share');
 Page({
+  behaviors: [shareBehavior],
   data: {
     loading: true,
     sessions: [],
@@ -21,7 +23,7 @@ Page({
         this.setData({ sessions: [], emptyTip: (res && res.message) || '加载失败' });
         return;
       }
-      const sessions = (res.list || []).map(mapMemberSessionRow);
+      const sessions = (res.list || []).map((row) => mapMemberSessionRow(row));
       this.setData({
         sessions,
         emptyTip: sessions.length ? '' : '还没有到店记录，开台体验后会出现在这里',

@@ -1,10 +1,10 @@
 [
   {
     "id": "r100",
-    "rechargeAmount": 0.02,
-    "bonusAmount": 0.01,
-    "arrivalAmount": 0.03,
-    "audience": "调试档：本金+赠金（上线前改回）"
+    "rechargeAmount": 100,
+    "bonusAmount": 10,
+    "arrivalAmount": 110,
+    "audience": "尝鲜入门 / 学生"
   },
   {
     "id": "r300",
@@ -18,6 +18,13 @@
     "rechargeAmount": 500,
     "bonusAmount": 80,
     "arrivalAmount": 580,
-    "audience": "亲子课包 / 粉丝 / 高频用户"
+    "audience": "累计满 500 可升 VIP"
+  },
+  {
+    "id": "r1000",
+    "rechargeAmount": 1000,
+    "bonusAmount": 180,
+    "arrivalAmount": 1180,
+    "audience": "累计满 1000 可升 SVIP"
   }
 ]

@@ -32,7 +32,7 @@ const TRANSITIONS = {
   reject: [STATUS.pending],
   cancel: [STATUS.pending],
   adminCancel: [STATUS.confirmed],
-  arrive: [STATUS.confirmed],
+  // arrived 仅由开台触发（resolveArriveOnStart），不提供手动 arrive 转换
 };
 
 function pad(value) {

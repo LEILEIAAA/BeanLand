@@ -1,7 +1,9 @@
 const api = require('../../../utils/api');
 const { buildStampProgress } = require('../../../utils/stampProgress');
 
+const { shareBehavior } = require('../../../utils/share');
 Page({
+  behaviors: [shareBehavior],
   data: {
     stampCount: 0,
     stampTarget: 5,

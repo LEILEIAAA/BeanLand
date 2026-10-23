@@ -16,7 +16,8 @@
       </block>
     </view>
 
-    <view class="map-empty" wx:if="{{!seatGroups.length}}">当前筛选下暂无座位</view>
+    <page-loading wx:if="{{loading && !seatGroups.length}}" tip="座位加载中" rows="{{3}}" />
+    <view class="map-empty" wx:elif="{{!seatGroups.length}}">当前筛选下暂无座位</view>
 
     <block wx:for="{{seatGroups}}" wx:key="tableCode">
       <view class="table-block">
@@ -82,7 +83,7 @@
     <view class="dock-row member-select">
       <input
         class="dock-input"
-        placeholder="搜会员加入开台"
+        placeholder="手机号/尾号(≥4位)/昵称"
         value="{{memberKeyword}}"
         bindinput="onMemberKeywordInput"
         bindfocus="onMemberFocus"

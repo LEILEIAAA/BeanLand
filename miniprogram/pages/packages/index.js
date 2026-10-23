@@ -1,7 +1,11 @@
-const seed = require('../../data/seed');
 const api = require('../../utils/api');
-const { canRecharge } = require('../../utils/memberProfile');
+const { DEFAULT_AVATAR } = require('../../utils/wxProfile');
+const {
+  needsMemberRegister,
+  openMemberRegister,
+} = require('../../utils/memberRegisterGate');
 const { syncTabBar, setTabBarHidden } = require('../../utils/tabBar');
+const { formatYuan } = require('../../utils/money');
 const {
   listApplicableCoupons,
   pickBestCoupon,
@@ -12,39 +16,40 @@ const {
   PAY_METHOD,
 } = require('../../utils/packagePurchase');
 
-const DEFAULT_PROMO = {
-  active: true,
-  discountRate: 8,
-  label: '开业七天',
-  tip: '无限时套餐开业8折',
+const EMPTY_PROMO = {
+  active: false,
+  discountRate: 0,
+  label: '',
+  tip: '',
 };
 
-function formatYuan(value) {
-  const num = Number(value || 0);
-  if (!Number.isFinite(num)) return '0';
-  return Number.isInteger(num) ? String(num) : String(Number(num.toFixed(2)));
+function decorateQuote(quote) {
+  if (!quote) return null;
+  return {
+    ...quote,
+    listPriceText: formatYuan(quote.listPrice),
+    couponAmountText: formatYuan(quote.couponAmount),
+    payAmountText: formatYuan(quote.payAmount),
+  };
 }
 
-const PACKAGE_ORDER = [
-  'opening-trio',
-  'weekend-solo',
-  'solo-2h',
-  'solo-1h',
-  'weekend-duo',
-  'duo-2h',
-  'duo-1h',
-  'weekend-family',
-];
-
-function sortPackages(list) {
-  const rank = new Map(PACKAGE_ORDER.map((id, index) => [id, index]));
-  return (list || []).slice().sort((a, b) => {
-    const ai = rank.has(a.id) ? rank.get(a.id) : 999;
-    const bi = rank.has(b.id) ? rank.get(b.id) : 999;
-    if (ai !== bi) return ai - bi;
-    return String(a.id || '').localeCompare(String(b.id || ''));
-  });
+function resolvePromoTip(promo) {
+  if (!promo) return '';
+  const tip = String(promo.tip || '').trim();
+  const rate = Number(promo.discountRate);
+  if ((!tip || /^全场[\d.]+折$/.test(tip)) && rate > 0 && rate < 10) {
+    return `全场${formatYuan(rate)}折`;
+  }
+  return tip;
 }
+
+function buildPromoBanner(promo) {
+  if (!promo || !promo.active) return '';
+  const tip = resolvePromoTip(promo);
+  return `${promo.label || '开业特惠'}${tip ? ` · ${tip}` : ''}`;
+}
+
+const { sortPackages } = require('../../utils/packageSort');
 
 function decoratePackages(list, promo) {
   return sortPackages(list).map((item, index) => {
@@ -56,7 +61,16 @@ function decoratePackages(list, promo) {
       : (item.overtimeRule || '当日不限时');
     const isTodayWeekend = sale.dayType === 'weekend';
     const ribbonText = item.badge
-      || (sale.promoActive ? '开业8折' : '');
+      || (sale.promoActive ? `开业${formatYuan(sale.promoDiscountRate)}折` : '');
+    // 有 badgeColor 配置则严格跟随；否则：自定义角标默认橙，开业自动角标默认黄。
+    let ribbonTone = '';
+    if (ribbonText) {
+      if (item.badgeColor === 'yellow' || item.badgeColor === 'orange') {
+        ribbonTone = item.badgeColor;
+      } else {
+        ribbonTone = item.badge ? 'orange' : 'yellow';
+      }
+    }
     return {
       ...sale,
       weekendPrice,
@@ -65,22 +79,27 @@ function decoratePackages(list, promo) {
       weekdayPriceText: formatYuan(weekdayPrice),
       salePriceText: formatYuan(sale.price),
       dayPriceText: formatYuan(sale.dayPrice),
+      discountText: formatYuan(sale.promoDiscountRate),
       durationLabel,
       includeChips: Array.isArray(item.includedItems) ? item.includedItems : [],
       isTodayWeekend,
       dayTypeLabel: isTodayWeekend ? '周末' : '工作日',
       dropNo: String(index + 1).padStart(2, '0'),
       badge: ribbonText,
-      ribbonTone: item.badge ? 'hot' : (sale.promoActive ? 'deal' : ''),
+      ribbonTone,
+      isRibbonYellow: ribbonTone === 'yellow',
+      isRibbonOrange: ribbonTone === 'orange',
     };
   });
 }
 
+const { shareBehavior } = require('../../utils/share');
 Page({
+  behaviors: [shareBehavior],
   data: {
     packages: [],
     packageCount: 0,
-    packagePromo: DEFAULT_PROMO,
+    packagePromo: EMPTY_PROMO,
     promoBanner: '',
     dayHint: '',
     couponBlocked: false,
@@ -95,6 +114,7 @@ Page({
     payMethod: PAY_METHOD.BALANCE,
     quote: null,
     balance: 0,
+    balanceText: '0',
     memberCoupons: [],
   },
   onShow() {
@@ -102,21 +122,15 @@ Page({
     setTabBarHidden(this, !!this.data.sheetOpen);
     this.loadPackages();
   },
-  async loadPackagePromo() {
-    try {
-      const store = await api.getStore();
-      if (store && store.packagePromo) return store.packagePromo;
-    } catch (error) {
-      console.warn('[packages] load promo failed', error);
-    }
-    return (seed.store && seed.store.packagePromo) || DEFAULT_PROMO;
-  },
   async loadPackages() {
-    const promo = await this.loadPackagePromo();
-    let rows = seed.packages;
+    let promo = EMPTY_PROMO;
+    let rows = [];
     try {
-      const packages = await api.getPackages();
-      if (packages && packages.length) rows = packages;
+      const res = await api.listPackagesWithPromo();
+      if (res && res.ok) {
+        if (Array.isArray(res.list)) rows = res.list;
+        if (res.packagePromo) promo = res.packagePromo;
+      }
     } catch (error) {
       console.warn('[packages] load failed', error);
     }
@@ -124,9 +138,7 @@ Page({
     const dayHint = decorated[0] && decorated[0].isTodayWeekend
       ? '今日周末价'
       : '今日工作日价';
-    const promoBanner = promo && promo.active
-      ? `${promo.label || '开业特惠'} · ${promo.tip || '无限时套餐开业8折'}`
-      : '';
+    const promoBanner = buildPromoBanner(promo);
     this.setData({
       packages: decorated,
       packageCount: decorated.length,
@@ -139,22 +151,13 @@ Page({
     try {
       const result = await api.ensureMember({});
       const member = result && result.ok ? result.member : null;
-      if (canRecharge(member)) {
+      if (member && !needsMemberRegister(member, DEFAULT_AVATAR)) {
         return member;
       }
     } catch (error) {
       console.warn('[packages] guard phone', error);
     }
-
-    wx.showModal({
-      title: '先完善会员资料',
-      content: '购买套餐需要手机号，请先点头像完成注册（头像、昵称、手机号）。',
-      confirmText: '去注册',
-      showCancel: false,
-      success: () => {
-        wx.navigateTo({ url: '/pages/member/register/index' });
-      },
-    });
+    openMemberRegister();
     return null;
   },
   async loadMemberCoupons() {
@@ -170,15 +173,18 @@ Page({
   },
   buildSheetState(pkg, member, coupons, couponId, payMethod) {
     const rawCoupons = Array.isArray(coupons) ? coupons : [];
-    const promo = this.data.packagePromo || DEFAULT_PROMO;
+    const promo = this.data.packagePromo || EMPTY_PROMO;
     const couponBlocked = isOpeningCouponBlocked(promo);
-    const settleLabel = pkg && pkg.promoActive ? '结算打8折后' : '结算价';
+    const settleLabel = pkg && pkg.promoActive
+      ? `结算打${formatYuan(pkg.promoDiscountRate)}折后`
+      : '结算价';
     const dayMeta = pkg
-      ? `${pkg.isTodayWeekend ? '周末价' : '工作日价'}${pkg.promoActive ? ' · 开业8折' : ''}`
+      ? `${pkg.isTodayWeekend ? '周末价' : '工作日价'}${pkg.promoActive ? ` · 开业${formatYuan(pkg.promoDiscountRate)}折` : ''}`
       : '';
 
     if (couponBlocked) {
       const quote = calcPackageQuote(pkg, null);
+      const balanceNum = Number((member && member.totalBalance) || 0);
       return {
         selectedPackage: pkg,
         memberCoupons: rawCoupons,
@@ -189,8 +195,9 @@ Page({
         settleLabel,
         dayMeta,
         payMethod: payMethod || PAY_METHOD.BALANCE,
-        quote,
-        balance: Number((member && member.totalBalance) || 0),
+        quote: decorateQuote(quote),
+        balance: balanceNum,
+        balanceText: formatYuan(balanceNum),
         sheetOpen: true,
       };
     }
@@ -222,11 +229,12 @@ Page({
           selected: String(item.id) === String(selectedId),
           usable: true,
           amount: off,
-          amountText: off > 0 ? `-¥${off}` : '',
+          amountText: off > 0 ? `-¥${formatYuan(off)}` : '',
         };
       }),
     ];
 
+    const balanceNum = Number((member && member.totalBalance) || 0);
     return {
       selectedPackage: pkg,
       memberCoupons: rawCoupons,
@@ -237,8 +245,9 @@ Page({
       settleLabel,
       dayMeta,
       payMethod: payMethod || PAY_METHOD.BALANCE,
-      quote,
-      balance: Number((member && member.totalBalance) || 0),
+      quote: decorateQuote(quote),
+      balance: balanceNum,
+      balanceText: formatYuan(balanceNum),
       sheetOpen: true,
     };
   },
@@ -299,6 +308,9 @@ Page({
   async confirmPay() {
     if (this.data.paying || !this.data.selectedPackage || !this.data.quote) return;
 
+    const member = await this.guardPhone();
+    if (!member) return;
+
     const pkg = this.data.selectedPackage;
     const quote = this.data.quote;
     const couponId = this.data.couponBlocked ? '' : (this.data.selectedCouponId || '');
@@ -311,7 +323,7 @@ Page({
     if (payMethod === PAY_METHOD.BALANCE && quote.needPayment && this.data.balance < quote.payAmount) {
       wx.showModal({
         title: '余额不足',
-        content: `当前余额 ¥${this.data.balance}，实付 ¥${quote.payAmount}。请先充值或改用微信支付。`,
+        content: `当前余额 ¥${formatYuan(this.data.balance)}，实付 ¥${formatYuan(quote.payAmount)}。请先充值或改用在线支付。`,
         confirmText: '去充值',
         cancelText: '知道了',
         success: (res) => {

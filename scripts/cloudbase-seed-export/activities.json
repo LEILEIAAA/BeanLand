@@ -2,7 +2,7 @@
   {
     "id": "mayday",
     "name": "五月天主题拼豆",
-    "price": 0.01,
+    "price": 99,
     "capacity": 28,
     "registeredCount": 0,
     "status": "recruiting",
@@ -22,7 +22,7 @@
   {
     "id": "squid-game",
     "name": "大学生鱿鱼游戏",
-    "price": 0.01,
+    "price": 39,
     "capacity": 24,
     "registeredCount": 0,
     "status": "recruiting",
@@ -42,7 +42,7 @@
   {
     "id": "craft-meetup",
     "name": "拼豆交流会",
-    "price": 0.01,
+    "price": 39,
     "capacity": 30,
     "registeredCount": 0,
     "status": "recruiting",
@@ -62,7 +62,7 @@
   {
     "id": "birthday",
     "name": "生日会 / 团建 / 包场",
-    "price": 0.01,
+    "price": 1999,
     "capacity": 40,
     "registeredCount": 0,
     "status": "consulting",

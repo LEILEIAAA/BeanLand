@@ -1,3 +1,5 @@
 {
-  "navigationBarTitleText": "套餐"
+  "navigationBarTitleText": "套餐",
+  "enableShareAppMessage": true,
+  "enableShareTimeline": true
 }

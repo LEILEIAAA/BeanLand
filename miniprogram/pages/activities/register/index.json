@@ -1,3 +1,5 @@
 {
-  "navigationBarTitleText": "活动报名"
+  "navigationBarTitleText": "活动报名",
+  "enableShareAppMessage": true,
+  "enableShareTimeline": true
 }

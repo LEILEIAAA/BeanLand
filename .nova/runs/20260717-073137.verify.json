@@ -1,0 +1,12 @@
+{
+  "id": "20260717-073137",
+  "ok": true,
+  "results": [
+    {
+      "command": "node -e \"const fs=require('fs');const w=fs.readFileSync('miniprogram/pages/member/index.wxml','utf8');const s=fs.readFileSync('miniprogram/pages/member/index.wxss','utf8');const j=fs.readFileSync('miniprogram/pages/member/index.js','utf8');if(w.includes('去预约')||w.includes('asset-actions')||!w.includes('btn-recharge')||s.includes('.asset-actions')||j.includes('goAppointment')){process.exit(1)}console.log('member recharge UI ok');\"",
+      "ok": true,
+      "exitCode": 0,
+      "tail": "member recharge UI ok"
+    }
+  ]
+}

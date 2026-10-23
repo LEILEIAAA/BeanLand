@@ -127,6 +127,15 @@ function calcSessionTime({
   };
 }
 
+function resolveSeatIdsSnapshot(session) {
+  const live = Array.isArray(session && session.seatIds) ? session.seatIds : [];
+  if (live.length) return [...live];
+  const snap = Array.isArray(session && session.seatIdsSnapshot)
+    ? session.seatIdsSnapshot
+    : [];
+  return [...snap];
+}
+
 function buildEndSessionFields(session, endedAt) {
   const end = Number(endedAt);
   const start = Number(session && session.startedAt);
@@ -140,10 +149,8 @@ function buildEndSessionFields(session, endedAt) {
     endedAt: end,
     totalMinutes,
     overtimeMinutes: Math.max(0, totalMinutes - duration),
-    // 结束时会清空 seatIds，此处快照原座位供历史复盘展示
-    seatIdsSnapshot: Array.isArray(session && session.seatIds)
-      ? [...session.seatIds]
-      : [],
+    // 优先用 live seatIds；已空则保留开台写入的 seatIdsSnapshot
+    seatIdsSnapshot: resolveSeatIdsSnapshot(session),
     updatedAt: end,
   };
 }
@@ -180,6 +187,8 @@ function buildStartSessionRecord({
     memberNickname: memberNickname || '',
     tableCode,
     seatIds: ids,
+    // 开台即快照，结束清空 seatIds 后历史仍可读
+    seatIdsSnapshot: [...ids],
     durationMinutes: duration,
     startedAt,
     expectedEndAt: startedAt + duration * 60 * 1000,

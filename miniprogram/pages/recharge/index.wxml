@@ -1,31 +1,49 @@
-<view class="container sub-page">
-  <view class="sub-hero">
-    <view class="sub-label">会员储值</view>
-    <view class="sub-value">微信支付</view>
-    <view class="sub-desc">选档后调起微信支付，到账写入云端余额。也可到店由店长代充录入。</view>
+<view class="container recharge-page">
+  <view class="rc-hero">
+    <view class="rc-kicker">会员储值</view>
+    <view class="rc-title">选择充值金额</view>
+    <view class="rc-desc">在线支付到账；也可到店由店长代充。</view>
   </view>
 
-  <block wx:for="{{rechargePlans}}" wx:key="id">
-    <view class="plan-card">
-      <view class="plan-top">
-        <view>
-          <view class="plan-title">充 {{item.rechargeAmount}} 送 {{item.bonusAmount}}</view>
-          <view class="plan-meta">适合：{{item.audience}}</view>
-        </view>
-        <view class="plan-price">实付 ¥{{item.rechargeAmount}}</view>
-      </view>
-      <view class="btn btn-primary {{paying ? 'btn-disabled' : ''}}" data-id="{{item.id}}" bindtap="choose">
-        {{paying ? '支付中…' : '微信支付'}}
-      </view>
-    </view>
-  </block>
+  <view class="rc-tier">
+    <view class="rc-tier-title">充值与会员等级</view>
+    <view class="rc-tier-body">累计充值满 ¥500 可升 VIP，满 ¥1000 可升 SVIP（亦可按累计消费达标）。</view>
+  </view>
 
-  <view class="list-card">
-    <view class="list-row">
-      <view class="list-main">
-        <view class="list-title">储值说明</view>
-        <view class="list-meta">实付为本金；赠送记入赠金且不可提现。到账后可用于体验、续时、升级、配件和活动报名。店长代充入口在店主看板。</view>
+  <view class="rc-section-label">推荐档位</view>
+  <view class="rc-list">
+    <block wx:for="{{rechargePlans}}" wx:key="id">
+      <view
+        class="rc-item {{selectedPlanId === item.id || selectedPlanId === item._id ? 'is-on' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="selectPlan"
+      >
+        <view class="rc-item-main">
+          <view class="rc-item-title">充 {{item.rechargeAmount}} 送 {{item.bonusAmount}}</view>
+          <view class="rc-item-meta">到账 ¥{{item.arrivalAmountText}} · {{item.audience}}</view>
+        </view>
+        <view class="rc-item-side">
+          <view class="rc-item-price">¥{{item.rechargeAmountText}}</view>
+          <view class="rc-radio {{selectedPlanId === item.id || selectedPlanId === item._id ? 'is-on' : ''}}"></view>
+        </view>
       </view>
+    </block>
+  </view>
+
+  <view class="rc-tip">赠金不可退。</view>
+
+  <view class="rc-spacer"></view>
+  <view class="rc-bar">
+    <view class="rc-bar-meta" wx:if="{{canConfirm}}">
+      <text>赠 ¥{{previewBonus}}</text>
+      <text class="rc-bar-sep">·</text>
+      <text>到账 ¥{{previewArrival}}</text>
+    </view>
+    <view
+      class="rc-btn {{!canConfirm || paying ? 'is-disabled' : ''}}"
+      bindtap="confirmPay"
+    >
+      {{confirmLabel}}
     </view>
   </view>
 </view>

@@ -6,36 +6,44 @@
   </view>
 
   <view class="tag-row section filter-row">
-    <view class="filter-tag {{filterStatus === '' ? 'is-on' : ''}}" data-status="" bindtap="setFilter">全部</view>
-    <view class="filter-tag {{filterStatus === 'paid' ? 'is-on' : ''}}" data-status="paid" bindtap="setFilter">已报名</view>
-    <view class="filter-tag {{filterStatus === 'refund_pending' ? 'is-on' : ''}}" data-status="refund_pending" bindtap="setFilter">待退款</view>
+    <view
+      wx:for="{{filterTabs}}"
+      wx:key="key"
+      class="filter-tag {{filterStatus === item.key ? 'is-on' : ''}}"
+      data-status="{{item.key}}"
+      bindtap="setFilter"
+    >{{item.label}}</view>
   </view>
 
   <view class="section">
     <view class="section-title">报名列表</view>
-    <view class="subtitle" wx:if="{{loading}}">加载中…</view>
-    <view class="subtitle" wx:elif="{{!list.length}}">暂无报名记录</view>
   </view>
 
-  <block wx:for="{{list}}" wx:key="_id">
-    <view class="card combined-card">
-      <view class="card-topline">
-        <view>
-          <view class="card-title">{{item.activityName}}</view>
-          <view class="card-meta">{{item.name}} · {{item.phone}}</view>
-          <view class="card-meta" wx:if="{{item.paidAtLabel}}">报名时间 {{item.paidAtLabel}}</view>
+  <page-loading wx:if="{{loading}}" tip="报名加载中" rows="{{4}}" />
+
+  <view class="subtitle" wx:elif="{{!list.length}}" style="margin-top: 8rpx;">暂无报名记录</view>
+
+  <block wx:else>
+    <block wx:for="{{list}}" wx:key="_id">
+      <view class="card combined-card">
+        <view class="card-topline">
+          <view>
+            <view class="card-title">{{item.activityName}}</view>
+            <view class="card-meta">{{item.name}} · {{item.phone}}</view>
+            <view class="card-meta" wx:if="{{item.paidAtLabel}}">报名时间 {{item.paidAtLabel}}</view>
+          </view>
+          <view class="status-badge {{item.status === 'refund_pending' ? 'warn' : ''}}">{{item.statusLabel}}</view>
         </view>
-        <view class="status-badge {{item.status === 'refund_pending' ? 'warn' : ''}}">{{item.statusLabel}}</view>
-      </view>
 
-      <view class="tag-row">
-        <view class="tag">¥{{item.amount}}</view>
-        <view class="tag">{{item.channelLabel}}</view>
-      </view>
+        <view class="tag-row">
+          <view class="tag">¥{{item.amountText}}</view>
+          <view class="tag">{{item.channelLabel}}</view>
+        </view>
 
-      <view class="action-row" wx:if="{{item.canConfirmRefund}}">
-        <view class="btn-mini btn-mini-primary" data-id="{{item._id}}" bindtap="confirmRefund">确认退款</view>
+        <view class="action-row" wx:if="{{item.canConfirmRefund}}">
+          <view class="btn-mini btn-mini-primary" data-id="{{item._id}}" bindtap="confirmRefund">重试退款</view>
+        </view>
       </view>
-    </view>
+    </block>
   </block>
 </view>

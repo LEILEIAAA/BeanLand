@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "generator": "nova-context/0.1",
-  "commit": "275325d2e36e",
+  "commit": "bd88e72a4519",
   "project": {
     "name": "Bean",
     "type": "frontend-app"
@@ -19,6 +19,6 @@
     "byTask": {}
   },
   "managed": [],
-  "generatedAt": "2026-07-16T14:21:32.235Z",
-  "sourceHash": "sha256-bb7405d9c7d87cc4f37fc1522bd518bb"
+  "generatedAt": "2026-07-16T22:57:57.306Z",
+  "sourceHash": "sha256-5fba7c3b874ab3fdfcebb7ea54191824"
 }

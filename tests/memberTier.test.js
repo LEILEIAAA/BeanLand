@@ -5,6 +5,7 @@ const {
   resolveTier,
   upgradeTier,
   tierLabel,
+  tierStyleClass,
   spentThresholdFromRecharge,
 } = require('../miniprogram/utils/memberTier');
 
@@ -40,4 +41,12 @@ test('upgradeTier never downgrades', () => {
 test('tierLabel maps codes', () => {
   assert.equal(tierLabel('vip'), 'VIP');
   assert.equal(tierLabel('unknown'), '普通会员');
+});
+
+test('tierStyleClass maps codes for UI skins', () => {
+  assert.equal(tierStyleClass('member'), 'tier-member');
+  assert.equal(tierStyleClass('vip'), 'tier-vip');
+  assert.equal(tierStyleClass('svip'), 'tier-svip');
+  assert.equal(tierStyleClass('unknown'), 'tier-member');
+  assert.equal(tierStyleClass(''), 'tier-member');
 });

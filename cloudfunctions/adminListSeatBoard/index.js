@@ -4,6 +4,7 @@ const {
   buildReservationsBySeatId,
 } = require('./seatSession');
 const { settleNoShowAppointments } = require('./settleNoShow');
+const { buildSeatsFromTables } = require('./seats');
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
@@ -14,6 +15,32 @@ function chinaToday() {
   const m = String(china.getUTCMonth() + 1).padStart(2, '0');
   const d = String(china.getUTCDate()).padStart(2, '0');
   return `${y}-${m}-${d}`;
+}
+
+function unwrapNumber(value) {
+  if (value == null) return 0;
+  if (typeof value === 'number') return value;
+  if (typeof value === 'object') {
+    if (value.$numberInt != null) return Number(value.$numberInt);
+    if (value.$numberLong != null) return Number(value.$numberLong);
+    if (value.$numberDouble != null) return Number(value.$numberDouble);
+  }
+  const n = Number(value);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function normalizeSeatRow(row) {
+  if (!row) return null;
+  const id = row.id || row._id || '';
+  if (!id) return null;
+  return {
+    id,
+    tableCode: row.tableCode || '',
+    area: row.area || '',
+    index: unwrapNumber(row.index),
+    capacity: unwrapNumber(row.capacity),
+    maintenance: !!row.maintenance,
+  };
 }
 
 async function assertAdmin(openid) {
@@ -37,6 +64,23 @@ async function safeGet(query) {
     console.warn('[adminListSeatBoard] query failed', error);
     return [];
   }
+}
+
+/** Server-side seat list so admin page does not depend on client DB read ACL. */
+async function loadSeatList() {
+  const fromSeats = await safeGet(db.collection('seats').limit(200).get());
+  if (fromSeats.length) {
+    return fromSeats.map(normalizeSeatRow).filter(Boolean);
+  }
+  const tables = await safeGet(db.collection('tables').limit(50).get());
+  if (!tables.length) return [];
+  return buildSeatsFromTables(
+    tables.map((t) => ({
+      ...t,
+      capacity: unwrapNumber(t.capacity),
+    })),
+    { seatIdSeparator: '' },
+  ).map(normalizeSeatRow).filter(Boolean);
 }
 
 async function loadTodayAppointments(today) {
@@ -76,7 +120,8 @@ exports.main = async () => {
 
     const now = Date.now();
     const today = chinaToday();
-    const [sessionRows, maintRows, reservedOcc, arrivedOcc, appointments] = await Promise.all([
+    const [sessionRows, maintRows, reservedOcc, arrivedOcc, appointments, seats] =
+      await Promise.all([
       safeGet(
         db.collection('seat_sessions').where({ status: 'active' }).limit(100).get(),
       ),
@@ -102,6 +147,7 @@ exports.main = async () => {
           .get(),
       ),
       loadTodayAppointments(today),
+      loadSeatList(),
     ]);
 
     await settleNoShowAppointments(db, appointments, now);
@@ -167,6 +213,7 @@ exports.main = async () => {
       ok: true,
       now,
       today,
+      seats,
       sessions,
       maintenanceSeatIds,
       inUse,

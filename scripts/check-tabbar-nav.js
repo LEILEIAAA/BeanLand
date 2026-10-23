@@ -126,8 +126,24 @@ if (!/wx:if="\{\{!hidden\}\}"/.test(customTabWxml)) {
 console.log('OK tabBar hides while package sheet open');
 
 const appWxss = fs.readFileSync(path.join(root, 'app.wxss'), 'utf8');
-if (!/\.tab-page\s*\{/.test(appWxss) || !/140rpx/.test(appWxss)) {
+if (!/\.tab-page\s*\{/.test(appWxss) || !/108rpx/.test(appWxss)) {
   console.error('TAB_PAGE_INSET_MISSING');
+  process.exit(1);
+}
+
+const tabBarWxss = fs.readFileSync(path.join(root, 'custom-tab-bar/index.wxss'), 'utf8');
+if (!/88rpx/.test(tabBarWxss)) {
+  console.error('TAB_BAR_HEIGHT_NOT_COMPACT');
+  process.exit(1);
+}
+
+const iconGen = fs.readFileSync(path.join(__dirname, 'generate-tab-icons.js'), 'utf8');
+if (/SOFT_TILES|soft-color tile/i.test(iconGen)) {
+  console.error('TAB_ICON_MUST_BE_MONO_NOT_COLOR_TILE');
+  process.exit(1);
+}
+if (!/MONO_ICONS|mono refined/i.test(iconGen)) {
+  console.error('TAB_ICON_MONO_GENERATOR_MISSING');
   process.exit(1);
 }
 const tabPageRoots = [

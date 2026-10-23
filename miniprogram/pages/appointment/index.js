@@ -11,6 +11,7 @@ const {
   indexesToSlots,
   formatSlotSpan,
 } = require('../../utils/timeSlots');
+const { resolveTimeSlots } = require('../../utils/storePublic');
 const {
   allowedRegisterDates,
   STATUS_LABEL,
@@ -26,10 +27,11 @@ const {
   resolveNickNameUpdate,
   needsSyncHints,
 } = require('../../utils/wxProfile');
+const { normalizePhone } = require('../../utils/memberProfile');
 const {
-  isRegistrationComplete,
-  normalizePhone,
-} = require('../../utils/memberProfile');
+  needsMemberRegister,
+  openMemberRegister,
+} = require('../../utils/memberRegisterGate');
 const { buildAssignTimerUrl } = require('../../utils/appointmentAssign');
 
 const sourceOptions = ['小程序', '美团', '小红书', '朋友圈', '楼内导流', '社群'];
@@ -92,7 +94,9 @@ function buildSeatGroups(seats, occupancies, date, selectedSlots, selectedSeatId
   return { groups, occupancy };
 }
 
+const { shareBehavior } = require('../../utils/share');
 Page({
+  behaviors: [shareBehavior],
   data: {
     mode: 'register',
     appointmentId: '',
@@ -162,13 +166,13 @@ Page({
 
     let timeSlots = [];
     try {
-      timeSlots = (await api.getTimeSlots()) || [];
+      timeSlots = resolveTimeSlots(await api.getTimeSlots());
     } catch (error) {
-      timeSlots = [];
+      console.warn('[appointment] load time slots failed', error);
+      timeSlots = resolveTimeSlots([]);
     }
     if (!timeSlots.length) {
-      const seed = require('../../data/seed');
-      timeSlots = seed.timeSlots || [];
+      wx.showToast({ title: '时段加载失败', icon: 'none' });
     }
 
     const defaultSlot = Math.min(1, Math.max(0, timeSlots.length - 1));
@@ -193,42 +197,43 @@ Page({
       'form.peopleCount': peopleCount,
     });
 
+    this._skipNextShowGate = true;
     await this.ensureMemberGate();
     this.applyWxProfile();
     await this.prefillMemberPhone();
   },
 
   onShow() {
-    if (this.data.mode === 'register') {
-      this.applyWxProfile();
+    if (this.data.mode !== 'register') return;
+    this.applyWxProfile();
+    if (this._skipNextShowGate) {
+      this._skipNextShowGate = false;
+      return;
     }
+    this.ensureMemberGate();
   },
 
   async ensureMemberGate() {
     try {
       const res = await api.getMyMember();
       const member = res && res.member;
-      if (!member || !isRegistrationComplete(member, DEFAULT_AVATAR)) {
-        wx.showModal({
-          title: '请先注册会员',
-          content: '预约开拼需要先完成会员注册',
-          confirmText: '去注册',
-          success: (r) => {
-            if (r.confirm) {
-              wx.redirectTo({ url: '/pages/member/register/index' });
-            } else {
-              wx.navigateBack({ fail: () => wx.switchTab({ url: '/pages/home/index' }) });
-            }
-          },
-        });
+      if (needsMemberRegister(member, DEFAULT_AVATAR)) {
+        const opened = openMemberRegister({ replace: true });
         this.setData({ memberReady: false });
+        if (!opened) {
+          wx.showToast({ title: '请先完成会员注册', icon: 'none' });
+        }
         return false;
       }
       this.setData({ memberReady: true, _member: member });
       return true;
     } catch (error) {
-      wx.showToast({ title: '请先登录并注册会员', icon: 'none' });
+      console.warn('[appointment] member gate', error);
+      const opened = openMemberRegister({ replace: true });
       this.setData({ memberReady: false });
+      if (!opened) {
+        wx.showToast({ title: '请先完成会员注册', icon: 'none' });
+      }
       return false;
     }
   },
@@ -431,8 +436,8 @@ Page({
 
   async submitRegister() {
     if (!this.data.memberReady) {
-      await this.ensureMemberGate();
-      return;
+      const ready = await this.ensureMemberGate();
+      if (!ready) return;
     }
     const form = this.data.form;
     const timeSlots = this.selectedSlots();

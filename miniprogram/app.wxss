@@ -8,11 +8,11 @@ page {
 
 .container { padding: 28rpx; }
 
-/* Reserve space under fixed custom-tab-bar (112rpx + safe area). */
+/* Reserve space under fixed custom-tab-bar (88rpx + safe area). */
 .tab-page {
   box-sizing: border-box;
-  padding-bottom: calc(140rpx + constant(safe-area-inset-bottom));
-  padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
+  padding-bottom: calc(108rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(108rpx + env(safe-area-inset-bottom));
 }
 .hero-stage { position: relative; }
 .hero-bands {

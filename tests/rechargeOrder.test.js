@@ -1,6 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
+const rechargeOrder = require('../miniprogram/utils/rechargeOrder');
 const {
   yuanToFen,
   buildOutTradeNo,
@@ -11,7 +12,7 @@ const {
   assertPayAmountMatch,
   CHANNEL,
   STATUS,
-} = require('../miniprogram/utils/rechargeOrder');
+} = rechargeOrder;
 
 test('yuanToFen converts recharge yuan to integer fen', () => {
   assert.equal(yuanToFen(100), 10000);
@@ -82,4 +83,11 @@ test('isCreditIdempotent when already credited', () => {
 test('assertPayAmountMatch accepts equal fen and rejects mismatch', () => {
   assert.equal(assertPayAmountMatch({ payAmountFen: 10000 }, 10000), true);
   assert.equal(assertPayAmountMatch({ payAmountFen: 10000 }, 9999), false);
+});
+
+test('custom recharge helpers are removed', () => {
+  assert.equal(rechargeOrder.resolveCustomRecharge, undefined);
+  assert.equal(rechargeOrder.CUSTOM_MIN_YUAN, undefined);
+  assert.equal(rechargeOrder.CUSTOM_PLAN_ID, undefined);
+  assert.equal(rechargeOrder.normalizeYuan, undefined);
 });

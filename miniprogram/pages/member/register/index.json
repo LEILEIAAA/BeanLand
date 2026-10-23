@@ -1,4 +1,8 @@
 {
   "navigationBarTitleText": "完善会员资料",
-  "usingComponents": {}
+  "usingComponents": {
+    "privacy-popup": "/components/privacy-popup/index"
+  },
+  "enableShareAppMessage": true,
+  "enableShareTimeline": true
 }

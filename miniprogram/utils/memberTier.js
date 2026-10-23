@@ -48,6 +48,12 @@ function tierLabel(tier) {
   return TIER_LABEL[tier] || TIER_LABEL.member;
 }
 
+function tierStyleClass(tier) {
+  if (tier === 'svip') return 'tier-svip';
+  if (tier === 'vip') return 'tier-vip';
+  return 'tier-member';
+}
+
 module.exports = {
   DEFAULT_TIER_RULES,
   TIER_RANK,
@@ -56,4 +62,5 @@ module.exports = {
   resolveTier,
   upgradeTier,
   tierLabel,
+  tierStyleClass,
 };

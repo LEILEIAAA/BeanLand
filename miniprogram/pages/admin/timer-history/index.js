@@ -3,7 +3,7 @@ const { mapAdminSessionRow } = require('../../../utils/seatSessionHistory');
 
 Page({
   data: {
-    loading: false,
+    loading: true,
     sessions: [],
     emptyTip: '',
   },

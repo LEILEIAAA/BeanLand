@@ -7,6 +7,8 @@ const {
   buildRejectFields,
   buildAdminCancelFields,
 } = require('./appointmentRegistration');
+// 说明：到店（arrived）只能由开台触发（见 adminStartSeatSession），
+// 本函数不再提供手动「标记到店」路径，未开台的预约停留在 confirmed。
 const {
   buildOccupancyUnion,
   assertCanBookSeats,
@@ -103,18 +105,6 @@ async function removeOccupanciesForAppointment(appointmentId) {
   } catch (error) {
     console.warn('[adminUpdateAppointment] remove occupancies', error);
   }
-}
-
-async function syncArrivedOccupancies(appt, appointmentId, now) {
-  const docs = buildOccupancyDocs({
-    appointmentId,
-    appointmentDate: appt.appointmentDate,
-    timeSlots: appt.timeSlots || (appt.timeSlot ? [appt.timeSlot] : []),
-    seatIds: appt.seatIds || [],
-    type: 'arrived',
-    now,
-  });
-  await writeOccupancies(docs);
 }
 
 async function handleConfirm(appt, appointmentId, seatIds, now) {
@@ -215,38 +205,6 @@ async function handleAdminCancel(appt, appointmentId, now) {
   };
 }
 
-async function handleArrive(appt, appointmentId, now) {
-  const gate = assertCanTransition(appt.status, 'arrive');
-  if (!gate.ok) {
-    return { ok: false, code: 'INVALID_STATUS', message: gate.reason };
-  }
-  if (!Array.isArray(appt.seatIds) || !appt.seatIds.length) {
-    return { ok: false, code: 'NO_SEATS', message: '请先确认选座' };
-  }
-
-  await ensureCollection('seat_occupancies');
-  try {
-    await syncArrivedOccupancies(appt, appointmentId, now);
-    await db.collection('appointments').doc(appointmentId).update({
-      data: {
-        status: STATUS.arrived,
-        arrivedAt: now,
-        updatedAt: now,
-      },
-    });
-  } catch (error) {
-    // best-effort: do not leave arrived without seats sync
-    console.error('[adminUpdateAppointment] arrive sync failed', error);
-    return {
-      ok: false,
-      code: 'SYNC_FAILED',
-      message: '到店同步座位管理失败，请重试',
-    };
-  }
-
-  return { ok: true, appointmentId, status: STATUS.arrived, seatIds: appt.seatIds };
-}
-
 exports.main = async (event) => {
   try {
     const { OPENID } = cloud.getWXContext();
@@ -280,9 +238,6 @@ exports.main = async (event) => {
     }
     if (action === 'reject') {
       return handleReject(appt, appointmentId, event.rejectReason, now);
-    }
-    if (action === 'arrive') {
-      return handleArrive(appt, appointmentId, now);
     }
     if (action === 'adminCancel') {
       return handleAdminCancel(appt, appointmentId, now);

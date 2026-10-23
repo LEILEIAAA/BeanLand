@@ -18,7 +18,10 @@
 
   <block wx:for="{{packages}}" wx:key="id">
     <view class="pkg-card {{item.id === 'opening-trio' ? 'is-hot' : ''}}">
-      <view class="pkg-ribbon {{item.ribbonTone ? 'tone-' + item.ribbonTone : ''}}" wx:if="{{item.badge}}">
+      <view
+        class="pkg-ribbon {{item.isRibbonYellow ? 'tone-yellow' : 'tone-orange'}}"
+        wx:if="{{item.badge}}"
+      >
         <text class="pkg-ribbon-text">{{item.badge}}</text>
       </view>
       <view class="pkg-card-top">
@@ -45,7 +48,7 @@
       </view>
 
       <view class="pkg-sale" wx:if="{{item.promoActive}}">
-        <text class="pkg-sale-label">今日按{{item.dayTypeLabel}}结算打8折后</text>
+        <text class="pkg-sale-label">今日按{{item.dayTypeLabel}}结算打{{item.discountText}}折后</text>
         <text class="pkg-sale-value">¥{{item.salePriceText}}</text>
         <text class="pkg-sale-base">¥{{item.dayPriceText}}</text>
       </view>
@@ -75,7 +78,7 @@
 
       <view class="buy-row settle">
         <text class="buy-label">{{settleLabel}}</text>
-        <text class="buy-value">¥{{quote.listPrice}}</text>
+        <text class="buy-value">¥{{quote.listPriceText}}</text>
       </view>
 
       <view class="buy-section-label">优惠券</view>
@@ -100,23 +103,23 @@
           class="pay-method {{payMethod === 'balance' ? 'selected' : ''}}"
           data-method="balance"
           bindtap="selectPayMethod"
-        >余额（¥{{balance}}）</view>
+        >余额（¥{{balanceText}}）</view>
         <view
           class="pay-method {{payMethod === 'wechat' ? 'selected' : ''}}"
           data-method="wechat"
           bindtap="selectPayMethod"
-        >微信支付</view>
+        >在线支付</view>
       </view>
 
       <view class="buy-row total">
         <text class="buy-label">实付</text>
-        <text class="buy-value emphasis">¥{{quote.payAmount}}</text>
+        <text class="buy-value emphasis">¥{{quote.payAmountText}}</text>
       </view>
       <view class="buy-tip" wx:if="{{!quote.needPayment}}">优惠券已全额抵扣，确认后直接核销</view>
 
       <view class="buy-actions">
         <view class="btn btn-primary {{paying ? 'btn-disabled' : ''}}" bindtap="confirmPay">
-          {{paying ? '支付中…' : (payMethod === 'wechat' && quote.needPayment ? '微信支付' : '确认支付')}}
+          {{paying ? '支付中…' : (payMethod === 'wechat' && quote.needPayment ? '在线支付' : '确认支付')}}
         </view>
       </view>
     </view>

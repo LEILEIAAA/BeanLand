@@ -1,0 +1,144 @@
+page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+.edit-scroll {
+  flex: 1;
+  min-height: 0;
+}
+
+.edit-body {
+  padding: 28rpx;
+}
+
+.form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  margin-top: 24rpx;
+}
+
+.block-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #1c1917;
+}
+
+.form-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.form-row {
+  display: flex;
+  gap: 20rpx;
+}
+
+.flex1 {
+  flex: 1;
+  min-width: 0;
+}
+
+.form-label {
+  font-size: 26rpx;
+  color: #57534e;
+  font-weight: 600;
+}
+
+.field-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 76rpx;
+  padding: 18rpx 24rpx;
+  border-radius: 20rpx;
+  border: 1rpx solid rgba(28, 25, 23, 0.08);
+  background: #fafaf9;
+  color: #1c1917;
+  font-size: 28rpx;
+}
+
+.picker-input {
+  display: flex;
+  align-items: center;
+}
+
+.field-textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 140rpx;
+  padding: 18rpx 24rpx;
+  border-radius: 20rpx;
+  border: 1rpx solid rgba(28, 25, 23, 0.08);
+  background: #fafaf9;
+  color: #1c1917;
+  font-size: 28rpx;
+}
+
+.sched-item {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  padding: 20rpx;
+  border-radius: 20rpx;
+  border: 1rpx solid rgba(28, 25, 23, 0.08);
+  background: #fff;
+}
+
+.sched-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sched-no {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1c1917;
+}
+
+.sched-ops {
+  display: flex;
+  gap: 12rpx;
+}
+
+.order-btn {
+  font-size: 24rpx;
+  color: #57534e;
+  padding: 8rpx 18rpx;
+  border-radius: 999rpx;
+  background: #f5f5f4;
+}
+
+.order-btn.is-danger {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.08);
+}
+
+.order-btn.is-disabled {
+  opacity: 0.4;
+}
+
+.add-btn {
+  width: 100%;
+}
+
+.edit-footer {
+  flex: none;
+  padding: 16rpx 28rpx;
+  padding-bottom: calc(16rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
+  background: #fff;
+  border-top: 1rpx solid rgba(28, 25, 23, 0.06);
+}
+
+.save-btn {
+  width: 100%;
+}
+
+.is-disabled {
+  opacity: 0.5;
+}

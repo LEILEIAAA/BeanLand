@@ -1,4 +1,17 @@
 const api = require('../../../utils/api');
+const {
+  ADMIN_MEMBER_SEARCH_DEBOUNCE_MS,
+  shouldRemoteSearchMember,
+} = require('../../../utils/adminMemberSearch');
+const { formatYuan } = require('../../../utils/money');
+
+function decorateSearchMembers(list) {
+  return (list || []).map((item) => ({
+    ...item,
+    totalBalanceText: formatYuan(item.totalBalance),
+    totalRechargeText: formatYuan(item.totalRecharge),
+  }));
+}
 
 Page({
   data: {
@@ -15,6 +28,15 @@ Page({
   onShow() {
     this.loadPlans();
   },
+  onUnload() {
+    this.clearSearchTimer();
+  },
+  clearSearchTimer() {
+    if (this._memberSearchTimer) {
+      clearTimeout(this._memberSearchTimer);
+      this._memberSearchTimer = null;
+    }
+  },
   async loadPlans() {
     try {
       const plans = await api.getRechargePlans();
@@ -29,16 +51,45 @@ Page({
     }
   },
   onPhoneInput(event) {
-    this.setData({ phone: event.detail.value });
-  },
-  async onSearch() {
-    const phone = String(this.data.phone || '').trim();
-    if (!phone) {
-      wx.showToast({ title: '请输入手机号', icon: 'none' });
+    const phone = event.detail.value;
+    this.setData({ phone });
+    this.clearSearchTimer();
+    const text = String(phone || '').trim();
+    if (!text) {
+      this._memberSearchSeq = (this._memberSearchSeq || 0) + 1;
+      this.setData({ members: [], selectedId: '', selectedLabel: '' });
       return;
     }
+    if (!shouldRemoteSearchMember(text)) {
+      this._memberSearchSeq = (this._memberSearchSeq || 0) + 1;
+      return;
+    }
+    this._memberSearchTimer = setTimeout(() => {
+      this.searchMembers({ silentEmpty: true });
+    }, ADMIN_MEMBER_SEARCH_DEBOUNCE_MS);
+  },
+  onSearch() {
+    this.clearSearchTimer();
+    this.searchMembers({ silentEmpty: false });
+  },
+  async searchMembers({ silentEmpty }) {
+    const phone = String(this.data.phone || '').trim();
+    if (!phone) {
+      if (!silentEmpty) {
+        wx.showToast({ title: '请输入手机号或尾号', icon: 'none' });
+      }
+      return;
+    }
+    if (!shouldRemoteSearchMember(phone)) {
+      if (!silentEmpty) {
+        wx.showToast({ title: '请至少输入4位手机号', icon: 'none' });
+      }
+      return;
+    }
+    const seq = (this._memberSearchSeq = (this._memberSearchSeq || 0) + 1);
     try {
       const result = await api.adminFindMember({ phone });
+      if (seq !== this._memberSearchSeq) return;
       if (!result || !result.ok) {
         wx.showToast({
           title: (result && result.message) || '查询失败',
@@ -48,17 +99,20 @@ Page({
       }
       const list = result.list || [];
       if (!list.length) {
-        wx.showToast({ title: '未找到会员', icon: 'none' });
+        if (!silentEmpty) {
+          wx.showToast({ title: '未找到会员', icon: 'none' });
+        }
         this.setData({ members: [], selectedId: '', selectedLabel: '' });
         return;
       }
       const first = list[0];
       this.setData({
-        members: list,
+        members: decorateSearchMembers(list),
         selectedId: first._id,
         selectedLabel: `${first.nickName || '未命名'} · ${first.phone || phone} · ${first.tier || 'member'}`,
       });
     } catch (error) {
+      if (seq !== this._memberSearchSeq) return;
       wx.showToast({ title: '查询失败（需店长权限）', icon: 'none' });
     }
   },
@@ -119,7 +173,7 @@ Page({
       }
       wx.showModal({
         title: '入账成功',
-        content: `余额 ¥${result.member.totalBalance}，等级 ${result.tier}`,
+        content: `余额 ¥${formatYuan(result.member.totalBalance)}，等级 ${result.tier}`,
         showCancel: false,
       });
     } catch (error) {

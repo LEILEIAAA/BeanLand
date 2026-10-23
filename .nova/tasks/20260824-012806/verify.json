@@ -1,0 +1,22 @@
+{
+  "id": "20260824-012806",
+  "ok": true,
+  "results": [
+    {
+      "command": "python -c \"from pathlib import Path; p=Path(r'c:/Users/ry/Desktop/Bean/Bean/assets'); files=['cover-weekday-duo-locker-1x1.png','cover-weekday-duo-locker-16x9.png']; missing=[f for f in files if not (p/f).exists() or (p/f).stat().st_size<10000]; raise SystemExit('missing '+str(missing) if missing else 0)\"",
+      "ok": true,
+      "exitCode": 0,
+      "tail": ""
+    }
+  ],
+  "risk": {
+    "decision": "allow",
+    "actionDigest": "sha256-ddddc92c94113f69ea65c231b35a4965",
+    "findings": [],
+    "changedFiles": [
+      "assets/cover-weekday-duo-locker-16x9.png",
+      "assets/cover-weekday-duo-locker-1x1.png"
+    ],
+    "evaluatedAt": "2026-08-23T17:31:42.671Z"
+  }
+}

@@ -1,3 +1,8 @@
 {
-  "navigationBarTitleText": "我的拼豆"
+  "navigationBarTitleText": "我的拼豆",
+  "usingComponents": {
+    "privacy-popup": "/components/privacy-popup/index"
+  },
+  "enableShareAppMessage": true,
+  "enableShareTimeline": true
 }

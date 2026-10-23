@@ -46,7 +46,13 @@
   margin-top: 12rpx;
   display: flex;
   gap: 24rpx;
+  align-items: center;
   font-size: 26rpx;
+}
+.ss-duration-row {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
 }
 .ss-duration {
   color: #1c1917;
@@ -55,6 +61,38 @@
 .ss-overtime {
   color: #dc2626;
   font-weight: 600;
+}
+.icon-clock {
+  position: relative;
+  width: 22rpx;
+  height: 22rpx;
+  border: 2rpx solid currentColor;
+  border-radius: 50%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  color: #047857;
+}
+.icon-clock::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 2rpx;
+  height: 7rpx;
+  background: currentColor;
+  transform: translate(-50%, -90%);
+  border-radius: 2rpx;
+}
+.icon-clock::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 6rpx;
+  height: 2rpx;
+  background: currentColor;
+  transform: translate(0, -50%);
+  border-radius: 2rpx;
 }
 .ss-foot {
   margin-top: 12rpx;

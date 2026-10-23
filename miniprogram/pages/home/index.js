@@ -1,4 +1,16 @@
-const { store, packages, activities } = require('../../data/seed');
+const api = require('../../utils/api');
+const {
+  buildFeaturedPackages,
+  buildFeaturedActivities,
+} = require('../../utils/homeFeatured');
+const { fallbackActivityCover } = require('../../utils/activityCover');
+const { resolveHomeHeroPhotos, DEFAULT_HERO_PHOTOS } = require('../../utils/homeBanners');
+const {
+  buildHeroChangePatch,
+  buildHeroDotPatch,
+  buildHeroPhotosPatch,
+} = require('../../utils/homeHeroSwiper');
+const { resolvePublicStore, DEFAULT_STORE } = require('../../utils/storePublic');
 const {
   DEFAULT_AVATAR,
   ensureDefaultProfile,
@@ -10,41 +22,11 @@ const {
   isProfileSynced,
   resolveNickNameUpdate,
 } = require('../../utils/wxProfile');
+const {
+  needsMemberRegister,
+  openMemberRegister,
+} = require('../../utils/memberRegisterGate');
 const { syncTabBar, setTabBarHidden } = require('../../utils/tabBar');
-
-const COVER_LAND = '/assets/background/image3.jpg';
-const COVER_POSTERS = '/assets/background/images1.jpg';
-
-const HERO_PHOTOS = [
-  { src: '/assets/background/images2.jpg', caption: '顶楼工坊' },
-  { src: '/assets/background/image3.jpg', caption: 'MAYDAYLAND' },
-  { src: '/assets/background/images1.jpg', caption: '窗边主题墙' },
-];
-
-const ACTIVITY_COVERS = {
-  mayday: COVER_POSTERS,
-  'squid-game': COVER_LAND,
-  'craft-meetup': COVER_POSTERS,
-};
-
-const HOME_PACKAGE_IDS = ['weekend-solo', 'weekend-duo', 'weekend-family'];
-const HOME_ACTIVITY_IDS = ['mayday', 'squid-game', 'craft-meetup'];
-
-const ACTIVITY_STATUS_LABEL = {
-  recruiting: '招募中',
-  consulting: '咨询中',
-};
-
-const PACKAGE_AUDIENCE_LABEL = {
-  'opening-trio': '三人免一',
-  'weekend-solo': '单人无限时',
-  'solo-2h': '单人2小时',
-  'solo-1h': '单人1小时',
-  'weekend-duo': '双人无限时',
-  'duo-2h': '双人2小时',
-  'duo-1h': '双人1小时',
-  'weekend-family': '亲子无限时',
-};
 
 /** MAYDAYLAND 灯箱取样色，按序给 Bean Land 逐字上色 */
 const BRAND_LETTER_COLORS = ['#BBD2E0', '#FFB80A', '#FF3D02', '#FCA681', '#69D868'];
@@ -61,56 +43,22 @@ function buildBrandLetters(name) {
   });
 }
 
-const PACKAGE_LOOKS = {
-  'weekend-solo': { accent: '#FFB80A', enLabel: 'SOLO' },
-  'weekend-duo': { accent: '#FF3D02', enLabel: 'DUO' },
-  'weekend-family': { accent: '#69D868', enLabel: 'KIDS' },
-  'opening-trio': { accent: '#FF3D02', enLabel: 'OPEN' },
-};
-
-const ACTIVITY_LOOKS = {
-  mayday: { accent: '#FFB80A', enLabel: 'LIVE', orbInk: '#18181b' },
-  'squid-game': { accent: '#FF3D02', enLabel: 'GAME', orbInk: '#ffffff' },
-  'craft-meetup': { accent: '#69D868', enLabel: 'MEET', orbInk: '#18181b' },
-};
-
+const { shareBehavior } = require('../../utils/share');
 Page({
+  behaviors: [shareBehavior],
   data: {
-    store,
-    brandLetters: buildBrandLetters(store.name),
-    heroPhotos: HERO_PHOTOS,
+    store: {
+      name: DEFAULT_STORE.name,
+      slogan: DEFAULT_STORE.slogan,
+      shortAddress: DEFAULT_STORE.shortAddress,
+    },
+    brandLetters: buildBrandLetters(DEFAULT_STORE.name),
+    heroPhotos: DEFAULT_HERO_PHOTOS,
     heroIndex: 0,
-    heroCaption: HERO_PHOTOS[0].caption,
-    featuredPackages: HOME_PACKAGE_IDS.map((id, index) => {
-      const item = packages.find((row) => row.id === id);
-      const look = PACKAGE_LOOKS[id] || { accent: '#BBD2E0', enLabel: 'PLAY' };
-      const durationLabel = Number(item.durationMinutes) > 0
-        ? `${item.durationMinutes} 分钟`
-        : (item.overtimeRule || '当日不限时');
-      return {
-        ...item,
-        audienceLabel: PACKAGE_AUDIENCE_LABEL[id] || item.targetAudience,
-        durationLabel,
-        priceLabel: item.weekdayPrice
-          ? `周末¥${item.weekendPrice} / 工作日¥${item.weekdayPrice}`
-          : `¥${item.price}`,
-        lookNo: String(index + 1).padStart(2, '0'),
-        includes: (item.includedItems || []).slice(0, 3),
-        ...look,
-      };
-    }),
-    activities: HOME_ACTIVITY_IDS.map((id, index) => {
-      const item = activities.find((row) => row.id === id);
-      const look = ACTIVITY_LOOKS[id] || { accent: '#FFB80A', enLabel: 'LIVE', orbInk: '#18181b' };
-      return {
-        ...item,
-        cover: ACTIVITY_COVERS[id] || '',
-        statusLabel: ACTIVITY_STATUS_LABEL[item.status] || item.status,
-        dropNo: String(index + 1).padStart(2, '0'),
-        shift: index % 2 === 1 ? 'shift-right' : 'shift-left',
-        ...look,
-      };
-    }),
+    swiperCurrent: 0,
+    heroCaption: DEFAULT_HERO_PHOTOS[0] ? DEFAULT_HERO_PHOTOS[0].caption : '',
+    featuredPackages: [],
+    activities: [],
     showProfileGuide: false,
     guideAvatarUrl: DEFAULT_AVATAR,
     guideNickName: '',
@@ -118,24 +66,101 @@ Page({
   onShow() {
     syncTabBar(this, 0);
     this.refreshProfileGuide();
+    this.loadStore();
+    this.loadHeroPhotos();
+    this.loadFeatured();
+  },
+  async loadStore() {
+    try {
+      const cloudStore = await api.getStore();
+      const store = resolvePublicStore(cloudStore);
+      this.setData({
+        store: {
+          name: store.name || '',
+          slogan: store.slogan || '',
+          shortAddress: store.shortAddress || '',
+        },
+        brandLetters: buildBrandLetters(store.name),
+      });
+    } catch (error) {
+      console.warn('[home] load store failed', error);
+      const store = resolvePublicStore(null);
+      this.setData({
+        store: {
+          name: store.name || '',
+          slogan: store.slogan || '',
+          shortAddress: store.shortAddress || '',
+        },
+        brandLetters: buildBrandLetters(store.name),
+      });
+    }
+  },
+  async loadHeroPhotos() {
+    try {
+      const heroPhotos = await api.getHomeBanners();
+      const banners = resolveHomeHeroPhotos(heroPhotos);
+      this.setData(buildHeroPhotosPatch(banners, this.data.heroIndex));
+    } catch (error) {
+      console.warn('[home] load hero photos failed', error);
+      const banners = resolveHomeHeroPhotos([]);
+      this.setData(buildHeroPhotosPatch(banners, this.data.heroIndex));
+    }
+  },
+  async loadFeatured() {
+    let packageRows = [];
+    let activityRows = [];
+    try {
+      const packages = await api.getPackages();
+      if (Array.isArray(packages)) packageRows = packages;
+    } catch (error) {
+      console.warn('[home] load packages failed', error);
+    }
+    try {
+      const activities = await api.getActivities();
+      if (Array.isArray(activities)) activityRows = activities;
+    } catch (error) {
+      console.warn('[home] load activities failed', error);
+    }
+    this.setData({
+      featuredPackages: buildFeaturedPackages(packageRows),
+      activities: buildFeaturedActivities(activityRows),
+    });
+  },
+  onActivityCoverError(event) {
+    const index = Number(event.currentTarget.dataset.index);
+    if (!Number.isFinite(index) || index < 0) return;
+    const list = this.data.activities || [];
+    const row = list[index];
+    if (!row) return;
+    const nextCover = fallbackActivityCover(index, row.cover);
+    if (!nextCover || nextCover === row.cover) return;
+    this.setData({ [`activities[${index}].cover`]: nextCover });
   },
   onHeroChange(event) {
-    const heroIndex = event.detail.current;
-    if (typeof heroIndex !== 'number') return;
-    const photo = HERO_PHOTOS[heroIndex];
-    this.setData({
-      heroIndex,
-      heroCaption: photo ? photo.caption : '',
-    });
+    const patch = buildHeroChangePatch(
+      this.data.heroPhotos,
+      this.data.heroIndex,
+      event.detail.current
+    );
+    if (!patch) return;
+    this.setData(patch);
   },
   onHeroDotTap(event) {
-    const heroIndex = Number(event.currentTarget.dataset.index);
-    if (Number.isNaN(heroIndex) || heroIndex === this.data.heroIndex) return;
-    const photo = HERO_PHOTOS[heroIndex];
-    this.setData({
-      heroIndex,
-      heroCaption: photo ? photo.caption : '',
-    });
+    const patch = buildHeroDotPatch(
+      this.data.heroPhotos,
+      this.data.heroIndex,
+      event.currentTarget.dataset.index
+    );
+    if (!patch) return;
+    // autoplay 只改 heroIndex，swiperCurrent 可能仍停在旧值；同值 setData 无法驱动跳转
+    if (this.data.swiperCurrent === patch.swiperCurrent) {
+      const nudge = patch.swiperCurrent === 0 ? 1 : patch.swiperCurrent - 1;
+      this.setData({ swiperCurrent: nudge }, () => {
+        this.setData(patch);
+      });
+      return;
+    }
+    this.setData(patch);
   },
   refreshProfileGuide() {
     const profile = ensureDefaultProfile();
@@ -208,7 +233,23 @@ Page({
     setTabBarHidden(this, false);
   },
   preventMove() {},
-  goAppointment() {
+  async goAppointment() {
+    try {
+      const res = await api.getMyMember();
+      const member = res && res.member;
+      if (needsMemberRegister(member, DEFAULT_AVATAR)) {
+        if (!openMemberRegister()) {
+          wx.showToast({ title: '请先完成会员注册', icon: 'none' });
+        }
+        return;
+      }
+    } catch (error) {
+      console.warn('[home] appointment gate', error);
+      if (!openMemberRegister()) {
+        wx.showToast({ title: '请先完成会员注册', icon: 'none' });
+      }
+      return;
+    }
     wx.navigateTo({ url: '/pages/appointment/index' });
   },
   goRoute() {

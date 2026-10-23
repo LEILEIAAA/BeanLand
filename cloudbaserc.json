@@ -4,7 +4,7 @@
   "functionRoot": "cloudfunctions",
   "functions": [
     {
-      "name": "adminStartSeatSession",
+      "name": "adminConfirmActivityRefund",
       "runtime": "Nodejs16.13",
       "handler": "index.main",
       "timeout": 20,
@@ -20,14 +20,6 @@
       "installDependency": true
     },
     {
-      "name": "adminListSeatBoard",
-      "runtime": "Nodejs16.13",
-      "handler": "index.main",
-      "timeout": 20,
-      "memorySize": 256,
-      "installDependency": true
-    },
-    {
       "name": "adminExtendSeatSession",
       "runtime": "Nodejs16.13",
       "handler": "index.main",
@@ -36,7 +28,87 @@
       "installDependency": true
     },
     {
-      "name": "adminSetSeatMaintenance",
+      "name": "adminFindMember",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "adminIssueCoupon",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "adminListActivities",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "adminListActivityRegistrations",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "adminListAppointments",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "adminListMemberCoupons",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "adminListMemberPackages",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "adminListMemberTransactions",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "adminListMembers",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "adminListPackages",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "adminListSeatBoard",
       "runtime": "Nodejs16.13",
       "handler": "index.main",
       "timeout": 20,
@@ -52,7 +124,351 @@
       "installDependency": true
     },
     {
+      "name": "adminRecharge",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "adminRedeemCoupon",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "adminRedeemPackage",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "adminSaveActivity",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "adminSaveActivityPageConfig",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "adminSaveHomeBanners",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "adminSavePackage",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "adminSavePackagePromo",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "adminSetSeatMaintenance",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "adminStartSeatSession",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "adminUpdateAppointment",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "cancelActivityRegistration",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "cancelAppointment",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "createActivityRegistration",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "createAppointment",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "createPackageOrder",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "createRechargeOrder",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "createWork",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "deleteWork",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "ensureMember",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "expirePackageOrders",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "getActivityPageConfig",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "getHomeBanners",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "getStore",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "getTimeSlots",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "getMyMember",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "getPackageOrder",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "getPhoneNumber",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "getRechargeOrder",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "listActivities",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "listMyActivityRegistrations",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "listMyAppointments",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "listMyCoupons",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "listMyPackageOrders",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
       "name": "listMySeatSessions",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "listMyTransactions",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "listMyWorks",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "listPackages",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "listRechargePlans",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "payActivityNotify",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "payPackageNotify",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "payRechargeNotify",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "purchasePackage",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "refundPackageOrder",
       "runtime": "Nodejs16.13",
       "handler": "index.main",
       "timeout": 20,

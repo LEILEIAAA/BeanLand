@@ -3,6 +3,7 @@ const {
   assertCanRegister,
   buildRegistrationDoc,
 } = require('./appointmentRegistration');
+const { assertMemberRegistered } = require('./memberRegistration');
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
@@ -37,8 +38,9 @@ exports.main = async (event) => {
     }
 
     const member = await loadMember(OPENID);
-    if (!member) {
-      return { ok: false, code: 'NOT_MEMBER', message: '请先注册会员' };
+    const registered = assertMemberRegistered(member);
+    if (!registered.ok) {
+      return registered;
     }
 
     const payload = event || {};

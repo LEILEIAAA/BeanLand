@@ -1,0 +1,23 @@
+<view class="pl {{compact ? 'pl-compact' : ''}}" aria-busy="true" aria-live="polite">
+  <view class="pl-head">
+    <view class="pl-spinner"></view>
+    <view class="pl-dots">
+      <view class="pl-dot"></view>
+      <view class="pl-dot pl-dot-2"></view>
+      <view class="pl-dot pl-dot-3"></view>
+    </view>
+    <text class="pl-tip">{{tip}}</text>
+  </view>
+
+  <view class="pl-card" wx:if="{{!compact}}">
+    <block wx:for="{{rowList}}" wx:key="key">
+      <view class="pl-row">
+        <view class="pl-col">
+          <view class="pl-bar pl-bar-title {{item.wide ? 'is-wide' : 'is-mid'}}"></view>
+          <view class="pl-bar pl-bar-meta"></view>
+        </view>
+        <view class="pl-chip"></view>
+      </view>
+    </block>
+  </view>
+</view>

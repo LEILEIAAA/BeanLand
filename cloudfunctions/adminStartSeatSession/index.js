@@ -301,7 +301,7 @@ exports.main = async (event) => {
         return {
           ok: false,
           code: 'MEMBER_NO_OPENID',
-          message: `${nick} 未绑定微信，无法开台`,
+          message: `${nick} 未绑定登录账号，无法开台`,
         };
       }
       prepared.push(record);

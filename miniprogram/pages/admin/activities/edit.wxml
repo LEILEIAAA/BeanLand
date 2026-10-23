@@ -1,0 +1,133 @@
+<privacy-popup />
+<scroll-view class="edit-scroll" scroll-y="{{true}}">
+  <view class="edit-body">
+    <view class="card form-card">
+    <view class="form-item">
+      <view class="form-label">活动名称 <text class="req">*</text></view>
+      <input class="field-input" placeholder="如：五月天主题拼豆" value="{{form.name}}" data-field="name" bindinput="onInput" />
+    </view>
+
+    <view class="form-item" wx:if="{{isCreate}}">
+      <view class="form-label">活动ID（选填，留空自动生成）</view>
+      <input class="field-input" placeholder="如：mayday" value="{{form.id}}" data-field="id" bindinput="onInput" />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">活动封面（海报墙展示）</view>
+      <view class="cover-box" wx:if="{{form.coverImage}}">
+        <image class="cover-preview" src="{{form.coverImage}}" mode="aspectFill" />
+        <view class="cover-ops">
+          <view class="btn btn-secondary cover-btn" bindtap="onChooseCover">更换</view>
+          <view class="btn btn-danger cover-btn" bindtap="onRemoveCover">移除</view>
+        </view>
+      </view>
+      <button class="cover-empty cover-empty-btn" wx:else bindtap="onChooseCover" hover-class="none">
+        <view class="cover-plus">+</view>
+        <view class="cover-tip">上传封面图（建议 4:3 或 3:4）</view>
+      </button>
+    </view>
+
+    <view class="form-row">
+      <view class="form-item flex1">
+        <view class="form-label">报名费</view>
+        <input class="field-input" type="digit" placeholder="0" value="{{form.price}}" data-field="price" bindinput="onInput" />
+      </view>
+      <view class="form-item flex1">
+        <view class="form-label">名额</view>
+        <input class="field-input" type="number" placeholder="0" value="{{form.capacity}}" data-field="capacity" bindinput="onInput" />
+      </view>
+    </view>
+
+    <view class="form-row">
+      <view class="form-item flex1">
+        <view class="form-label">状态</view>
+        <picker mode="selector" range="{{statusLabels}}" value="{{form.statusIndex}}" bindchange="onStatusChange">
+          <view class="field-input picker-input">{{statusLabels[form.statusIndex]}}</view>
+        </picker>
+      </view>
+      <view class="form-item flex1">
+        <view class="form-label">排序（越小越前）</view>
+        <input class="field-input" type="number" placeholder="10" value="{{form.sortOrder}}" data-field="sortOrder" bindinput="onInput" />
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">筛选关键字（会员端筛选 tab，选填）</view>
+      <input class="field-input" placeholder="例如：五月天" value="{{form.keyword}}" data-field="keyword" bindinput="onInput" />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">角标配色（海报英文角标）</view>
+      <view class="accent-row">
+        <view
+          wx:for="{{accentOptions}}"
+          wx:key="value"
+          class="badge-dot {{form.accentIndex === index ? 'is-active' : ''}}"
+          style="background: {{item.bg}};"
+          data-index="{{index}}"
+          catchtap="onAccentTap"
+        ></view>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">海报一句话（海报墙展示文案）</view>
+      <input class="field-input" placeholder="如：开业第一场，先把夏天拼出来" value="{{form.blurb}}" data-field="blurb" bindinput="onInput" />
+    </view>
+
+    <view class="form-row">
+      <view class="form-item flex1">
+        <view class="form-label">开场日期</view>
+        <picker mode="date" value="{{form.startDate}}" bindchange="onDateChange">
+          <view class="field-input picker-input">{{form.startDate || '选择日期'}}</view>
+        </picker>
+      </view>
+      <view class="form-item flex1">
+        <view class="form-label">开场时间</view>
+        <picker mode="time" value="{{form.startTime}}" bindchange="onTimeChange">
+          <view class="field-input picker-input">{{form.startTime || '选择时间'}}</view>
+        </picker>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">日程说明</view>
+      <input class="field-input" placeholder="如：开业首周 D1–D2" value="{{form.scheduleText}}" data-field="scheduleText" bindinput="onInput" />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">时间说明</view>
+      <input class="field-input" placeholder="如：约90分钟/场" value="{{form.timeText}}" data-field="timeText" bindinput="onInput" />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">适合人群</view>
+      <input class="field-input" placeholder="如：大学生、朋友组队" value="{{form.audience}}" data-field="audience" bindinput="onInput" />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">活动内容</view>
+      <textarea class="field-textarea" placeholder="活动详情介绍" value="{{form.content}}" data-field="content" bindinput="onInput" auto-height />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">包含内容（每行一项）</view>
+      <textarea class="field-textarea" placeholder="基础材料&#10;歌单氛围&#10;作品合影" value="{{form.includesText}}" data-field="includesText" bindinput="onInput" auto-height />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">报名须知</view>
+      <textarea class="field-textarea" placeholder="取消规则、注意事项等" value="{{form.notice}}" data-field="notice" bindinput="onInput" auto-height />
+    </view>
+
+    <view class="switch-row">
+      <view class="form-label">上架（会员端可见）</view>
+      <switch checked="{{form.onShelf}}" data-field="onShelf" bindchange="onSwitch" color="#1c1917" />
+    </view>
+    </view>
+  </view>
+</scroll-view>
+
+<view class="edit-footer">
+  <view class="btn btn-primary save-btn {{saving ? 'is-disabled' : ''}}" bindtap="onSave">保存</view>
+</view>

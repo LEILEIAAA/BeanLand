@@ -1,9 +1,10 @@
+<privacy-popup />
 <view class="container sub-page">
   <view class="works-toolbar">
     <view class="btn btn-primary" bindtap="onUpload">上传作品</view>
   </view>
 
-  <view wx:if="{{loading}}" class="works-hint">加载中…</view>
+  <page-loading wx:if="{{loading}}" tip="作品加载中" rows="{{3}}" />
 
   <block wx:elif="{{works.length}}">
     <view class="works-grid">

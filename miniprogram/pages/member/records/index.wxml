@@ -7,7 +7,9 @@
     </view>
   </view>
 
-  <view class="list-card">
+  <page-loading wx:if="{{loading}}" tip="流水加载中" rows="{{5}}" />
+
+  <view class="list-card" wx:else>
     <block wx:if="{{emptyTip}}">
       <view class="list-row">
         <view class="list-main">

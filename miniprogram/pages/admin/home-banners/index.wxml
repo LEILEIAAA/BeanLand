@@ -1,0 +1,49 @@
+<privacy-popup />
+<scroll-view class="edit-scroll" scroll-y="{{true}}">
+  <view class="edit-body">
+    <view class="section-title">首页轮播</view>
+    <view class="subtitle">管理首页顶部轮播图与对应文案。图片建议使用竖版海报（3:4），拖动排序决定展示顺序。</view>
+
+    <page-loading wx:if="{{loading}}" tip="配置加载中" rows="{{3}}" />
+
+    <block wx:else>
+      <block wx:for="{{banners}}" wx:key="index">
+        <view class="card banner-card">
+          <view class="banner-head">
+            <view class="banner-no">第 {{index + 1}} 张</view>
+            <view class="banner-order">
+              <view class="order-btn {{index === 0 ? 'is-disabled' : ''}}" data-index="{{index}}" bindtap="onMoveUp">上移</view>
+              <view class="order-btn {{index === banners.length - 1 ? 'is-disabled' : ''}}" data-index="{{index}}" bindtap="onMoveDown">下移</view>
+            </view>
+          </view>
+
+          <view class="form-item">
+            <view class="form-label">轮播图片 <text class="req">*</text></view>
+            <view class="cover-box" wx:if="{{item.src}}">
+              <image class="cover-preview" src="{{item.src}}" mode="aspectFill" />
+              <view class="cover-ops">
+                <view class="btn btn-secondary cover-btn" data-index="{{index}}" bindtap="onChooseImage">更换</view>
+                <view class="btn btn-danger cover-btn" data-index="{{index}}" bindtap="onRemove">删除</view>
+              </view>
+            </view>
+            <view class="cover-empty" wx:else data-index="{{index}}" bindtap="onChooseImage">
+              <view class="cover-plus">+</view>
+              <view class="cover-tip">上传轮播图（建议 3:4）</view>
+            </view>
+          </view>
+
+          <view class="form-item">
+            <view class="form-label">对应文案（轮播下方标题）</view>
+            <input class="field-input" placeholder="如：顶楼工坊" value="{{item.caption}}" data-index="{{index}}" bindinput="onCaptionInput" />
+          </view>
+        </view>
+      </block>
+
+      <view class="btn btn-secondary add-btn {{banners.length >= maxBanners ? 'is-disabled' : ''}}" bindtap="onAdd">+ 新增一张</view>
+    </block>
+  </view>
+</scroll-view>
+
+<view class="edit-footer">
+  <view class="btn btn-primary save-btn {{saving ? 'is-disabled' : ''}}" bindtap="onSave">保存</view>
+</view>

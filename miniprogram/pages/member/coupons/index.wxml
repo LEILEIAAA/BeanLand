@@ -15,7 +15,9 @@
     </block>
   </view>
 
-  <view class="list-card" wx:if="{{coupons.length}}">
+  <page-loading wx:if="{{loading}}" tip="优惠券加载中" rows="{{4}}" />
+
+  <view class="list-card" wx:elif="{{coupons.length}}">
     <block wx:for="{{coupons}}" wx:key="id">
       <view class="list-row {{item.dimmed ? 'coupon-dimmed' : ''}}">
         <view class="list-main">
@@ -34,5 +36,5 @@
     </block>
   </view>
 
-  <view class="empty-tip" wx:elif="{{!loading}}">{{emptyTip || '暂无优惠券'}}</view>
+  <view class="empty-tip" wx:else>{{emptyTip || '暂无优惠券'}}</view>
 </view>

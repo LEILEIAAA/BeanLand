@@ -1,0 +1,19 @@
+{
+  "id": "20260823-203550",
+  "ok": true,
+  "results": [
+    {
+      "command": "powershell -NoProfile -Command \"if ((Test-Path 'assets/cover-group-3free1-weekday-1x1.png') -and (Test-Path 'assets/cover-group-3free1-weekday-16x9.png')) { Write-Output 'covers ok'; exit 0 } else { exit 1 }\"",
+      "ok": true,
+      "exitCode": 0,
+      "tail": "covers ok"
+    }
+  ],
+  "risk": {
+    "decision": "allow",
+    "actionDigest": "sha256-5761ca4528a2c45fadfec3d701dd671b",
+    "findings": [],
+    "changedFiles": [],
+    "evaluatedAt": "2026-08-23T12:40:04.001Z"
+  }
+}

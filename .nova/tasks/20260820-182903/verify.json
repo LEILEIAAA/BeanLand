@@ -1,0 +1,19 @@
+{
+  "id": "20260820-182903",
+  "ok": true,
+  "results": [
+    {
+      "command": "python -c \"from pathlib import Path; p=Path(r'c:/Users/ry/Desktop/Bean/Bean/assets'); a=p/'cover-afterwork-10card-weekday-16x9.png'; b=p/'cover-afterwork-10card-weekday-1x1.png'; assert a.exists() and b.exists(); print(a.name, a.stat().st_size); print(b.name, b.stat().st_size)\"",
+      "ok": true,
+      "exitCode": 0,
+      "tail": "cover-afterwork-10card-weekday-16x9.png 1857425\ncover-afterwork-10card-weekday-1x1.png 1275788"
+    }
+  ],
+  "risk": {
+    "decision": "allow",
+    "actionDigest": "sha256-d541aecf79c232aeeb1d7e510b207e04",
+    "findings": [],
+    "changedFiles": [],
+    "evaluatedAt": "2026-08-20T10:30:57.656Z"
+  }
+}

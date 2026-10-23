@@ -8,21 +8,16 @@
   <view class="list-card">
     <view class="field">
       <view class="field-label">会员手机号</view>
-      <input class="field-input" type="number" maxlength="11" placeholder="与会员中心填写一致" value="{{phone}}" bindinput="onPhoneInput" />
+      <input class="field-input" type="number" maxlength="11" placeholder="手机号或尾号（至少4位）" value="{{phone}}" bindinput="onPhoneInput" />
       <view class="btn btn-secondary" bindtap="onSearch">查找</view>
     </view>
 
     <block wx:for="{{members}}" wx:key="_id">
       <view class="member-row {{selectedId === item._id ? 'active' : ''}}" data-id="{{item._id}}" bindtap="onPickMember">
         <view class="list-title">{{item.nickName || '未命名'}} · {{item.phone}}</view>
-        <view class="list-meta">余额 ¥{{item.totalBalance}} · {{item.tier}} · 累计充 ¥{{item.totalRecharge}}</view>
+        <view class="list-meta">余额 ¥{{item.totalBalanceText}} · {{item.tier}} · 累计充 ¥{{item.totalRechargeText}}</view>
       </view>
     </block>
-
-    <view class="field" wx:if="{{selectedLabel}}">
-      <view class="field-label">当前选中</view>
-      <view class="list-meta">{{selectedLabel}}</view>
-    </view>
 
     <view class="field" wx:if="{{plans.length}}">
       <view class="field-label">充值档位</view>

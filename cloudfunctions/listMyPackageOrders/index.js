@@ -31,22 +31,31 @@ function mapOrder(row) {
   };
 }
 
+const REFUND_TAB_STATUSES = [
+  STATUS.EXPIRED_REFUNDED,
+  STATUS.EXPIRED_REFUND_PENDING,
+  STATUS.EXPIRED_REFUNDING,
+  STATUS.USER_REFUNDED,
+  STATUS.USER_REFUND_PENDING,
+  STATUS.USER_REFUNDING,
+  // 字符串兜底，避免云端副本 STATUS 常量未同步时筛丢
+  'expired_refunded',
+  'expired_refund_pending',
+  'expired_refunding',
+  'user_refunded',
+  'user_refund_pending',
+  'user_refunding',
+];
+
 function matchesTab(order, tab, now) {
   if (tab === TAB.UNUSED) {
     return canRedeemPackageOrder(order, now);
   }
   if (tab === TAB.USED) {
-    return order.status === STATUS.REDEEMED;
+    return order.status === STATUS.REDEEMED || order.status === 'redeemed';
   }
-  if (tab === TAB.EXPIRED) {
-    return [
-      STATUS.EXPIRED_REFUNDED,
-      STATUS.EXPIRED_REFUND_PENDING,
-      STATUS.EXPIRED_REFUNDING,
-      STATUS.USER_REFUNDED,
-      STATUS.USER_REFUND_PENDING,
-      STATUS.USER_REFUNDING,
-    ].includes(order.status);
+  if (tab === TAB.EXPIRED || tab === 'refunded') {
+    return REFUND_TAB_STATUSES.includes(order.status);
   }
   return false;
 }

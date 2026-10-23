@@ -1,16 +1,14 @@
-const packages = [
+const packagesRaw = [
   {
     id: 'opening-trio',
     name: '三人同行一人免单',
-    // 调试价（上线前改回）
-    price: 0.01,
-    weekendPrice: 0.01,
-    weekdayPrice: 0.01,
+    price: 139.8,
+    weekendPrice: 139.8,
+    weekdayPrice: 99.8,
     targetAudience: '开业期间 7.18-7.24 限时专享 · 无限时',
     durationMinutes: 0,
     overtimeRule: '当日不限时',
     includedItems: ['三人入场', '付两人价', '材料齐全', '合影服务'],
-    isRecommended: true,
     badge: '开业限定',
     skipOpeningDiscount: true,
     status: 'on_sale',
@@ -18,121 +16,109 @@ const packages = [
   {
     id: 'weekend-solo',
     name: '单人无限时',
-    // 调试价（上线前改回）
-    price: 0.01,
-    weekendPrice: 0.01,
-    weekdayPrice: 0.01,
+    price: 69.9,
+    weekendPrice: 69.9,
+    weekdayPrice: 49.9,
     targetAudience: '单人到店畅拼',
     durationMinutes: 0,
     overtimeRule: '当日不限时',
     includedItems: ['拼豆材料', '图纸任选', '现场指导', '成品熨烫'],
-    isRecommended: true,
     status: 'on_sale',
   },
   {
     id: 'solo-2h',
     name: '单人2小时',
-    // 调试价（上线前改回）
-    price: 0.01,
-    weekendPrice: 0.01,
-    weekdayPrice: 0.01,
+    price: 39.9,
+    weekendPrice: 39.9,
+    weekdayPrice: 29.9,
     targetAudience: '轻体验 · 可升级无限时',
     durationMinutes: 120,
     overtimeRule: '到点结束',
     includedItems: ['拼豆材料', '图纸任选', '现场指导'],
-    isRecommended: true,
-    skipOpeningDiscount: true,
     status: 'on_sale',
   },
   {
     id: 'solo-1h',
     name: '单人1小时',
-    // 调试价（上线前改回）
-    price: 0.01,
-    weekendPrice: 0.01,
-    weekdayPrice: 0.01,
+    price: 24.9,
+    weekendPrice: 24.9,
+    weekdayPrice: 15.9,
     targetAudience: '尝鲜试玩',
     durationMinutes: 60,
     overtimeRule: '到点结束',
     includedItems: ['拼豆材料', '图纸任选', '现场指导'],
-    isRecommended: false,
-    skipOpeningDiscount: true,
     status: 'on_sale',
   },
   {
     id: 'weekend-duo',
     name: '双人无限时',
-    // 调试价（上线前改回）
-    price: 0.01,
-    weekendPrice: 0.01,
-    weekdayPrice: 0.01,
+    price: 119.9,
+    weekendPrice: 119.9,
+    weekdayPrice: 91.9,
     targetAudience: '闺蜜 / 情侣 / 同学同行',
     durationMinutes: 0,
     overtimeRule: '当日不限时',
     includedItems: ['双人材料', '图纸任选', '合影拍照', '成品包装'],
-    isRecommended: true,
     status: 'on_sale',
   },
   {
     id: 'duo-2h',
     name: '双人2小时',
-    // 调试价（上线前改回）
-    price: 0.01,
-    weekendPrice: 0.01,
-    weekdayPrice: 0.01,
+    price: 69.9,
+    weekendPrice: 69.9,
+    weekdayPrice: 55.9,
     targetAudience: '双人轻体验 · 可升级无限时',
     durationMinutes: 120,
     overtimeRule: '到点结束',
     includedItems: ['双人材料', '图纸任选', '现场指导'],
-    isRecommended: true,
-    skipOpeningDiscount: true,
     status: 'on_sale',
   },
   {
     id: 'duo-1h',
     name: '双人1小时',
-    // 调试价（上线前改回）
-    price: 0.01,
-    weekendPrice: 0.01,
-    weekdayPrice: 0.01,
+    price: 49.9,
+    weekendPrice: 49.9,
+    weekdayPrice: 29.9,
     targetAudience: '双人尝鲜试玩',
     durationMinutes: 60,
     overtimeRule: '到点结束',
     includedItems: ['双人材料', '图纸任选', '现场指导'],
-    isRecommended: false,
-    skipOpeningDiscount: true,
     status: 'on_sale',
   },
   {
     id: 'weekend-family',
     name: '亲子无限时',
-    // 调试价（上线前改回）
-    price: 0.01,
-    weekendPrice: 0.01,
-    weekdayPrice: 0.01,
+    price: 79.9,
+    weekendPrice: 79.9,
+    weekdayPrice: 59.9,
     targetAudience: '1 大 1 小亲子',
     durationMinutes: 0,
     overtimeRule: '当日不限时',
     includedItems: ['亲子材料', '儿童友好图纸', '安全指导', '合影拍照'],
-    isRecommended: true,
     status: 'on_sale',
   },
 ];
+
+const packages = packagesRaw.map((item, index) => ({
+  sortOrder: (index + 1) * 10,
+  onShelf: true,
+  ...item,
+}));
 
 /** China local wall time -> epoch ms (Asia/Shanghai, UTC+8). */
 function chinaLocalMs(year, month, day, hour, minute) {
   return Date.UTC(year, month - 1, day, hour - 8, minute, 0);
 }
 
-const activities = [
-  // 调试价（上线前改回）；开业三场，包场置底
+const activitiesRaw = [
   {
     id: 'mayday',
     name: '五月天主题拼豆',
-    price: 0.01,
+    price: 99,
     capacity: 28,
     registeredCount: 0,
     status: 'recruiting',
+    keyword: '五月天',
     startAt: chinaLocalMs(2026, 7, 18, 14, 0),
     scheduleText: '开业首周 D1–D2',
     timeText: '下午场 / 晚场（以社群通知为准）',
@@ -144,10 +130,11 @@ const activities = [
   {
     id: 'squid-game',
     name: '大学生鱿鱼游戏',
-    price: 0.01,
+    price: 39,
     capacity: 24,
     registeredCount: 0,
     status: 'recruiting',
+    keyword: '鱿鱼局',
     startAt: chinaLocalMs(2026, 7, 21, 14, 0),
     scheduleText: '开业首周 D4–D5',
     timeText: '约 90 分钟 / 场',
@@ -159,10 +146,11 @@ const activities = [
   {
     id: 'craft-meetup',
     name: '拼豆交流会',
-    price: 0.01,
+    price: 39,
     capacity: 30,
     registeredCount: 0,
     status: 'recruiting',
+    keyword: '交流会',
     startAt: chinaLocalMs(2026, 7, 24, 19, 0),
     scheduleText: '开业首周 D7',
     timeText: '晚间场（以社群通知为准）',
@@ -174,10 +162,11 @@ const activities = [
   {
     id: 'birthday',
     name: '生日会 / 团建 / 包场',
-    price: 0.01,
+    price: 1999,
     capacity: 40,
     registeredCount: 0,
     status: 'consulting',
+    keyword: '包场',
     scheduleText: '档期协商',
     timeText: '按包场场次协商',
     audience: '生日聚会、团建、朋友包场',
@@ -187,14 +176,13 @@ const activities = [
   },
 ];
 
-const timeSlots = [
-  '10:00-12:00',
-  '12:00-14:00',
-  '14:00-16:00',
-  '16:00-18:00',
-  '18:00-20:00',
-  '20:00-22:00',
-];
+const activities = activitiesRaw.map((item, index) => ({
+  sortOrder: (index + 1) * 10,
+  onShelf: true,
+  ...item,
+}));
+
+const timeSlots = require('../utils/storePublic').DEFAULT_TIME_SLOTS.slice();
 
 const { buildSeatsFromTables } = require('../utils/seats');
 
@@ -227,9 +215,10 @@ const seatOccupancies = [
 ];
 
 const rechargePlans = [
-  { id: 'r100', rechargeAmount: 0.02, bonusAmount: 0.01, arrivalAmount: 0.03, audience: '调试档：本金+赠金（上线前改回）' },
+  { id: 'r100', rechargeAmount: 100, bonusAmount: 10, arrivalAmount: 110, audience: '尝鲜入门 / 学生' },
   { id: 'r300', rechargeAmount: 300, bonusAmount: 40, arrivalAmount: 340, audience: '闺蜜 / 亲子 / 复购用户' },
-  { id: 'r500', rechargeAmount: 500, bonusAmount: 80, arrivalAmount: 580, audience: '亲子课包 / 粉丝 / 高频用户' },
+  { id: 'r500', rechargeAmount: 500, bonusAmount: 80, arrivalAmount: 580, audience: '累计满 500 可升 VIP' },
+  { id: 'r1000', rechargeAmount: 1000, bonusAmount: 180, arrivalAmount: 1180, audience: '累计满 1000 可升 SVIP' },
 ];
 
 const memberTags = ['学生', '亲子', '五月天粉丝', '美团用户', '小红书用户', '楼内用户', '老客', '高意向包场', '体验官', '暑期课包用户'];
@@ -237,7 +226,7 @@ const memberTags = ['学生', '亲子', '五月天粉丝', '美团用户', '小�
 const coupons = [
   { name: '打卡奖励 · 赠送 2 小时', category: 'checkin', benefitType: 'hours', benefitValue: 2 },
   { name: '老师专属 · 8 折', category: 'teacher', benefitType: 'discount', benefitValue: 8 },
-  { name: '最佳作品 · 赠送 3 小时', category: 'best_work', benefitType: 'hours', benefitValue: 3 },
+  { name: '活动优惠 · 赠送 3 小时', category: 'best_work', benefitType: 'hours', benefitValue: 3 },
   { name: '打卡奖励 · 8 折', category: 'checkin', benefitType: 'discount', benefitValue: 8 },
   { name: '老师专属 · 赠送 1 小时', category: 'teacher', benefitType: 'hours', benefitValue: 1 },
 ];
@@ -288,7 +277,7 @@ const memberProfile = {
     },
     {
       id: 'c5',
-      name: '最佳作品 · 赠送 3 小时',
+      name: '活动优惠 · 赠送 3 小时',
       category: 'best_work',
       benefitType: 'hours',
       benefitValue: 3,
@@ -338,22 +327,13 @@ const memberProfile = {
 };
 
 const store = {
-  name: 'Bean Land',
-  slogan: '拼一局，带走一块自己的光',
-  address: '杭州市拱墅区上塘路 259 号（假山路口）新青年广场 A幢2617',
-  shortAddress: '杭州市拱墅区上塘路 259 号 · 新青年广场 A幢2617',
-  routeTip: '第一次来如果找不到，可以直接联系店主或询问前台 / 保安。',
-  phone: '18267171841',
-  wechat: '待填写',
-  markerName: 'Bean Land',
-  latitude: 30.2868,
-  longitude: 120.1453,
-  scale: 17,
+  ...require('../utils/storePublic').DEFAULT_STORE,
+  heroPhotos: require('../utils/homeBanners').DEFAULT_HERO_PHOTOS,
   packagePromo: {
     active: true,
     discountRate: 8,
     label: '开业七天',
-    tip: '无限时套餐开业8折',
+    tip: '全场8折',
   },
 };
 

@@ -5,18 +5,23 @@
     "slogan": "拼一局，带走一块自己的光",
     "address": "杭州市拱墅区上塘路 259 号（假山路口）新青年广场 A幢2617",
     "shortAddress": "杭州市拱墅区上塘路 259 号 · 新青年广场 A幢2617",
-    "routeTip": "第一次来如果找不到，可以直接联系店主或询问前台 / 保安。",
-    "phone": "18267171841",
-    "wechat": "待填写",
+    "routeTip": "地址在 A幢 2617；电梯到顶楼就到，找不到直接打电话。",
+    "phone": "15715719050",
+    "wechat": "15715719050",
     "markerName": "Bean Land",
-    "latitude": 30.2868,
-    "longitude": 120.1453,
+    "latitude": 30.2961,
+    "longitude": 120.157959,
     "scale": 17,
+    "heroPhotos": [
+      { "src": "/assets/background/images2.jpg", "caption": "顶楼工坊" },
+      { "src": "/assets/background/image3.jpg", "caption": "MAYDAYLAND" },
+      { "src": "/assets/background/images1.jpg", "caption": "窗边主题墙" }
+    ],
     "packagePromo": {
       "active": true,
       "discountRate": 8,
       "label": "开业七天",
-      "tip": "无限时套餐开业8折"
+      "tip": "全场8折"
     }
   }
 ]

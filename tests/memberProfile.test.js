@@ -60,6 +60,7 @@ test('isProfileComplete requires nickName and phone', () => {
   assert.equal(isProfileComplete({ nickName: '豆', phone: '13812345678' }), true);
   assert.equal(isProfileComplete({ nickName: '', phone: '13812345678' }), false);
   assert.equal(isProfileComplete({ nickName: '豆', phone: '' }), false);
+  assert.equal(isProfileComplete({ nickName: 'Bean artist1', phone: '13812345678' }), false);
 });
 
 test('isRegistrationComplete also requires chosen avatar', () => {
@@ -84,6 +85,17 @@ test('isRegistrationComplete also requires chosen avatar', () => {
     ),
     true,
   );
+  assert.equal(
+    isRegistrationComplete(
+      {
+        nickName: 'Bean artist3',
+        phone: '13812345678',
+        avatarUrl: 'wxfile://tmp_avatar',
+      },
+      def,
+    ),
+    false,
+  );
 });
 
 test('canRecharge only checks phone', () => {
@@ -97,4 +109,95 @@ test('phoneAuthFailMessage maps common errMsg', () => {
   assert.match(phoneAuthFailMessage('getPhoneNumber:fail no permission'), /未开通|权限/);
   assert.match(phoneAuthFailMessage('getPhoneNumber:fail'), /真机|重试/);
   assert.doesNotMatch(phoneAuthFailMessage('getPhoneNumber:fail'), /手填/);
+});
+
+test('buildRegisterProgress lists missing items in fixed order', () => {
+  const { buildRegisterProgress } = require('../miniprogram/utils/memberProfile');
+  const def = '/assets/icons/bean.png';
+
+  const onlyPhoneMissing = buildRegisterProgress(
+    { nickName: '豆', phone: '', avatarUrl: 'wxfile://tmp_avatar' },
+    def,
+  );
+  assert.deepEqual(onlyPhoneMissing.missingLabels, ['手机号']);
+  assert.equal(onlyPhoneMissing.doneCount, 2);
+  assert.equal(onlyPhoneMissing.registrationComplete, false);
+  assert.equal(onlyPhoneMissing.finishButtonText, '确认注册');
+  assert.equal(onlyPhoneMissing.finishHintText, '还需完善：手机号');
+  assert.equal(onlyPhoneMissing.finishToast, '还需完善：手机号');
+
+  const avatarAndPhone = buildRegisterProgress(
+    { nickName: '豆', phone: '', avatarUrl: def },
+    def,
+  );
+  assert.deepEqual(avatarAndPhone.missingLabels, ['头像', '手机号']);
+  assert.equal(avatarAndPhone.finishHintText, '还需完善：头像、手机号');
+  assert.equal(avatarAndPhone.finishButtonText, '确认注册');
+
+  const defaultNickMissing = buildRegisterProgress(
+    {
+      nickName: 'Bean artist1',
+      phone: '13812345678',
+      avatarUrl: 'wxfile://tmp_avatar',
+    },
+    def,
+  );
+  assert.equal(defaultNickMissing.hasNickName, false);
+  assert.deepEqual(defaultNickMissing.missingLabels, ['昵称']);
+  assert.equal(defaultNickMissing.finishHintText, '还需完善：昵称');
+
+  const allMissing = buildRegisterProgress(
+    { nickName: '', phone: '', avatarUrl: def },
+    def,
+  );
+  assert.deepEqual(allMissing.missingLabels, ['头像', '昵称', '手机号']);
+  assert.equal(allMissing.doneCount, 0);
+  assert.equal(allMissing.finishHintText, '还需完善：头像、昵称、手机号');
+  assert.equal(allMissing.finishButtonText, '确认注册');
+
+  const complete = buildRegisterProgress(
+    { nickName: '豆', phone: '13812345678', avatarUrl: 'wxfile://tmp_avatar' },
+    def,
+  );
+  assert.deepEqual(complete.missingLabels, []);
+  assert.equal(complete.doneCount, 3);
+  assert.equal(complete.registrationComplete, true);
+  assert.equal(complete.finishButtonText, '确认注册');
+  assert.equal(complete.finishHintText, '已完成 3/3');
+  assert.equal(complete.finishToast, '');
+});
+
+test('resolveWechatNicknameInput rejects typing and keeps WeChat fill', () => {
+  const { resolveWechatNicknameInput } = require('../miniprogram/utils/memberProfile');
+
+  assert.deepEqual(resolveWechatNicknameInput('', '张'), {
+    accept: false,
+    value: '',
+    reason: 'typing',
+  });
+  assert.deepEqual(resolveWechatNicknameInput('张', '张三'), {
+    accept: false,
+    value: '',
+    reason: 'typing',
+  });
+  assert.deepEqual(resolveWechatNicknameInput('', '拼豆小张'), {
+    accept: true,
+    value: '拼豆小张',
+    reason: '',
+  });
+  assert.deepEqual(resolveWechatNicknameInput('旧名', '拼豆小张'), {
+    accept: true,
+    value: '拼豆小张',
+    reason: '',
+  });
+  assert.deepEqual(resolveWechatNicknameInput('拼豆小张', ''), {
+    accept: true,
+    value: '',
+    reason: '',
+  });
+  assert.deepEqual(resolveWechatNicknameInput('', 'Bean artist1'), {
+    accept: false,
+    value: '',
+    reason: 'default',
+  });
 });

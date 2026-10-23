@@ -1,0 +1,82 @@
+<view class="container">
+  <view class="section-title">储值流水</view>
+
+  <view class="filter-panel">
+    <view class="filter-row">
+      <view class="chip-row">
+        <block wx:for="{{filters}}" wx:key="key">
+          <view
+            class="chip {{filterType === item.key ? 'is-on' : ''}}"
+            data-type="{{item.key}}"
+            bindtap="setTypeFilter"
+          >{{item.label}}</view>
+        </block>
+      </view>
+      <view class="time-trigger" bindtap="openTimeSheet">
+        <image class="time-icon" src="/assets/icons/calendar.png" mode="aspectFit" />
+        <view class="time-text">{{rangeLabel}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="grid-two stats-grid">
+    <view class="card stat-card">
+      <view class="card-meta">进账合计</view>
+      <view class="price">¥{{stats.incomeText}}</view>
+    </view>
+    <view class="card stat-card">
+      <view class="card-meta">出账合计</view>
+      <view class="price">¥{{stats.expenseText}}</view>
+    </view>
+    <view class="card stat-card">
+      <view class="card-meta">净额</view>
+      <view class="price">¥{{stats.netText}}</view>
+    </view>
+    <view class="card stat-card">
+      <view class="card-meta">笔数</view>
+      <view class="price">{{stats.count}}</view>
+    </view>
+  </view>
+
+  <page-loading wx:if="{{loading}}" tip="流水加载中" rows="{{4}}" />
+
+  <view class="subtitle" wx:elif="{{!list.length}}" style="margin-top: 24rpx;">该时段暂无流水</view>
+
+  <block wx:else>
+    <block wx:for="{{list}}" wx:key="id">
+      <view class="card">
+        <view class="card-topline">
+          <view class="card-main">
+            <view class="card-title">{{item.typeLabel}} {{item.body}}</view>
+            <view class="card-meta">{{item.memberNickname}} · {{item.memberPhone || '未绑定手机'}}</view>
+            <view class="card-meta">{{item.meta}}</view>
+          </view>
+          <view class="amount {{item.amount >= 0 ? 'plus' : 'minus'}}">{{item.amountText}}</view>
+        </view>
+        <view class="card-meta">会员余额 ¥{{item.balanceAfterText}}</view>
+      </view>
+    </block>
+  </block>
+
+  <view class="time-mask" wx:if="{{timeSheetOpen}}" catchtouchmove="noop" bindtap="closeTimeSheet">
+    <view class="time-sheet" catchtap="noop">
+      <view class="time-sheet-title">选择时间范围</view>
+      <view class="time-sheet-row">
+        <view class="time-sheet-label">开始</view>
+        <picker mode="date" value="{{draftStartDate}}" end="{{draftEndDate}}" bindchange="onDraftStartChange">
+          <view class="time-sheet-value">{{draftStartDate}}</view>
+        </picker>
+      </view>
+      <view class="time-sheet-row">
+        <view class="time-sheet-label">结束</view>
+        <picker mode="date" value="{{draftEndDate}}" start="{{draftStartDate}}" bindchange="onDraftEndChange">
+          <view class="time-sheet-value">{{draftEndDate}}</view>
+        </picker>
+      </view>
+      <view class="time-sheet-actions">
+        <view class="btn btn-secondary time-sheet-btn" bindtap="closeTimeSheet">取消</view>
+        <view class="btn btn-primary time-sheet-btn" bindtap="confirmTimeSheet">确定</view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,19 @@
+{
+  "id": "20260913-161355",
+  "ok": true,
+  "results": [
+    {
+      "command": "powershell -NoProfile -Command \"Get-ChildItem 'assets\\cover-solo-locker-1h-*.png' | ForEach-Object { Write-Output ($_.Name + ' ' + $_.Length) }; if (-not (Test-Path 'assets\\cover-solo-locker-1h-1x1.png')) { exit 1 }; if (-not (Test-Path 'assets\\cover-solo-locker-1h-16x9.png')) { exit 1 }\"",
+      "ok": true,
+      "exitCode": 0,
+      "tail": "cover-solo-locker-1h-16x9.png 201637\ncover-solo-locker-1h-1x1.png 229002"
+    }
+  ],
+  "risk": {
+    "decision": "allow",
+    "actionDigest": "sha256-b4229cae89b863b946da1fc0da0b91a6",
+    "findings": [],
+    "changedFiles": [],
+    "evaluatedAt": "2026-09-13T08:14:06.153Z"
+  }
+}

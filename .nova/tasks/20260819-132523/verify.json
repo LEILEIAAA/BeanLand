@@ -1,0 +1,23 @@
+{
+  "id": "20260819-132523",
+  "ok": true,
+  "results": [
+    {
+      "command": "python -c \"from pathlib import Path; p=Path(r'c:/Users/ry/Desktop/Bean/Bean/assets'); a=p/'cover-10card-weekend-16x9.png'; b=p/'cover-10card-weekend-1x1.png'; assert a.exists() and b.exists(); print(a.name, a.stat().st_size); print(b.name, b.stat().st_size)\"",
+      "ok": true,
+      "exitCode": 0,
+      "tail": "cover-10card-weekend-16x9.png 1766431\ncover-10card-weekend-1x1.png 1206169"
+    }
+  ],
+  "risk": {
+    "decision": "allow",
+    "actionDigest": "sha256-d7f5b5c5c790eb5099d69f9a127446bf",
+    "findings": [],
+    "changedFiles": [
+      "assets/_preview/",
+      "assets/cover-10card-weekend-16x9.png",
+      "assets/cover-10card-weekend-1x1.png"
+    ],
+    "evaluatedAt": "2026-08-19T05:31:27.937Z"
+  }
+}

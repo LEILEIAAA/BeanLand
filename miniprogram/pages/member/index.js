@@ -1,13 +1,14 @@
 const seed = require('../../data/seed');
 const api = require('../../utils/api');
-const { tierLabel } = require('../../utils/memberTier');
+const { tierLabel, tierStyleClass } = require('../../utils/memberTier');
 const { buildActions } = require('../../utils/memberActions');
+const { buildMemberHighlight } = require('../../utils/memberHighlight');
 const {
   isValidPhone,
   maskPhone,
   isRegistrationComplete,
-  canRecharge,
 } = require('../../utils/memberProfile');
+const { openMemberRegister } = require('../../utils/memberRegisterGate');
 const {
   DEFAULT_AVATAR,
   ensureDefaultProfile,
@@ -15,7 +16,12 @@ const {
 } = require('../../utils/wxProfile');
 const { buildWorksCardPreview } = require('../../utils/worksView');
 const { syncTabBar } = require('../../utils/tabBar');
-const { formatYuan2 } = require('../../utils/money');
+const { formatYuan } = require('../../utils/money');
+const {
+  findActiveMemberSession,
+  activeElapsedLabelFromSessions,
+} = require('../../utils/seatSessionHistory');
+const { countActiveSchedule } = require('../../utils/memberScheduleCount');
 
 function buildStampDots(count, target) {
   return Array.from({ length: target }, (_, index) => ({
@@ -33,7 +39,7 @@ function buildStampHint(count, target) {
 function emptyMemberView() {
   return {
     totalBalance: 0,
-    totalBalanceText: '0.00',
+    totalBalanceText: '0',
     principalBalance: 0,
     bonusBalance: 0,
     totalSpent: 0,
@@ -49,10 +55,22 @@ function emptyMemberView() {
   };
 }
 
+function emptyHighlight() {
+  return buildMemberHighlight({
+    activeSession: null,
+    scheduleCount: 0,
+    packageCount: 0,
+    availableCount: 0,
+  });
+}
+
+const { shareBehavior } = require('../../utils/share');
 Page({
+  behaviors: [shareBehavior],
   data: {
     member: emptyMemberView(),
     tierLabel: '普通会员',
+    tierClass: 'tier-member',
     loadingMember: true,
     isAdmin: false,
     avatarUrl: DEFAULT_AVATAR,
@@ -63,13 +81,20 @@ Page({
     registrationComplete: false,
     stampDots: buildStampDots(0, 5),
     stampHint: buildStampHint(0, 5),
+    // 临时隐藏：改 showStampCard 为 true 可恢复集章卡
+    showStampCard: false,
     showWorksCard: false,
     workCount: 0,
     previewThumbs: [],
     worksEmpty: true,
     worksHint: '还没有作品，去拍一张',
     availableCount: 0,
-    actions: buildActions(emptyMemberView(), { isAdmin: false, availableCount: 0 }),
+    highlight: emptyHighlight(),
+    actions: buildActions(emptyMemberView(), {
+      isAdmin: false,
+      availableCount: 0,
+      highlight: emptyHighlight(),
+    }),
   },
   onLoad() {
     this.loadProfile();
@@ -95,14 +120,18 @@ Page({
     this.setData({ loadingMember: true });
     try {
       const profile = ensureDefaultProfile();
-      const [result, couponRes, packageRes] = await Promise.all([
-        api.ensureMember({
-          nickName: profile.nickName || this.data.nickName || '',
-          avatarUrl: profile.avatarUrl || '',
-        }),
-        api.listMyCoupons({ tab: 'unused' }).catch(() => null),
-        api.listMyPackageOrders({ tab: 'unused' }).catch(() => null),
-      ]);
+      const [result, couponRes, packageRes, seatRes, appointmentList, activityRes] =
+        await Promise.all([
+          api.ensureMember({
+            nickName: profile.nickName || this.data.nickName || '',
+            avatarUrl: profile.avatarUrl || '',
+          }),
+          api.listMyCoupons({ tab: 'unused' }).catch(() => null),
+          api.listMyPackageOrders({ tab: 'unused' }).catch(() => null),
+          api.listMySeatSessions({ limit: 20 }).catch(() => null),
+          api.listMyAppointments().catch(() => []),
+          api.listMyActivityRegistrations().catch(() => null),
+        ]);
 
       if (!result || !result.ok || !result.member) {
         throw new Error((result && result.message) || 'ensureMember failed');
@@ -116,11 +145,25 @@ Page({
         packageRes && packageRes.ok && Array.isArray(packageRes.list)
           ? packageRes.list.length
           : 0;
+      const scheduleCount = countActiveSchedule({
+        appointments: Array.isArray(appointmentList) ? appointmentList : [],
+        activities:
+          activityRes && activityRes.ok && Array.isArray(activityRes.list)
+            ? activityRes.list
+            : [],
+      });
+      const seatList =
+        seatRes && seatRes.ok && Array.isArray(seatRes.list) ? seatRes.list : [];
+      const activeSession = findActiveMemberSession(seatList);
+      const activeElapsedLabel = activeElapsedLabelFromSessions(seatList);
 
       this.applyMember(result.member, {
         isAdmin: !!result.isAdmin,
         availableCount,
         packageCount,
+        scheduleCount,
+        activeSession,
+        activeElapsedLabel,
       });
     } catch (error) {
       console.warn('[member] ensureMember fallback seed', error);
@@ -143,6 +186,13 @@ Page({
     const isAdmin = !!(options && options.isAdmin);
     const availableCount = Number((options && options.availableCount) || 0);
     const packageCount = Number((options && options.packageCount) || 0);
+    const scheduleCount = Number(
+      options && options.scheduleCount != null
+        ? options.scheduleCount
+        : (member.appointments && member.appointments.length) || 0,
+    );
+    const activeSession = (options && options.activeSession) || null;
+    const activeElapsedLabel = String((options && options.activeElapsedLabel) || '');
     const stampCount = Number(member.stampCount || 0);
     const stampTarget = Number(member.stampTarget || 5);
     const phone = member.phone || '';
@@ -152,14 +202,21 @@ Page({
       { nickName, phone, avatarUrl },
       DEFAULT_AVATAR,
     );
+    const highlight = buildMemberHighlight({
+      activeSession,
+      scheduleCount,
+      packageCount,
+      availableCount,
+    });
     this.setData({
       member: {
         ...member,
-        totalBalanceText: formatYuan2(member.totalBalance),
+        totalBalanceText: formatYuan(member.totalBalance),
       },
       isAdmin,
       availableCount,
       tierLabel: tierLabel(member.tier || 'member'),
+      tierClass: tierStyleClass(member.tier || 'member'),
       phone,
       phoneMasked: maskPhone(phone),
       hasPhone: isValidPhone(phone),
@@ -168,7 +225,15 @@ Page({
       registrationComplete,
       stampDots: buildStampDots(stampCount, stampTarget),
       stampHint: buildStampHint(stampCount, stampTarget),
-      actions: buildActions(member, { isAdmin, availableCount, packageCount }),
+      highlight,
+      actions: buildActions(member, {
+        isAdmin,
+        availableCount,
+        packageCount,
+        scheduleCount,
+        activeElapsedLabel,
+        highlight,
+      }),
     });
   },
   onAvatarError() {
@@ -176,29 +241,38 @@ Page({
     this.setData({ avatarUrl: '/assets/icons/bean.png' });
   },
   goRegister() {
-    wx.navigateTo({ url: '/pages/member/register/index' });
+    openMemberRegister();
+  },
+  requireRegistered() {
+    if (this.data.loadingMember) {
+      wx.showToast({ title: '加载中', icon: 'none' });
+      return false;
+    }
+    if (!this.data.registrationComplete) {
+      this.goRegister();
+      return false;
+    }
+    return true;
+  },
+  goSettings() {
+    if (!this.requireRegistered()) return;
+    wx.navigateTo({ url: '/pages/member/settings/index' });
   },
   goRecharge() {
-    if (!canRecharge({ phone: this.data.phone })) {
-      wx.showModal({
-        title: '先完善会员资料',
-        content: '转账代充需要手机号。请点头像进入注册页，授权微信手机号。',
-        confirmText: '去注册',
-        success: (res) => {
-          if (res.confirm) this.goRegister();
-        },
-      });
-      return;
-    }
+    if (!this.requireRegistered()) return;
     wx.navigateTo({ url: '/pages/recharge/index' });
   },
-  goAppointment() {
-    wx.navigateTo({ url: '/pages/appointment/index' });
-  },
   goStamps() {
+    if (!this.requireRegistered()) return;
     wx.navigateTo({ url: '/pages/member/stamps/index' });
   },
+  goHighlight() {
+    if (!this.requireRegistered()) return;
+    const key = this.data.highlight && this.data.highlight.routeKey;
+    if (key) this.navigateByKey(key);
+  },
   goWorks() {
+    if (!this.requireRegistered()) return;
     wx.navigateTo({ url: '/pages/member/works/index' });
   },
   async loadWorksPreview() {
@@ -218,21 +292,24 @@ Page({
       this.setData(buildWorksCardPreview([]));
     }
   },
-  onShortcut(event) {
-    const { key } = event.currentTarget.dataset;
+  navigateByKey(key) {
+    if (!this.requireRegistered()) return;
     const routes = {
       packages: '/pages/member/packages/index',
       records: '/pages/member/records/index',
       seatSessions: '/pages/member/seat-sessions/index',
       coupons: '/pages/member/coupons/index',
       stamps: '/pages/member/stamps/index',
-      appointments: '/pages/member/appointments/index',
-      activityRegs: '/pages/member/activity-registrations/index',
+      schedule: '/pages/member/appointments/index',
+      settings: '/pages/member/settings/index',
       admin: '/pages/admin/dashboard/index',
     };
-
     if (routes[key]) {
       wx.navigateTo({ url: routes[key] });
     }
+  },
+  onShortcut(event) {
+    const { key } = event.currentTarget.dataset;
+    this.navigateByKey(key);
   },
 });

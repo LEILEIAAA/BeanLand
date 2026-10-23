@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "储值流水",
+  "usingComponents": {
+    "page-loading": "/components/page-loading/index"
+  }
+}

@@ -2,8 +2,8 @@ const api = require('../../../utils/api');
 const {
   isValidPhone,
   maskPhone,
-  hasChosenAvatar,
-  isRegistrationComplete,
+  buildRegisterProgress,
+  hasChosenNickName,
   normalizePhone,
   phoneAuthFailMessage,
 } = require('../../../utils/memberProfile');
@@ -12,10 +12,11 @@ const {
   ensureDefaultProfile,
   writeProfile,
   displayAvatar,
-  resolveNickNameUpdate,
 } = require('../../../utils/wxProfile');
 
+const { shareBehavior } = require('../../../utils/share');
 Page({
+  behaviors: [shareBehavior],
   data: {
     avatarUrl: DEFAULT_AVATAR,
     nickName: '',
@@ -26,11 +27,22 @@ Page({
     hasPhone: false,
     doneCount: 0,
     registrationComplete: false,
+    finishButtonText: '确认注册',
+    finishHintText: '还需完善：头像、昵称、手机号',
+    finishToast: '还需完善：头像、昵称、手机号',
     phoneBusy: false,
     finishing: false,
   },
   onShow() {
     this.bootstrap();
+    this.ensurePrivacyReady();
+  },
+  ensurePrivacyReady() {
+    if (typeof wx.requirePrivacyAuthorize !== 'function') return;
+    wx.requirePrivacyAuthorize({
+      success: () => {},
+      fail: () => {},
+    });
   },
   async bootstrap() {
     const profile = ensureDefaultProfile();
@@ -94,10 +106,7 @@ Page({
     this.refreshFlags();
   },
   refreshFlags() {
-    const hasAvatar = hasChosenAvatar(this.data.avatarUrl, DEFAULT_AVATAR);
-    const hasNickName = !!String(this.data.nickName || '').trim();
-    const hasPhone = isValidPhone(this.data.phone);
-    const registrationComplete = isRegistrationComplete(
+    const progress = buildRegisterProgress(
       {
         avatarUrl: this.data.avatarUrl,
         nickName: this.data.nickName,
@@ -105,13 +114,15 @@ Page({
       },
       DEFAULT_AVATAR,
     );
-    const doneCount = [hasAvatar, hasNickName, hasPhone].filter(Boolean).length;
     this.setData({
-      hasAvatar,
-      hasNickName,
-      hasPhone,
-      doneCount,
-      registrationComplete,
+      hasAvatar: progress.hasAvatar,
+      hasNickName: progress.hasNickName,
+      hasPhone: progress.hasPhone,
+      doneCount: progress.doneCount,
+      registrationComplete: progress.registrationComplete,
+      finishButtonText: progress.finishButtonText,
+      finishHintText: progress.finishHintText,
+      finishToast: progress.finishToast,
     });
   },
   persistLocal(partial) {
@@ -176,9 +187,35 @@ Page({
       },
     });
   },
+  onNicknameFocus() {
+    if (typeof wx.requirePrivacyAuthorize !== 'function') return;
+    wx.requirePrivacyAuthorize({
+      success: () => {},
+      fail: () => {
+        wx.showToast({ title: '需同意隐私保护提示后才能选用昵称', icon: 'none' });
+      },
+    });
+  },
   async onNicknameBlur(event) {
-    const nickName = resolveNickNameUpdate(event.detail.value, this.data.nickName);
-    if (!nickName || nickName === this.data.nickName) return;
+    const next = String((event.detail && event.detail.value) || '').trim();
+    if (!next) return;
+    if (!hasChosenNickName(next)) {
+      wx.showToast({ title: '请点键盘上方选用昵称', icon: 'none' });
+      return;
+    }
+    await this.saveNickName(next);
+  },
+  async saveNickName(nickName) {
+    if (this._nickSaving) return;
+    if (!hasChosenNickName(nickName)) {
+      wx.showToast({ title: '请选用昵称', icon: 'none' });
+      return;
+    }
+    if (nickName === this.data.nickName && this.data.hasNickName) {
+      return;
+    }
+
+    this._nickSaving = true;
     this.persistLocal({ nickName });
     try {
       const result = await api.ensureMember({ nickName });
@@ -187,10 +224,13 @@ Page({
       } else {
         this.refreshFlags();
       }
+      wx.showToast({ title: '昵称已保存', icon: 'success' });
     } catch (error) {
       this.refreshFlags();
+      wx.showToast({ title: '昵称保存失败，请重试', icon: 'none' });
+    } finally {
+      this._nickSaving = false;
     }
-    wx.showToast({ title: '昵称已保存', icon: 'success' });
   },
   async onGetPhoneNumber(event) {
     if (this.data.phoneBusy) return;
@@ -241,7 +281,7 @@ Page({
       } catch (storageError) {
         // ignore
       }
-      wx.showToast({ title: '手机号已授权', icon: 'success' });
+      wx.showToast({ title: '手机号已登录', icon: 'success' });
     } catch (error) {
       console.warn('[register] phone auth', error);
       wx.showToast({ title: '授权入库失败，请重试', icon: 'none' });
@@ -251,7 +291,10 @@ Page({
   },
   onFinish() {
     if (!this.data.registrationComplete) {
-      wx.showToast({ title: '请完成头像、昵称、手机号', icon: 'none' });
+      wx.showToast({
+        title: this.data.finishToast || '还需完善：头像、昵称、手机号',
+        icon: 'none',
+      });
       return;
     }
     this.finishAndBack('注册完成');

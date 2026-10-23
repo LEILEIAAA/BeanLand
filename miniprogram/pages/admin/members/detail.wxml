@@ -1,0 +1,51 @@
+<view class="container">
+  <view class="section-title">会员详情</view>
+  <page-loading wx:if="{{loading}}" tip="会员加载中" rows="{{3}}" />
+
+  <block wx:elif="{{member}}">
+    <view class="card section">
+      <view class="card-topline">
+        <view class="card-title">{{member.nickname}}</view>
+        <view class="status-badge">{{member.tierLabel}}</view>
+      </view>
+      <view class="card-meta">手机号 {{member.phone}}</view>
+      <view class="card-meta">余额 ¥{{member.balanceText}}</view>
+      <view class="card-meta">本金 ¥{{member.principalText}} · 赠金 ¥{{member.bonusText}}</view>
+      <view class="card-meta">累计充值 ¥{{member.rechargeText}} · 累计消费 ¥{{member.spentText}}</view>
+    </view>
+
+    <view class="tx-title">消费记录</view>
+    <view class="filter-panel">
+      <view class="chip-row">
+        <block wx:for="{{filters}}" wx:key="key">
+          <view
+            class="chip {{filterType === item.key ? 'is-on' : ''}}"
+            data-type="{{item.key}}"
+            bindtap="setTypeFilter"
+          >{{item.label}}</view>
+        </block>
+      </view>
+    </view>
+
+    <page-loading wx:if="{{txLoading}}" tip="消费记录加载中" rows="{{3}}" />
+
+    <view class="empty-tip" wx:elif="{{!transactions.length}}">暂无消费记录</view>
+
+    <block wx:else>
+      <block wx:for="{{transactions}}" wx:key="id">
+        <view class="card">
+          <view class="card-topline">
+            <view class="card-main">
+              <view class="card-title">{{item.typeLabel}} {{item.body}}</view>
+              <view class="card-meta">{{item.meta}}</view>
+            </view>
+            <view class="amount {{item.amount >= 0 ? 'plus' : 'minus'}}">{{item.amountText}}</view>
+          </view>
+          <view class="card-meta">会员余额 ¥{{item.balanceAfterText}}</view>
+        </view>
+      </block>
+    </block>
+  </block>
+
+  <view class="subtitle" wx:else>未找到该会员</view>
+</view>

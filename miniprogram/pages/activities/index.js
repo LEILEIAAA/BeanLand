@@ -1,12 +1,31 @@
 const api = require('../../utils/api');
-const { activities: seedActivities } = require('../../data/seed');
 const { syncTabBar } = require('../../utils/tabBar');
+const { DEFAULT_AVATAR } = require('../../utils/wxProfile');
+const {
+  needsMemberRegister,
+  openMemberRegister,
+} = require('../../utils/memberRegisterGate');
+const {
+  normalizeActivityPageConfig,
+  buildScheduleRows,
+} = require('../../utils/activityPageConfig');
+const {
+  normalizeKeyword,
+  buildActivityFilters,
+  filterActivities,
+} = require('../../utils/activityFilters');
+const {
+  resolveActivityCover,
+  fallbackActivityCover,
+} = require('../../utils/activityCover');
+const { formatYuan } = require('../../utils/money');
 
-const COVER_POOL = [
-  '/assets/background/images1.jpg',
-  '/assets/background/image3.jpg',
-  '/assets/background/images2.jpg',
-];
+// 角标配色预设，与云函数 ACCENT_THEMES 对齐；后台可切换。
+const ACCENT_THEMES = {
+  yellow: { accent: '#FFB80A', orbInk: '#18181b' },
+  orange: { accent: '#FF3D02', orbInk: '#ffffff' },
+  green: { accent: '#69D868', orbInk: '#18181b' },
+};
 
 const ACTIVITY_STATUS_LABEL = {
   recruiting: '招募中',
@@ -17,54 +36,32 @@ const ACTIVITY_STATUS_LABEL = {
   draft: '未发布',
 };
 
-/** 开业首周日程（改期只改这里） */
-const OPENING_WEEK = [
-  { day: '1-2', title: '五月天主题拼豆', note: '开业第一场，歌单与作品墙', status: '报名中', kind: 'event' },
-  { day: '3', title: '散场日', note: '无主题局，可预约日常座位', status: '可预约', kind: 'rest' },
-  { day: '4-5', title: '大学生鱿鱼游戏', note: '三关迷你季，紧张好看又能出片', status: '报名中', kind: 'event' },
-  { day: '6', title: '散场日', note: '休整补豆，作品继续打磨', status: '可预约', kind: 'rest' },
-  { day: '7', title: '拼豆交流会', note: '带上最得意的作品来评选', status: '报名中', kind: 'event' },
-];
-
 const ACTIVITY_LOOKS = {
   mayday: {
     accent: '#FFB80A',
     enLabel: 'LIVE',
     orbInk: '#18181b',
-    category: 'theme',
     blurb: '开业第一场。歌单、色卡、作品墙——先把夏天拼出来',
   },
   'squid-game': {
     accent: '#FF3D02',
     enLabel: 'GAME',
     orbInk: '#ffffff',
-    category: 'game',
     blurb: '大学生专场三关局。报名费可抵扣消费，前三送无限时',
   },
   'craft-meetup': {
     accent: '#69D868',
     enLabel: 'MEET',
     orbInk: '#18181b',
-    category: 'meetup',
     blurb: '带上最得意的作品，评选、交流、认识同好',
   },
   birthday: {
     accent: '#FF3D02',
     enLabel: 'VIP',
     orbInk: '#ffffff',
-    category: 'private',
     blurb: '生日会 / 团建 / 包场，整场都是你的',
   },
 };
-
-const FILTERS = [
-  { id: 'all', label: '全部' },
-  { id: 'recruiting', label: '招募中' },
-  { id: 'theme', label: '五月天' },
-  { id: 'game', label: '鱿鱼局' },
-  { id: 'meetup', label: '交流会' },
-  { id: 'private', label: '包场' },
-];
 
 function decorateActivities(list) {
   return (list || []).map((item, index) => {
@@ -73,38 +70,40 @@ function decorateActivities(list) {
       accent: '#FFB80A',
       enLabel: 'DROP',
       orbInk: '#18181b',
-      category: 'all',
       blurb: '开业主题局，欢迎来玩',
     };
     const registeredCount = Number(item.registeredCount || 0);
     const capacity = Number(item.capacity || 0);
+    // 角标配色优先后台 accentTheme，缺省回退内置 look；海报文案同样以后台为准。
+    const theme = ACCENT_THEMES[item.accentTheme] || null;
     return {
       ...item,
-      ...look,
+      accent: (theme && theme.accent) || look.accent,
+      enLabel: look.enLabel,
+      orbInk: (theme && theme.orbInk) || look.orbInk,
+      keyword: normalizeKeyword(item.keyword),
+      blurb: item.blurb || look.blurb || '开业主题局，欢迎来玩',
       id,
-      cover: COVER_POOL[index % COVER_POOL.length],
+      cover: resolveActivityCover(item.coverImage, index),
       statusLabel: ACTIVITY_STATUS_LABEL[item.status] || item.status,
       dropNo: String(index + 1).padStart(2, '0'),
       shift: index % 2 === 1 ? 'shift-right' : 'shift-left',
       registeredCount,
       capacity,
       seatLabel: `${registeredCount}/${capacity}`,
+      priceText: formatYuan(item.price),
     };
   });
 }
 
-function filterActivities(list, filterId) {
-  if (filterId === 'all') return list;
-  if (filterId === 'recruiting') {
-    return list.filter((item) => item.status === 'recruiting');
-  }
-  return list.filter((item) => item.category === filterId);
-}
-
+const { shareBehavior } = require('../../utils/share');
 Page({
+  behaviors: [shareBehavior],
   data: {
-    filters: FILTERS,
-    openingWeek: OPENING_WEEK,
+    filters: buildActivityFilters([]),
+    hero: normalizeActivityPageConfig(null).hero,
+    scheduleTitle: normalizeActivityPageConfig(null).schedule.title,
+    openingWeek: [],
     activeFilter: 'all',
     allActivities: [],
     activities: [],
@@ -115,16 +114,47 @@ Page({
     this.loadActivities();
   },
   async loadActivities() {
-    let rows = seedActivities;
+    let rows = [];
     try {
       const cloudRows = await api.getActivities();
-      if (cloudRows && cloudRows.length) rows = cloudRows;
+      if (Array.isArray(cloudRows)) rows = cloudRows;
     } catch (error) {
       console.warn('[activities] load failed', error);
     }
-    const allActivities = decorateActivities(rows);
-    const activeFilter = this.data.activeFilter;
+    let config = normalizeActivityPageConfig(null);
+    let scheduleRows = null;
+    try {
+      const pageConfig = await api.getActivityPageConfig();
+      if (pageConfig && pageConfig.activitiesPage) {
+        config = normalizeActivityPageConfig(pageConfig.activitiesPage);
+      }
+      if (pageConfig && Array.isArray(pageConfig.scheduleRows) && pageConfig.scheduleRows.length) {
+        scheduleRows = pageConfig.scheduleRows;
+      }
+    } catch (error) {
+      console.warn('[activities] config load failed', error);
+    }
+    const sortedRows = (rows || [])
+      .map((row, index) => ({ row, index }))
+      .sort((a, b) => {
+        const diff = (Number(a.row.sortOrder) || 0) - (Number(b.row.sortOrder) || 0);
+        return diff !== 0 ? diff : a.index - b.index;
+      })
+      .map((item) => item.row);
+    const allActivities = decorateActivities(sortedRows);
+    const filters = buildActivityFilters(allActivities);
+    let activeFilter = this.data.activeFilter;
+    if (!filters.some((item) => item.id === activeFilter)) {
+      activeFilter = 'all';
+    }
+    // 优先用云函数已 join 的日程（含未上架散场日）；否则本地用上架活动拼
+    const openingWeek = scheduleRows || buildScheduleRows(config.schedule.items, allActivities);
     this.setData({
+      hero: config.hero,
+      scheduleTitle: config.schedule.title,
+      openingWeek,
+      filters,
+      activeFilter,
       allActivities,
       activities: filterActivities(allActivities, activeFilter),
       featuredCount: allActivities.filter((item) => item.status === 'recruiting').length,
@@ -138,10 +168,41 @@ Page({
       activities: filterActivities(this.data.allActivities, filterId),
     });
   },
-  join(event) {
+  onActivityCoverError(event) {
+    const index = Number(event.currentTarget.dataset.index);
+    if (!Number.isFinite(index) || index < 0) return;
+    const list = this.data.activities || [];
+    const row = list[index];
+    if (!row) return;
+    const nextCover = fallbackActivityCover(index, row.cover);
+    if (!nextCover || nextCover === row.cover) return;
+    const patch = { [`activities[${index}].cover`]: nextCover };
+    const allIndex = (this.data.allActivities || []).findIndex((item) => item.id === row.id);
+    if (allIndex >= 0) {
+      patch[`allActivities[${allIndex}].cover`] = nextCover;
+    }
+    this.setData(patch);
+  },
+  async join(event) {
     const id = event.currentTarget.dataset.id || '';
     if (!id) {
       wx.showToast({ title: '请选择活动', icon: 'none' });
+      return;
+    }
+    try {
+      const res = await api.getMyMember();
+      const member = res && res.member;
+      if (needsMemberRegister(member, DEFAULT_AVATAR)) {
+        if (!openMemberRegister()) {
+          wx.showToast({ title: '请先完成会员注册', icon: 'none' });
+        }
+        return;
+      }
+    } catch (error) {
+      console.warn('[activities] join gate', error);
+      if (!openMemberRegister()) {
+        wx.showToast({ title: '请先完成会员注册', icon: 'none' });
+      }
       return;
     }
     wx.navigateTo({ url: `/pages/activities/register/index?activityId=${id}` });

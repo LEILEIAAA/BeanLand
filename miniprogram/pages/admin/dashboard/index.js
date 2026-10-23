@@ -1,58 +1,51 @@
 const api = require('../../../utils/api');
+const {
+  buildAdminDashboardMenu,
+  applyAdminDashboardBadges,
+} = require('../../../utils/adminDashboardMenu');
 
 Page({
   data: {
-    metrics: [
-      { label: '今日预约', value: '—' },
-      { label: '本周预约', value: '—' },
-      { label: '新增会员', value: '—' },
-      { label: '储值金额', value: '—' },
-      { label: '活动报名', value: '—' },
-      { label: '即将超时', value: '—' },
-    ],
+    sections: buildAdminDashboardMenu(),
   },
+
   onShow() {
-    this.loadActivityMetric();
+    this.refreshBadges();
   },
-  async loadActivityMetric() {
+
+  async refreshBadges() {
     try {
-      const res = await api.adminListActivityRegistrations({});
-      if (!res || !res.ok) return;
-      const metrics = this.data.metrics.map((item) => {
-        if (item.label !== '活动报名') return item;
-        return { ...item, value: String(res.todayPaidCount || 0) };
+      const [appointments, activityRes] = await Promise.all([
+        api.adminListAppointments({ status: 'pending' }),
+        api.adminListActivityRegistrations({ status: 'refund_pending' }),
+      ]);
+      const appointmentsPending = Array.isArray(appointments) ? appointments.length : 0;
+      const activityList = (activityRes && activityRes.list) || [];
+      const activityRegsPending = Array.isArray(activityList) ? activityList.length : 0;
+      this.setData({
+        sections: applyAdminDashboardBadges(buildAdminDashboardMenu(), {
+          appointmentsPending,
+          activityRegsPending,
+        }),
       });
-      this.setData({ metrics });
     } catch (error) {
-      console.warn('[admin-dashboard] activity metric', error);
+      console.warn('[admin-dashboard-badges]', error);
     }
   },
-  goCoupons() {
-    wx.navigateTo({ url: '/pages/admin/coupons/index' });
-  },
-  goPackages() {
+
+  goMenu(event) {
+    const url = event.currentTarget.dataset.url;
+    if (!url) return;
     wx.navigateTo({
-      url: '/pages/admin/package-redeem/index',
+      url,
       fail: (err) => {
         const msg = (err && (err.errMsg || err.message)) || '页面打开失败';
         wx.showModal({
-          title: '无法打开套餐核销',
+          title: '无法打开',
           content: msg,
           showCancel: false,
         });
       },
     });
-  },
-  goAppointments() {
-    wx.navigateTo({ url: '/pages/admin/appointments/index' });
-  },
-  goActivityRegs() {
-    wx.navigateTo({ url: '/pages/admin/activity-registrations/index' });
-  },
-  goTimer() {
-    wx.navigateTo({ url: '/pages/admin/timer/index' });
-  },
-  goTimerHistory() {
-    wx.navigateTo({ url: '/pages/admin/timer-history/index' });
   },
 });

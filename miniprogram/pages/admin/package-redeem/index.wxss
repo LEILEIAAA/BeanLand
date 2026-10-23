@@ -65,13 +65,7 @@
   margin: 0 -24rpx;
   padding-left: 24rpx;
   padding-right: 24rpx;
-}
-
-.selected-box {
-  padding: 16rpx 20rpx;
   border-radius: 16rpx;
-  background: rgba(15, 23, 42, 0.04);
-  font-size: 26rpx;
 }
 
 .coupon-side {
@@ -94,4 +88,13 @@
 
 .redeem-btn-busy {
   opacity: 0.5;
+}
+
+.empty-tip {
+  margin-top: 48rpx;
+  padding: 48rpx 32rpx;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 26rpx;
+  line-height: 1.5;
 }

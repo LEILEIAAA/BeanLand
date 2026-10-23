@@ -40,7 +40,7 @@ function sampleUserCoupons({ openid, memberId, now = Date.now() }) {
     {
       _openid: openid,
       memberId,
-      name: '最佳作品 · 赠送 3 小时',
+      name: '活动优惠 · 赠送 3 小时',
       category: 'best_work',
       benefitType: 'hours',
       benefitValue: 3,

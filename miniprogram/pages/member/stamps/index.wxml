@@ -8,36 +8,40 @@
     </view>
   </view>
 
-  <view class="section-title" style="margin-bottom: 16rpx;">集章记录</view>
-  <view class="list-card" style="margin-bottom: 28rpx;">
-    <block wx:if="{{stampLogs.length}}">
-      <block wx:for="{{stampLogs}}" wx:key="id">
+  <page-loading wx:if="{{loading}}" tip="集章加载中" rows="{{4}}" />
+
+  <block wx:else>
+    <view class="section-title" style="margin-bottom: 16rpx;">集章记录</view>
+    <view class="list-card" style="margin-bottom: 28rpx;">
+      <block wx:if="{{stampLogs.length}}">
+        <block wx:for="{{stampLogs}}" wx:key="id">
+          <view class="list-row">
+            <view class="list-main">
+              <view class="list-title">{{item.action}}</view>
+              <view class="list-meta">{{item.at}}</view>
+            </view>
+            <view class="list-amount plus">+{{item.stampDelta}}</view>
+          </view>
+        </block>
+      </block>
+      <view wx:else class="list-row">
+        <view class="list-main">
+          <view class="list-title">暂无集章记录</view>
+          <view class="list-meta">到店体验后会在这里出现</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section-title" style="margin-bottom: 16rpx;">怎么集章</view>
+    <view class="list-card">
+      <block wx:for="{{stampRules}}" wx:key="action">
         <view class="list-row">
           <view class="list-main">
             <view class="list-title">{{item.action}}</view>
-            <view class="list-meta">{{item.at}}</view>
           </view>
-          <view class="list-amount plus">+{{item.stampDelta}}</view>
+          <view class="status-chip ok">+{{item.stampDelta}}</view>
         </view>
       </block>
-    </block>
-    <view wx:else class="list-row">
-      <view class="list-main">
-        <view class="list-title">暂无集章记录</view>
-        <view class="list-meta">到店体验后会在这里出现</view>
-      </view>
     </view>
-  </view>
-
-  <view class="section-title" style="margin-bottom: 16rpx;">怎么集章</view>
-  <view class="list-card">
-    <block wx:for="{{stampRules}}" wx:key="action">
-      <view class="list-row">
-        <view class="list-main">
-          <view class="list-title">{{item.action}}</view>
-        </view>
-        <view class="status-chip ok">+{{item.stampDelta}}</view>
-      </view>
-    </block>
-  </view>
+  </block>
 </view>

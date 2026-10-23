@@ -1,15 +1,16 @@
+<privacy-popup />
 <view class="container sub-page register-page">
   <view class="sub-hero">
     <view class="sub-label">会员注册</view>
     <view class="sub-value">完善资料</view>
-    <view class="sub-desc">请依次选用微信头像、昵称并授权手机号。三项齐全后点底部按钮返回会员页。</view>
+    <view class="sub-desc">请依次选用头像、昵称并完成手机号快捷登录。三项齐全后点底部按钮返回会员页。</view>
   </view>
 
   <view class="list-card register-card">
     <view class="step-row">
       <view class="step-head">
         <text class="step-no">1</text>
-        <text class="step-title">微信头像</text>
+        <text class="step-title">头像</text>
         <text class="step-status {{hasAvatar ? 'done' : ''}}">{{hasAvatar ? '已选' : '未选'}}</text>
       </view>
       <view class="avatar-block">
@@ -22,51 +23,54 @@
             hover-class="none"
           ></button>
         </view>
-        <view class="step-hint">点击头像选用微信头像</view>
+        <view class="step-hint">点击头像选用头像</view>
       </view>
     </view>
 
     <view class="step-row">
       <view class="step-head">
         <text class="step-no">2</text>
-        <text class="step-title">微信昵称</text>
+        <text class="step-title">昵称</text>
         <text class="step-status {{hasNickName ? 'done' : ''}}">{{hasNickName ? '已填' : '未填'}}</text>
       </view>
       <view class="nickname-box">
-        <view class="nickname-display">{{nickName || '未设置昵称'}}</view>
-        <view class="nickname-sync-wrap block">
-          <view class="nickname-sync-label">{{hasNickName ? '更换微信昵称' : '选用微信昵称'}}</view>
-          <input
-            class="nickname-sync-ghost"
-            type="nickname"
-            maxlength="32"
-            bindblur="onNicknameBlur"
-          />
-        </view>
+        <view class="nickname-display">{{hasNickName ? nickName : '未设置昵称'}}</view>
+        <input
+          class="nickname-input"
+          type="nickname"
+          maxlength="32"
+          placeholder="{{hasNickName ? '点按更换昵称' : '点按选用昵称'}}"
+          placeholder-class="nickname-input-ph"
+          bindfocus="onNicknameFocus"
+          bindblur="onNicknameBlur"
+          confirm-type="done"
+        />
+        <view class="step-hint">弹出键盘后，请点上方「使用昵称」</view>
       </view>
     </view>
 
     <view class="step-row">
       <view class="step-head">
         <text class="step-no">3</text>
-        <text class="step-title">微信手机号</text>
-        <text class="step-status {{hasPhone ? 'done' : ''}}">{{hasPhone ? '已授权' : '未授权'}}</text>
+        <text class="step-title">手机号</text>
+        <text class="step-status {{hasPhone ? 'done' : ''}}">{{hasPhone ? '已登录' : '未登录'}}</text>
       </view>
       <view wx:if="{{hasPhone}}" class="phone-masked">{{phoneMasked}}</view>
       <button
-        class="btn-phone-auth"
+        class="{{hasPhone ? 'btn-phone-link' : 'btn-phone-auth'}}"
         open-type="getPhoneNumber"
         bindgetphonenumber="onGetPhoneNumber"
         loading="{{phoneBusy}}"
         disabled="{{phoneBusy}}"
-      >{{hasPhone ? '更换微信手机号' : '授权微信手机号'}}</button>
+        hover-class="none"
+      >{{hasPhone ? '更换手机号' : '手机号快捷登录'}}</button>
     </view>
   </view>
 
   <view class="register-foot">
-    <view class="progress-text">已完成 {{doneCount}}/3</view>
+    <view class="progress-text">{{finishHintText}}</view>
     <view class="btn btn-primary {{registrationComplete ? '' : 'disabled'}}" bindtap="onFinish">
-      {{registrationComplete ? '完成注册并返回' : '请完成以上三项'}}
+      {{finishButtonText}}
     </view>
   </view>
 </view>

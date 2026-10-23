@@ -1,31 +1,76 @@
 <view class="container sub-page">
   <view class="sub-hero">
     <view class="sub-label">我的预约</view>
-    <view class="sub-value">{{appointments.length}} 条</view>
-    <view class="sub-desc">商家确认后请按时到店。预约开始后座位保留 15 分钟，超时未到将自动取消，以免影响其他客人。待商家确认可自行取消；已确认如需取消请联系商家。</view>
+    <view class="sub-value" wx:if="{{activeTab === 'appointments'}}">{{appointmentActiveCount}} 条</view>
+    <view class="sub-value" wx:else>{{activityActiveCount}} 条</view>
+    <view class="sub-desc" wx:if="{{activeTab === 'appointments'}}">
+      商家确认后请按时到店。预约开始后座位保留 15 分钟，超时未到将自动取消，以免影响其他客人。待商家确认可自行取消；已确认如需取消请联系商家。
+    </view>
+    <view class="sub-desc" wx:else>选活动并支付即报名成功，凭报名记录按时到店参加，不占拼豆座位。开场 24 小时以上可自行取消并全额退；不足 24 小时取消扣 30% 手续费；活动已开始不可取消。</view>
   </view>
 
-  <view class="list-card" style="margin-bottom: 28rpx;" wx:if="{{appointments.length}}">
-    <block wx:for="{{appointments}}" wx:key="id">
-      <view class="list-row">
-        <view class="list-main">
-          <view class="list-title">{{item.title}}</view>
-          <view class="list-meta">{{item.date}} {{item.timeSlot}} · {{item.peopleCount}} 人</view>
-          <view class="list-meta reject-reason" wx:if="{{item.showRejectReason}}">拒绝原因：{{item.rejectReason}}</view>
-        </view>
-        <view class="status-chip {{item.status === 'cancelled' || item.status === 'rejected' || item.status === 'no_show' ? '' : 'ok'}}">
-          {{item.statusLabel}}
-        </view>
-      </view>
-      <view class="btn btn-secondary" style="margin: 0 0 20rpx;" wx:if="{{item.canCancel}}" data-id="{{item.id}}" bindtap="cancel">
-        取消预约
-      </view>
-      <view class="btn btn-secondary" style="margin: 0 0 20rpx;" wx:if="{{item.showContactCancel}}" bindtap="contactCancel">
-        联系商家取消
-      </view>
+  <view class="coupon-tabs">
+    <block wx:for="{{tabs}}" wx:key="key">
+      <view
+        class="coupon-tab {{activeTab === item.key ? 'active' : ''}}"
+        data-tab="{{item.key}}"
+        bindtap="onTabChange"
+      >{{item.label}}</view>
     </block>
   </view>
-  <view class="card-meta" wx:elif="{{!loading}}" style="margin-bottom: 28rpx;">暂无预约记录</view>
 
-  <view class="btn btn-primary" bindtap="goBook">再约一次</view>
+  <page-loading wx:if="{{loading}}" tip="预约加载中" rows="{{4}}" />
+
+  <block wx:elif="{{activeTab === 'appointments'}}">
+    <view class="list-card" style="margin-bottom: 28rpx;" wx:if="{{appointments.length}}">
+      <block wx:for="{{appointments}}" wx:key="id">
+        <view class="list-row">
+          <view class="list-main">
+            <view class="list-title">{{item.title}}</view>
+            <view class="list-meta">{{item.date}} {{item.timeSlot}} · {{item.peopleCount}} 人</view>
+            <view class="list-meta reject-reason" wx:if="{{item.showRejectReason}}">拒绝原因：{{item.rejectReason}}</view>
+          </view>
+          <view class="status-chip {{item.status === 'cancelled' || item.status === 'rejected' || item.status === 'no_show' || item.status === 'completed' ? '' : 'ok'}}">
+            {{item.statusLabel}}
+          </view>
+        </view>
+        <view class="btn btn-secondary" style="margin: 0 0 20rpx;" wx:if="{{item.canCancel}}" data-id="{{item.id}}" bindtap="cancelAppointment">
+          取消预约
+        </view>
+        <view class="btn btn-secondary" style="margin: 0 0 20rpx;" wx:if="{{item.showContactCancel}}" bindtap="contactCancel">
+          联系商家取消
+        </view>
+      </block>
+    </view>
+    <view class="card-meta" wx:else style="margin-bottom: 28rpx;">暂无预约记录</view>
+    <view class="btn btn-secondary" bindtap="goBook">再约一次</view>
+  </block>
+
+  <block wx:else>
+    <view class="list-card" style="margin-bottom: 28rpx;" wx:if="{{activities.length}}">
+      <block wx:for="{{activities}}" wx:key="_id">
+        <view class="list-row">
+          <view class="list-main">
+            <view class="list-title">{{item.activityName}}</view>
+            <view class="list-meta">¥{{item.amountText}} · {{item.channelLabel}} · {{item.statusLabel}}</view>
+          </view>
+          <view
+            class="status-chip {{item.status === 'paid' ? 'ok' : ''}}"
+            wx:if="{{item.status !== 'paid'}}"
+          >{{item.statusLabel}}</view>
+          <view
+            class="btn btn-secondary"
+            style="padding: 12rpx 20rpx; font-size: 24rpx;"
+            wx:if="{{item.status === 'paid'}}"
+            data-id="{{item._id}}"
+            bindtap="cancelActivity"
+          >取消</view>
+        </view>
+      </block>
+    </view>
+    <view class="list-card" wx:else>
+      <view class="list-meta">还没有活动报名记录。</view>
+    </view>
+    <view class="btn btn-primary" style="margin-top: 28rpx;" bindtap="goBrowse">去活动页看看</view>
+  </block>
 </view>

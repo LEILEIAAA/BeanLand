@@ -1,0 +1,32 @@
+<view class="container">
+  <view class="section-title">套餐配置</view>
+  <view class="subtitle">管理套餐上下架、价格与内容。下架后会员端不可见。</view>
+
+  <admin-package-promo />
+
+  <view class="btn btn-primary create-btn" bindtap="goCreate">+ 新建套餐</view>
+
+  <view class="list-area">
+    <view class="list-loading" wx:if="{{loading}}">套餐加载中…</view>
+    <view class="subtitle" wx:elif="{{!list.length}}" style="margin-top: 24rpx;">暂无套餐，点上方新建</view>
+    <block wx:else>
+      <block wx:for="{{list}}" wx:key="docId">
+        <view class="card">
+          <view class="card-topline">
+            <view>
+              <view class="card-title">{{item.name}}</view>
+              <view class="card-meta">周中¥{{item.weekdayPriceText}} · 周末¥{{item.weekendPriceText}} · {{item.durationLabel}}</view>
+            </view>
+            <view class="shelf-badge shelf-{{item.shelfTone}}">{{item.shelfLabel}}</view>
+          </view>
+          <view class="card-meta" wx:if="{{item.targetAudience}}">{{item.targetAudience}}</view>
+          <view class="row-actions">
+            <view class="btn btn-secondary act-btn" data-id="{{item.docId}}" bindtap="goEdit">编辑</view>
+            <view class="btn btn-secondary act-btn" data-id="{{item.docId}}" data-onshelf="{{item.onShelf}}" bindtap="toggleShelf">{{item.onShelf ? '下架' : '上架'}}</view>
+            <view class="btn btn-danger act-btn" data-id="{{item.docId}}" data-name="{{item.name}}" bindtap="removeItem">删除</view>
+          </view>
+        </view>
+      </block>
+    </block>
+  </view>
+</view>

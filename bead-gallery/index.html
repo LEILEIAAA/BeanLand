@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>拼豆册</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1b2838;
+      --muted: #5d7082;
+      --board: #d7e4ec;
+      --hole: #b7c9d6;
+      --tile: #fffcf8;
+      --line: #8ea4b4;
+      --wire: #7f96a6;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body {
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background-color: var(--board);
+      background-image: radial-gradient(circle, var(--hole) 1.15px, transparent 1.25px);
+      background-size: 16px 16px;
+    }
+
+    button, input { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: 3px;
+    }
+
+    .top {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      padding: 22px 28px 16px;
+      background: rgba(215, 228, 236, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(27, 40, 56, 0.08);
+    }
+
+    .head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: Outfit, "Noto Sans SC", sans-serif;
+      font-weight: 700;
+      font-size: 40px;
+      letter-spacing: -0.04em;
+      line-height: 0.95;
+    }
+
+    .sub {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .search {
+      width: min(320px, 46vw);
+      height: 42px;
+      padding: 0 14px;
+      border: 2px solid var(--ink);
+      border-radius: 999px;
+      background: var(--tile);
+    }
+
+    .rails { margin-top: 16px; display: grid; gap: 10px; }
+    .rail-row { display: flex; align-items: center; gap: 12px; }
+    .rail-label {
+      width: 36px;
+      flex: none;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+    .rail {
+      position: relative;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      min-height: 36px;
+    }
+    .rail::before {
+      content: "";
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      top: 17px;
+      height: 2px;
+      background: var(--wire);
+      opacity: 0.7;
+    }
+
+    .bead {
+      position: relative;
+      height: 34px;
+      padding: 0 12px;
+      border: 2px solid var(--ink);
+      border-radius: 999px;
+      background: var(--bead, #f4f7f8);
+      box-shadow: inset 0 -2px 0 rgba(27, 40, 56, 0.12);
+    }
+    .bead[aria-pressed="true"] {
+      background: var(--ink);
+      color: #f7fbff;
+    }
+
+    .tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      align-items: center;
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .tools button {
+      height: 30px;
+      padding: 0 10px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      background: transparent;
+    }
+    .tools button[aria-pressed="true"] {
+      border-color: var(--ink);
+      color: var(--ink);
+      background: var(--tile);
+    }
+    .count { margin-right: auto; font-variant-numeric: tabular-nums; }
+    .hint {
+      margin: 10px 0 0;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    main { padding: 18px 28px 48px; }
+    .grid {
+      columns: 4 220px;
+      column-gap: 16px;
+    }
+    .card {
+      break-inside: avoid;
+      margin: 0 0 16px;
+      padding: 8px;
+      background: var(--tile);
+      border-radius: 18px;
+      box-shadow: 0 10px 24px rgba(27, 40, 56, 0.06);
+    }
+    .shot {
+      display: block;
+      width: 100%;
+      padding: 0;
+      border: 0;
+      border-radius: 12px;
+      background: #fff;
+      overflow: hidden;
+    }
+    .shot img {
+      display: block;
+      width: 100%;
+      max-height: 460px;
+      object-fit: contain;
+      background:
+        linear-gradient(90deg, rgba(183, 201, 214, 0.35) 1px, transparent 1px),
+        linear-gradient(rgba(183, 201, 214, 0.35) 1px, transparent 1px),
+        #fff;
+      background-size: 12px 12px;
+    }
+    .meta { padding: 8px 6px 4px; }
+    .title {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.35;
+    }
+    .by, .why {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .tag {
+      height: 22px;
+      padding: 0 8px;
+      border-radius: 999px;
+      background: #e7eef3;
+      font-size: 11px;
+      line-height: 22px;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+    }
+    .likes {
+      font-family: Outfit, sans-serif;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .keep, .open {
+      height: 26px;
+      padding: 0 8px;
+      border: 1px solid var(--ink);
+      border-radius: 999px;
+      background: transparent;
+      font-size: 12px;
+    }
+    .keep[aria-pressed="true"] {
+      background: #ff5a7a;
+      border-color: #ff5a7a;
+      color: white;
+    }
+    .empty {
+      padding: 48px 0;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .light {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      background: rgba(18, 28, 38, 0.82);
+    }
+    .light.open { display: grid; grid-template-rows: auto 1fr auto; }
+    .light-bar, .light-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 18px;
+      color: #f4f8fb;
+    }
+    .light-bar a { color: inherit; }
+    .light-stage {
+      display: grid;
+      grid-template-columns: 48px 1fr 48px;
+      align-items: center;
+      min-height: 0;
+      padding: 0 8px;
+    }
+    .light-stage img {
+      max-width: min(920px, 100%);
+      max-height: calc(100vh - 150px);
+      margin: 0 auto;
+      object-fit: contain;
+      background: white;
+      border-radius: 8px;
+    }
+    .nav, .x {
+      width: 40px;
+      height: 40px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.16);
+      color: white;
+      font-size: 22px;
+    }
+    .pages { font-family: Outfit, sans-serif; font-size: 13px; }
+
+    @media (max-width: 720px) {
+      .top, main { padding-left: 14px; padding-right: 14px; }
+      h1 { font-size: 32px; }
+      .head { align-items: stretch; flex-direction: column; }
+      .search { width: 100%; }
+      .grid { columns: 2 140px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="head">
+      <div>
+        <h1>拼豆册</h1>
+        <p class="sub">按标题里的物件归类。点上面的珠子只看一格。合集、角色周边、对不上物件名的笔记不进。</p>
+      </div>
+      <input class="search" id="q" type="search" placeholder="搜标题或作者" aria-label="搜索标题或作者">
+    </div>
+    <div class="rails">
+      <div class="rail-row">
+        <div class="rail-label">用途</div>
+        <div class="rail" id="uses"></div>
+      </div>
+    </div>
+    <div class="tools">
+      <div class="count" id="count"></div>
+      <button type="button" id="sort-likes" aria-pressed="true">赞最多</button>
+      <button type="button" id="sort-feed" aria-pressed="false">采集顺序</button>
+      <button type="button" id="expand" aria-pressed="false">展开组图</button>
+      <button type="button" id="kept-only" aria-pressed="false">只看留下的</button>
+    </div>
+    <p class="hint" id="hint"></p>
+  </header>
+  <main>
+    <div class="grid" id="grid"></div>
+  </main>
+  <div class="light" id="light" hidden>
+    <div class="light-bar">
+      <div id="light-title"></div>
+      <button class="x" type="button" id="close" aria-label="关闭">×</button>
+    </div>
+    <div class="light-stage">
+      <button class="nav" type="button" id="prev" aria-label="上一张">‹</button>
+      <img id="light-img" alt="">
+      <button class="nav" type="button" id="next" aria-label="下一张">›</button>
+    </div>
+    <div class="light-foot">
+      <div class="pages" id="pages"></div>
+      <a id="source" target="_blank" rel="noreferrer">打开原笔记</a>
+    </div>
+  </div>
+  <script src="catalog.js"></script>
+  <script>
+    const COLOR = {
+      全部: "#f4f7f8",
+      杯垫: "#f2c9a0",
+      餐垫: "#e7c4a0",
+      锅垫: "#d7b48a",
+      壶垫: "#c9a27a",
+      杯套: "#f3d2b0",
+      餐盘: "#e8d2b8",
+      托盘: "#e7c4b0",
+      台灯: "#f6d36b",
+      落地灯: "#e7b15a",
+      壁灯: "#f0a05a",
+      挂灯: "#f2c14e",
+      灯箱: "#f7e08a",
+      灯牌: "#ffe08a",
+      相框: "#a9c7e8",
+      墙饰: "#c5b6e0",
+      挂毯: "#b7a8d4",
+      镜子: "#d5c6d8",
+      门牌: "#f0d36e",
+      挂钩: "#c5d0d8",
+      开关: "#d5dde3",
+      纸巾盒: "#b7d7c5",
+      笔筒: "#9ec9b6",
+      收纳: "#8fbfae",
+      首饰盒: "#f3a7c2",
+      书立: "#c9d7a8",
+      花瓶: "#f3a7c2",
+      花盆: "#e7a0b4",
+      烛台: "#f0c0a0",
+      香薰: "#e7d0c8",
+      风铃: "#c9dff0",
+      胸针: "#f0b6c8",
+      发夹: "#f7c6d4",
+      手机壳: "#b7d4ea",
+      时钟: "#d5dde3",
+      日历: "#c9d7a8",
+      摆件: "#e4d4c4"
+    };
+    const ORDER = ["杯垫", "餐垫", "锅垫", "壶垫", "杯套", "餐盘", "托盘", "台灯", "落地灯", "壁灯", "挂灯", "灯箱", "灯牌", "相框", "墙饰", "挂毯", "镜子", "门牌", "挂钩", "开关", "纸巾盒", "笔筒", "收纳", "首饰盒", "书立", "花瓶", "花盆", "烛台", "香薰", "风铃", "胸针", "发夹", "手机壳", "时钟", "日历", "摆件"];
+    const beads = window.BEADS || [];
+    const useCount = {};
+    for (const note of beads) {
+      for (const use of note.uses || []) useCount[use] = (useCount[use] || 0) + 1;
+    }
+    const useNames = [
+      "全部",
+      ...ORDER.filter((name) => (useCount[name] || 0) >= 4),
+      ...Object.keys(useCount).filter((name) => !ORDER.includes(name) && useCount[name] >= 4)
+    ];
+    const kept = new Set(JSON.parse(localStorage.getItem("bead-kept") || "[]"));
+    const state = { use: "全部", q: "", sort: "likes", expand: false, keptOnly: false };
+    let viewer = null;
+
+    const grid = document.getElementById("grid");
+    const count = document.getElementById("count");
+
+    function rail(host, names, key) {
+      host.innerHTML = names.map((name) => {
+        const color = COLOR[name] || "#e7eef3";
+        const label = name === "全部" ? `全部 ${beads.length}` : `${name} ${useCount[name] || 0}`;
+        return `<button type="button" class="bead" data-key="${key}" data-value="${name}" style="--bead:${color}" aria-pressed="${state[key] === name}">${label}</button>`;
+      }).join("");
+    }
+    rail(document.getElementById("uses"), useNames, "use");
+
+    function saveKept() {
+      localStorage.setItem("bead-kept", JSON.stringify([...kept]));
+    }
+
+    function match(note) {
+      if (state.use !== "全部" && !note.uses.includes(state.use)) return false;
+      if (state.keptOnly && !kept.has(note.id)) return false;
+      if (!state.q) return true;
+      const hay = `${note.title} ${note.author}`.toLowerCase();
+      return hay.includes(state.q.toLowerCase());
+    }
+
+    function ordered() {
+      const list = beads.filter(match);
+      if (state.sort === "likes") list.sort((a, b) => b.likes - a.likes);
+      return list;
+    }
+
+    function likesText(n) {
+      if (n >= 10000) return `${(n / 10000).toFixed(1)}万赞`;
+      return `${n} 赞`;
+    }
+
+    function card(note, image, imageIndex) {
+      const el = document.createElement("article");
+      el.className = "card";
+      const tags = note.uses.map((name) => `<span class="tag">${name}</span>`).join("");
+      el.innerHTML = `
+        <button class="shot" type="button" data-open>
+          <img src="${image.file}" alt="${note.title.replace(/"/g, "")}" width="${image.w || 3}" height="${image.h || 4}" loading="lazy">
+        </button>
+        <div class="meta">
+          <h2 class="title"></h2>
+          <p class="by"></p>
+          <p class="why"></p>
+          <div class="tags">${tags}</div>
+          <div class="row">
+            <span class="likes">${likesText(note.likes)}${note.images.length > 1 ? ` · ${note.images.length} 张` : ""}</span>
+            <button class="keep" type="button" aria-pressed="${kept.has(note.id)}">${kept.has(note.id) ? "已留" : "留下"}</button>
+          </div>
+        </div>`;
+      el.querySelector(".title").textContent = note.title;
+      el.querySelector(".by").textContent = note.author;
+      el.querySelector(".why").textContent = note.why || "";
+      el.querySelector("[data-open]").addEventListener("click", () => openViewer(note, imageIndex));
+      el.querySelector(".keep").addEventListener("click", (event) => {
+        if (kept.has(note.id)) kept.delete(note.id);
+        else kept.add(note.id);
+        saveKept();
+        event.currentTarget.setAttribute("aria-pressed", kept.has(note.id));
+        event.currentTarget.textContent = kept.has(note.id) ? "已留" : "留下";
+        if (state.keptOnly) render();
+      });
+      return el;
+    }
+
+    function render() {
+      const list = ordered();
+      grid.replaceChildren();
+      let shown = 0;
+      for (const note of list) {
+        const images = state.expand ? note.images : note.images.slice(0, 1);
+        images.forEach((image, index) => {
+          grid.append(card(note, image, state.expand ? index : 0));
+          shown += 1;
+        });
+      }
+      count.textContent = shown
+        ? `${list.length} 组 · ${shown} 张`
+        : "这一格还是空的";
+      const hint = document.getElementById("hint");
+      hint.textContent = state.use === "全部"
+        ? "格子按标题里的物件名来，不按搜索推荐。一条标题写了两种物件，会同时出现在两格。"
+        : `${state.use} ${list.length} 组。这是这一格的搜索样本。`;
+      if (!shown) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "换一个用途，或清空搜索。";
+        grid.append(empty);
+      }
+    }
+
+    document.body.addEventListener("click", (event) => {
+      const bead = event.target.closest(".bead");
+      if (!bead) return;
+      state[bead.dataset.key] = bead.dataset.value;
+      document.querySelectorAll(`.bead[data-key="${bead.dataset.key}"]`).forEach((button) => {
+        button.setAttribute("aria-pressed", button === bead);
+      });
+      render();
+    });
+
+    document.getElementById("q").addEventListener("input", (event) => {
+      state.q = event.target.value.trim();
+      render();
+    });
+
+    function press(id, apply) {
+      document.getElementById(id).addEventListener("click", (event) => {
+        apply(event.currentTarget);
+        render();
+      });
+    }
+    press("sort-likes", (button) => {
+      state.sort = "likes";
+      button.setAttribute("aria-pressed", "true");
+      document.getElementById("sort-feed").setAttribute("aria-pressed", "false");
+    });
+    press("sort-feed", (button) => {
+      state.sort = "feed";
+      button.setAttribute("aria-pressed", "true");
+      document.getElementById("sort-likes").setAttribute("aria-pressed", "false");
+    });
+    press("expand", (button) => {
+      state.expand = !state.expand;
+      button.setAttribute("aria-pressed", state.expand);
+    });
+    press("kept-only", (button) => {
+      state.keptOnly = !state.keptOnly;
+      button.setAttribute("aria-pressed", state.keptOnly);
+    });
+
+    const light = document.getElementById("light");
+    function openViewer(note, index) {
+      viewer = { note, index };
+      light.hidden = false;
+      light.classList.add("open");
+      paintViewer();
+    }
+    function paintViewer() {
+      if (!viewer) return;
+      const { note, index } = viewer;
+      const image = note.images[index];
+      const img = document.getElementById("light-img");
+      img.src = image.file;
+      img.alt = note.title;
+      document.getElementById("light-title").textContent = `${note.title} · ${note.author}`;
+      document.getElementById("pages").textContent = `${index + 1} / ${note.images.length}`;
+      const source = document.getElementById("source");
+      source.href = `https://www.xiaohongshu.com/explore/${note.id}?xsec_token=${encodeURIComponent(note.token)}`;
+    }
+    function closeViewer() {
+      viewer = null;
+      light.classList.remove("open");
+      light.hidden = true;
+    }
+    function step(delta) {
+      if (!viewer) return;
+      const total = viewer.note.images.length;
+      viewer.index = (viewer.index + delta + total) % total;
+      paintViewer();
+    }
+    document.getElementById("close").addEventListener("click", closeViewer);
+    document.getElementById("prev").addEventListener("click", () => step(-1));
+    document.getElementById("next").addEventListener("click", () => step(1));
+    light.addEventListener("click", (event) => {
+      if (event.target === light) closeViewer();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (!viewer) return;
+      if (event.key === "Escape") closeViewer();
+      if (event.key === "ArrowLeft") step(-1);
+      if (event.key === "ArrowRight") step(1);
+    });
+
+    render();
+  </script>
+</body>
+</html>

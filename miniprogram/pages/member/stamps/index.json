@@ -1,3 +1,5 @@
 {
-  "navigationBarTitleText": "我的集章"
+  "navigationBarTitleText": "我的集章",
+  "enableShareAppMessage": true,
+  "enableShareTimeline": true
 }

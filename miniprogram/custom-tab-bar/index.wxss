@@ -8,8 +8,8 @@
   align-items: flex-start;
   justify-content: space-around;
   box-sizing: border-box;
-  height: calc(112rpx + env(safe-area-inset-bottom));
-  padding: 12rpx 8rpx env(safe-area-inset-bottom);
+  height: calc(88rpx + env(safe-area-inset-bottom));
+  padding: 6rpx 4rpx env(safe-area-inset-bottom);
   background: #ffffff;
   border-top: none;
   box-shadow: none;
@@ -21,22 +21,22 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: 4rpx;
-  padding-top: 4rpx;
+  gap: 2rpx;
+  padding-top: 2rpx;
 }
 
 .tab-icon {
-  width: 44rpx;
-  height: 44rpx;
+  width: 46rpx;
+  height: 46rpx;
   display: block;
 }
 
 .tab-text {
-  font-size: 20rpx;
-  line-height: 1.2;
+  font-size: 18rpx;
+  line-height: 1.15;
   color: #a8a29e;
   font-weight: 600;
-  letter-spacing: 0.5rpx;
+  letter-spacing: 0.4rpx;
 }
 
 .tab-item.is-active .tab-text {

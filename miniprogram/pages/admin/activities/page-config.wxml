@@ -1,0 +1,69 @@
+<scroll-view class="edit-scroll" scroll-y="{{true}}">
+  <view class="edit-body">
+    <view class="section-title">活动页配置</view>
+    <view class="subtitle">编辑活动页顶部文案与日程。日程内容从已有活动中选择，标题、简介、状态自动跟随活动。</view>
+
+    <page-loading wx:if="{{loading}}" tip="配置加载中" rows="{{4}}" />
+
+    <block wx:else>
+      <view class="card form-card">
+        <view class="block-title">顶部文案</view>
+        <view class="form-item">
+          <view class="form-label">标题（大标题）</view>
+          <input class="field-input" placeholder="如：开业首周有局" value="{{hero.title}}" data-field="title" bindinput="onHeroInput" />
+        </view>
+        <view class="form-item">
+          <view class="form-label">副标题（顶部小标）</view>
+          <input class="field-input" placeholder="如：Opening Week" value="{{hero.subtitle}}" data-field="subtitle" bindinput="onHeroInput" />
+        </view>
+        <view class="form-item">
+          <view class="form-label">内容（描述）</view>
+          <textarea class="field-textarea" placeholder="一句话介绍这段时间的安排" value="{{hero.content}}" data-field="content" bindinput="onHeroInput" auto-height />
+        </view>
+      </view>
+
+      <view class="card form-card">
+        <view class="block-title">日程</view>
+        <view class="form-item">
+          <view class="form-label">日程标题</view>
+          <input class="field-input" placeholder="如：开业首周日程" value="{{scheduleTitle}}" bindinput="onScheduleTitleInput" />
+        </view>
+
+        <block wx:for="{{items}}" wx:key="index">
+          <view class="sched-item">
+            <view class="sched-head">
+              <view class="sched-no">第 {{index + 1}} 项</view>
+              <view class="sched-ops">
+                <view class="order-btn {{index === 0 ? 'is-disabled' : ''}}" data-index="{{index}}" bindtap="onMoveUp">上移</view>
+                <view class="order-btn {{index === items.length - 1 ? 'is-disabled' : ''}}" data-index="{{index}}" bindtap="onMoveDown">下移</view>
+                <view class="order-btn is-danger" data-index="{{index}}" bindtap="onRemove">删除</view>
+              </view>
+            </view>
+            <view class="form-row">
+              <view class="form-item" style="width: 200rpx;">
+                <view class="form-label">日期标签</view>
+                <input class="field-input" placeholder="如 1-2" value="{{item.day}}" data-index="{{index}}" bindinput="onDayInput" />
+              </view>
+              <view class="form-item flex1">
+                <view class="form-label">选择活动</view>
+                <picker mode="selector" range="{{activityNames}}" data-index="{{index}}" bindchange="onPickActivity">
+                  <view class="field-input picker-input">{{item.activityName || '点击选择活动'}}</view>
+                </picker>
+              </view>
+            </view>
+          </view>
+        </block>
+
+        <picker wx:if="{{activityNames.length && items.length < maxItems}}" mode="selector" range="{{activityNames}}" bindchange="onAddPick">
+          <view class="btn btn-secondary add-btn">+ 新增日程项（选择活动）</view>
+        </picker>
+        <view wx:elif="{{!activityNames.length}}" class="btn btn-secondary add-btn is-disabled" bindtap="onAddEmpty">暂无活动，请先创建活动</view>
+        <view wx:else class="btn btn-secondary add-btn is-disabled">已达上限 {{maxItems}} 项</view>
+      </view>
+    </block>
+  </view>
+</scroll-view>
+
+<view class="edit-footer">
+  <view class="btn btn-primary save-btn {{saving ? 'is-disabled' : ''}}" bindtap="onSave">保存</view>
+</view>

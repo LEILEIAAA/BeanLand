@@ -10,6 +10,7 @@ const {
   isOpeningCouponBlocked,
   STATUS,
 } = require('./packagePurchase');
+const { assertMemberRegistered } = require('./memberRegistration');
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
@@ -134,8 +135,9 @@ exports.main = async (event) => {
     return { ok: false, code: 'NOT_FOUND', message: 'member not found' };
   }
   const member = memberFound.data[0];
-  if (!isValidPhone(member.phone)) {
-    return { ok: false, code: 'PHONE_REQUIRED', message: 'phone required before purchase' };
+  const registered = assertMemberRegistered(member);
+  if (!registered.ok) {
+    return registered;
   }
 
   const rawPkg = await loadPackage(packageId);

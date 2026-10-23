@@ -18,6 +18,11 @@ const {
   syncAssignSelectionMeta,
   buildAssignBanner,
 } = require('../../../utils/appointmentAssign');
+const {
+  ADMIN_MEMBER_SEARCH_DEBOUNCE_MS,
+  shouldRemoteSearchMember,
+} = require('../../../utils/adminMemberSearch');
+const { resolveSeatsForBoard } = require('../../../utils/seatBoard');
 
 const statusLabel = {
   idle: '空闲',
@@ -77,7 +82,7 @@ function humanizeStartError(result, selectedMembers) {
   }
   if (code === 'COUNT_MISMATCH') return '人数与座位数不一致';
   if (code === 'SEAT_BLOCKED') return '所选座位不可用，请换座';
-  if (code === 'MEMBER_NO_OPENID') return '会员未绑定微信，无法开台';
+  if (code === 'MEMBER_NO_OPENID') return '会员未绑定登录账号，无法开台';
   if (code === 'MEMBER_NOT_FOUND') return '会员不存在或未注册';
   if (code === 'FORBIDDEN') return '无店主权限';
   return raw || '开台失败';
@@ -293,7 +298,7 @@ function buildStatusFilters(counts, active) {
 
 Page({
   data: {
-    loading: false,
+    loading: true,
     pageMode: 'manage',
     assignBanner: { title: '', subtitle: '' },
     assignPeopleCount: 0,
@@ -518,7 +523,7 @@ Page({
 
   async refreshBoard() {
     this.setData({ loading: true });
-    let seats = [];
+    let clientSeats = [];
     let board = {
       ok: true,
       sessions: [],
@@ -529,73 +534,84 @@ Page({
     let boardError = '';
 
     try {
-      seats = (await api.getSeats()) || [];
-    } catch (error) {
-      boardError = cloudErrorMessage(error, '座位列表加载失败');
-    }
-
-    try {
-      const result = await api.adminListSeatBoard();
-      if (result && result.ok === false) {
-        boardError =
-          result.message ||
-          (result.code === 'FORBIDDEN' ? '无店主权限' : '座位板加载失败');
-      } else if (result) {
-        board = result;
+      try {
+        const result = await api.adminListSeatBoard();
+        if (result && result.ok === false) {
+          boardError =
+            result.message ||
+            (result.code === 'FORBIDDEN' ? '无店主权限' : '座位板加载失败');
+        } else if (result) {
+          board = result;
+        }
+      } catch (error) {
+        boardError = cloudErrorMessage(error, '座位板接口失败');
       }
-    } catch (error) {
-      boardError = cloudErrorMessage(error, '座位板接口失败');
-    }
 
-    this._seatsCache = seats;
-    this._boardCache = board;
+      // Prefer seats from cloud function (admin ACL). Client getSeats is fallback only.
+      if (!(board && Array.isArray(board.seats) && board.seats.length)) {
+        try {
+          clientSeats = (await api.getSeats()) || [];
+        } catch (error) {
+          if (!boardError) {
+            boardError = cloudErrorMessage(error, '座位列表加载失败');
+          }
+        }
+      }
 
-    const isAssign = this.data.pageMode === 'assign';
-    const memberCount = isAssign
-      ? Number(this.data.assignPeopleCount) || 0
-      : (this.data.selectedMembers || []).length;
-    let selectedSeatIds = this.data.selectedSeatIds || [];
-    if (!isAssign) {
-      selectedSeatIds = trimSeatsToMemberCount(selectedSeatIds, memberCount);
-    } else {
-      selectedSeatIds = syncAssignSelectionMeta({
-        selectedSeatIds,
-        peopleCount: memberCount,
-      }).selectedSeatIds;
-    }
-    const fullGroups = buildSeatGroups(
-      seats,
-      board,
-      selectedSeatIds,
-      memberCount,
-      this.seatGroupOptions(),
-    );
-    this._fullSeatGroups = fullGroups;
-    const statusFilter = this.data.statusFilter || 'all';
-    const counts = countSeatStatuses(fullGroups);
-    const sessions = mapSessions(board);
+      const seats = resolveSeatsForBoard(board, clientSeats);
+      this._seatsCache = seats;
+      this._boardCache = board;
 
-    const patch = {
-      selectedSeatIds,
-      seatGroups: filterSeatGroupsByStatus(fullGroups, statusFilter),
-      statusFilters: buildStatusFilters(counts, statusFilter),
-      sessions,
-      loading: false,
-      boardReady: !boardError,
-    };
-    if (isAssign) {
-      Object.assign(
-        patch,
-        syncAssignSelectionMeta({
+      const isAssign = this.data.pageMode === 'assign';
+      const memberCount = isAssign
+        ? Number(this.data.assignPeopleCount) || 0
+        : (this.data.selectedMembers || []).length;
+      let selectedSeatIds = this.data.selectedSeatIds || [];
+      if (!isAssign) {
+        selectedSeatIds = trimSeatsToMemberCount(selectedSeatIds, memberCount);
+      } else {
+        selectedSeatIds = syncAssignSelectionMeta({
           selectedSeatIds,
           peopleCount: memberCount,
-        }),
+        }).selectedSeatIds;
+      }
+      const fullGroups = buildSeatGroups(
+        seats,
+        board,
+        selectedSeatIds,
+        memberCount,
+        this.seatGroupOptions(),
       );
-    }
-    this.setData(patch);
+      this._fullSeatGroups = fullGroups;
+      const statusFilter = this.data.statusFilter || 'all';
+      const counts = countSeatStatuses(fullGroups);
+      const sessions = mapSessions(board);
 
-    if (boardError) {
-      wx.showToast({ title: boardError.slice(0, 40), icon: 'none' });
+      const patch = {
+        selectedSeatIds,
+        seatGroups: filterSeatGroupsByStatus(fullGroups, statusFilter),
+        statusFilters: buildStatusFilters(counts, statusFilter),
+        sessions,
+        boardReady: !boardError,
+      };
+      if (isAssign) {
+        Object.assign(
+          patch,
+          syncAssignSelectionMeta({
+            selectedSeatIds,
+            peopleCount: memberCount,
+          }),
+        );
+      }
+      this.setData(patch);
+
+      if (boardError) {
+        showTip(boardError, { modalTitle: '座位管理' });
+      } else if (!seats.length) {
+        showTip('暂无座位数据，请检查云库 seats/tables', { forceModal: true });
+      }
+    } finally {
+      this.setData({ loading: false });
     }
   },
 
@@ -627,15 +643,23 @@ Page({
       memberKeyword,
       memberDropdownOpen: true,
     });
+    if (!shouldRemoteSearchMember(text)) {
+      this._memberSearchSeq = (this._memberSearchSeq || 0) + 1;
+      this.setData({
+        members: [],
+        memberSearching: false,
+      });
+      return;
+    }
     this._memberSearchTimer = setTimeout(() => {
       this.remoteSearchMembers(memberKeyword);
-    }, 300);
+    }, ADMIN_MEMBER_SEARCH_DEBOUNCE_MS);
   },
 
   async remoteSearchMembers(keyword) {
     const text = String(keyword || '').trim();
     const seq = (this._memberSearchSeq = (this._memberSearchSeq || 0) + 1);
-    if (!text) {
+    if (!text || !shouldRemoteSearchMember(text)) {
       this.setData({
         members: [],
         memberSearching: false,

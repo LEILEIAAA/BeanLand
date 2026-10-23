@@ -15,7 +15,9 @@
     </block>
   </view>
 
-  <view class="list-card" wx:if="{{orders.length}}">
+  <page-loading wx:if="{{loading}}" tip="套餐加载中" rows="{{4}}" />
+
+  <view class="list-card" wx:elif="{{orders.length}}">
     <block wx:for="{{orders}}" wx:key="id">
       <view class="list-row pkg-row">
         <view class="list-main">
@@ -39,5 +41,5 @@
     </block>
   </view>
 
-  <view class="empty-tip" wx:elif="{{!loading}}">{{emptyTip || '暂无套餐'}}</view>
+  <view class="empty-tip" wx:else>{{emptyTip || '暂无套餐'}}</view>
 </view>

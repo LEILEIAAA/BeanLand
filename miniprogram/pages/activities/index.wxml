@@ -8,9 +8,9 @@
       <view class="band band-green"></view>
     </view>
     <view class="act-hero-copy">
-      <view class="act-kicker">Opening Week</view>
-      <view class="act-title">开业首周有局</view>
-      <view class="act-sub">五月天破圈开场，接着大学生鱿鱼局，周末收个作品交流会。中间两天散场；包场咨询见海报墙末位。</view>
+      <view class="act-kicker" wx:if="{{hero.subtitle}}">{{hero.subtitle}}</view>
+      <view class="act-title">{{hero.title}}</view>
+      <view class="act-sub" wx:if="{{hero.content}}">{{hero.content}}</view>
       <view class="act-stats">
         <text class="act-stat-num">{{featuredCount}}</text>
         <text class="act-stat-label">场招募中</text>
@@ -18,20 +18,20 @@
     </view>
   </view>
 
-  <view class="act-week">
+  <view class="act-week" wx:if="{{openingWeek.length}}">
     <view class="act-week-head">
       <view class="act-week-kicker">Schedule</view>
-      <view class="act-week-title">开业首周日程</view>
+      <view class="act-week-title">{{scheduleTitle}}</view>
       <view class="act-week-hint">具体日期若有调整，以本页为准</view>
     </view>
-    <block wx:for="{{openingWeek}}" wx:key="day">
+    <block wx:for="{{openingWeek}}" wx:key="activityId">
       <view class="act-week-row {{item.kind === 'rest' ? 'is-rest' : ''}}">
-        <view class="act-week-day">D{{item.day}}</view>
+        <view class="act-week-day" wx:if="{{item.day}}">D{{item.day}}</view>
         <view class="act-week-body">
           <view class="act-week-name">{{item.title}}</view>
-          <view class="act-week-note">{{item.note}}</view>
+          <view class="act-week-note" wx:if="{{item.note}}">{{item.note}}</view>
         </view>
-        <view class="act-week-status">{{item.status}}</view>
+        <view class="act-week-status" wx:if="{{item.status}}">{{item.status}}</view>
       </view>
     </block>
   </view>
@@ -55,7 +55,13 @@
     <block wx:for="{{activities}}" wx:key="id">
       <view class="poster-card {{item.shift}} act-poster" data-id="{{item.id}}" bindtap="join">
         <view class="poster-media">
-          <image class="poster-cover" src="{{item.cover}}" mode="aspectFill" />
+          <image
+            class="poster-cover"
+            src="{{item.cover}}"
+            mode="aspectFill"
+            data-index="{{index}}"
+            binderror="onActivityCoverError"
+          />
           <view class="poster-scrim"></view>
           <view class="poster-tag" style="background: {{item.accent}}; color: {{item.orbInk}};">{{item.enLabel}}</view>
           <view class="poster-status">{{item.statusLabel}}</view>
@@ -67,7 +73,7 @@
             <view class="poster-blurb">{{item.blurb}}</view>
           </view>
           <view class="poster-orb act-orb" style="background: {{item.accent}};">
-            <text class="poster-orb-price" style="color: {{item.orbInk}};">¥{{item.price}}</text>
+            <text class="poster-orb-price" style="color: {{item.orbInk}};">¥{{item.priceText}}</text>
           </view>
         </view>
       </view>

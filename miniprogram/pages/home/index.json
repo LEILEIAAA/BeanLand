@@ -1,3 +1,5 @@
 {
-  "navigationBarTitleText": "Bean Land"
+  "navigationBarTitleText": "Bean Land",
+  "enableShareAppMessage": true,
+  "enableShareTimeline": true
 }

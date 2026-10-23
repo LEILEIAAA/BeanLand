@@ -1,0 +1,169 @@
+.filter-panel {
+  margin-top: 20rpx;
+  padding: 12rpx 14rpx;
+  border-radius: 20rpx;
+  background: #fff;
+  border: 1rpx solid rgba(28, 25, 23, 0.06);
+  box-shadow: 0 4rpx 20rpx rgba(28, 25, 23, 0.03);
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  flex: 1;
+  min-width: 0;
+}
+
+.chip {
+  padding: 8rpx 18rpx;
+  border-radius: 999rpx;
+  background: #f5f5f4;
+  color: #57534e;
+  font-size: 22rpx;
+  font-weight: 700;
+  border: 1rpx solid transparent;
+  line-height: 1.2;
+}
+
+.chip.is-on {
+  color: #9a3412;
+  background: #ffedd5;
+  border-color: rgba(249, 115, 22, 0.35);
+}
+
+.time-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  flex: 0 0 auto;
+  max-width: 46%;
+  padding: 8rpx 12rpx;
+  border-radius: 999rpx;
+  background: #fafaf9;
+  border: 1rpx solid rgba(28, 25, 23, 0.08);
+}
+
+.time-icon {
+  width: 28rpx;
+  height: 28rpx;
+  flex: 0 0 auto;
+}
+
+.time-text {
+  min-width: 0;
+  color: #1c1917;
+  font-size: 22rpx;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.grid-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16rpx;
+}
+
+.stats-grid {
+  margin-top: 24rpx;
+}
+
+.grid-two .card {
+  margin-bottom: 0;
+}
+
+.stat-card {
+  padding: 24rpx;
+}
+
+.card-topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 20rpx;
+  align-items: flex-start;
+}
+
+.card-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.amount {
+  font-size: 30rpx;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.amount.plus {
+  color: #15803d;
+}
+
+.amount.minus {
+  color: #b91c1c;
+}
+
+.time-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(24, 24, 27, 0.45);
+}
+
+.time-sheet {
+  width: 100%;
+  padding: 36rpx 32rpx calc(36rpx + env(safe-area-inset-bottom));
+  border-radius: 36rpx 36rpx 0 0;
+  background: #fff;
+  box-shadow: 0 -12rpx 40rpx rgba(24, 24, 27, 0.12);
+}
+
+.time-sheet-title {
+  margin-bottom: 28rpx;
+  font-size: 34rpx;
+  font-weight: 800;
+  color: #18181b;
+}
+
+.time-sheet-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  min-height: 88rpx;
+  padding: 0 8rpx;
+  border-bottom: 1rpx solid rgba(28, 25, 23, 0.06);
+}
+
+.time-sheet-label {
+  color: #78716c;
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+.time-sheet-value {
+  color: #1c1917;
+  font-size: 28rpx;
+  font-weight: 800;
+}
+
+.time-sheet-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 32rpx;
+}
+
+.time-sheet-btn {
+  flex: 1;
+}

@@ -7,6 +7,11 @@ const {
 } = require('../../../utils/appointmentRegistration');
 const { formatSlotSpan } = require('../../../utils/timeSlots');
 const { buildAssignTimerUrl } = require('../../../utils/appointmentAssign');
+const {
+  ADMIN_APPOINTMENT_FILTER_TABS,
+  DEFAULT_ADMIN_APPOINTMENT_FILTER,
+  filterAdminAppointments,
+} = require('../../../utils/adminAppointmentFilter');
 
 function displayRow(item) {
   const slots = Array.isArray(item.timeSlots) && item.timeSlots.length
@@ -42,10 +47,17 @@ function displayRow(item) {
   };
 }
 
+function applyFilter(allAppointments, statusFilter) {
+  return filterAdminAppointments(allAppointments, statusFilter);
+}
+
 Page({
   data: {
-    loading: false,
+    loading: true,
+    allAppointments: [],
     appointments: [],
+    filterTabs: ADMIN_APPOINTMENT_FILTER_TABS,
+    statusFilter: DEFAULT_ADMIN_APPOINTMENT_FILTER,
     rejectSheetOpen: false,
     rejectTargetId: '',
     rejectTargetLabel: '',
@@ -59,12 +71,26 @@ Page({
     this.loadList();
   },
 
+  onFilterChange(event) {
+    const key = event.currentTarget.dataset.key;
+    if (!key || key === this.data.statusFilter) return;
+    this.setData({
+      statusFilter: key,
+      appointments: applyFilter(this.data.allAppointments, key),
+    });
+  },
+
   async loadList() {
     this.setData({ loading: true });
     try {
       const list = await api.adminListAppointments({});
-      const appointments = (list || []).map(displayRow);
-      this.setData({ appointments });
+      const allAppointments = (list || []).map(displayRow);
+      const statusFilter = this.data.statusFilter || DEFAULT_ADMIN_APPOINTMENT_FILTER;
+      this.setData({
+        allAppointments,
+        appointments: applyFilter(allAppointments, statusFilter),
+        statusFilter,
+      });
     } catch (error) {
       console.warn('[admin-appointments]', error);
       wx.showToast({ title: '加载失败', icon: 'none' });

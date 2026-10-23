@@ -12,7 +12,7 @@
           class="field-input field-input-flex"
           type="number"
           maxlength="11"
-          placeholder="11 位手机号"
+          placeholder="手机号或尾号（至少4位）"
           placeholder-class="field-placeholder"
           value="{{phone}}"
           bindinput="onPhoneInput"
@@ -25,14 +25,9 @@
     <block wx:for="{{members}}" wx:key="_id">
       <view class="member-row {{selectedId === item._id ? 'active' : ''}}" data-id="{{item._id}}" bindtap="onPickMember">
         <view class="list-title">{{item.nickName || '未命名'}} · {{item.phone}}</view>
-        <view class="list-meta">余额 ¥{{item.totalBalance}} · {{item.tier}}</view>
+        <view class="list-meta">余额 ¥{{item.totalBalanceText}} · {{item.tier}}</view>
       </view>
     </block>
-
-    <view class="field" wx:if="{{selectedLabel}}">
-      <view class="field-label">当前选中</view>
-      <view class="selected-box">{{selectedLabel}}</view>
-    </view>
   </view>
 
   <view class="op-panel" hidden="{{!selectedId}}">
@@ -48,7 +43,8 @@
 
     <!-- 核销优先：默认展示 -->
     <view hidden="{{opTab !== 'redeem'}}">
-      <view class="list-card" wx:if="{{coupons.length}}">
+      <page-loading wx:if="{{loadingCoupons}}" tip="优惠券加载中" rows="{{3}}" compact />
+      <view class="list-card" wx:elif="{{coupons.length}}">
         <block wx:for="{{coupons}}" wx:key="id">
           <view class="list-row {{item.available ? '' : 'coupon-dimmed'}}">
             <view class="list-main">
@@ -70,7 +66,7 @@
           </view>
         </block>
       </view>
-      <view class="empty-tip" wx:elif="{{!loadingCoupons}}">该会员暂无未使用优惠券</view>
+      <view class="empty-tip" wx:else>该会员暂无未使用优惠券</view>
     </view>
 
     <!-- 发放：hidden 常驻，避免原生 picker 后挂载点不开 -->

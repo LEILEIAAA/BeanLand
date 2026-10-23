@@ -1,0 +1,95 @@
+.promo-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+  margin-top: 8rpx;
+}
+
+.promo-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 64rpx;
+}
+
+.promo-title {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: #1c1917;
+}
+
+.promo-toggle {
+  flex: none;
+  width: 88rpx;
+  height: 52rpx;
+  padding: 4rpx;
+  box-sizing: border-box;
+  border-radius: 999rpx;
+  background: #d6d3d1;
+}
+
+.promo-toggle.is-on {
+  background: #1c1917;
+}
+
+.promo-toggle-knob {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2rpx 8rpx rgba(28, 25, 23, 0.18);
+  transform: translateX(0);
+}
+
+.promo-toggle.is-on .promo-toggle-knob {
+  transform: translateX(36rpx);
+}
+
+.promo-hint {
+  font-size: 24rpx;
+  color: #a8a29e;
+  line-height: 1.5;
+}
+
+.promo-row {
+  display: flex;
+  gap: 20rpx;
+}
+
+.promo-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.promo-item.flex1 {
+  flex: 1;
+  min-width: 0;
+}
+
+.promo-label {
+  font-size: 26rpx;
+  color: #57534e;
+  font-weight: 600;
+}
+
+.field-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 76rpx;
+  padding: 18rpx 24rpx;
+  border-radius: 20rpx;
+  border: 1rpx solid rgba(28, 25, 23, 0.08);
+  background: #fafaf9;
+  color: #1c1917;
+  font-size: 28rpx;
+}
+
+.promo-save {
+  width: 100%;
+  margin-top: 8rpx;
+}
+
+.is-disabled {
+  opacity: 0.5;
+}

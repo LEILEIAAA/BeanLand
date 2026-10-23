@@ -1,4 +1,5 @@
 const api = require('../../../utils/api');
+const { formatYuan } = require('../../../utils/money');
 
 const TAB = {
   UNUSED: 'unused',
@@ -68,14 +69,25 @@ function mapOrder(item, tab, now) {
       || item.status === 'user_refund_pending'
       || item.status === 'expired_refunding'
       || item.status === 'user_refunding';
+    const userRefunded = item.status === 'user_refunded';
+    const expiredRefunded = item.status === 'expired_refunded';
     if (pending) {
       statusText = '退款处理中';
-    } else if (item.status === 'user_refunded') {
+    } else if (userRefunded) {
       statusText = '已退款';
-    } else {
+    } else if (expiredRefunded) {
       statusText = '已过期退款';
+    } else {
+      statusText = '退款记录';
     }
-    meta = item.refundedAt ? `退款 ${formatTime(item.refundedAt)}` : `到期 ${formatDay(item.expiresAt)}`;
+    const refundAt = item.refundedAt || item.updatedAt || 0;
+    if (refundAt) {
+      meta = `${userRefunded || pending ? '退款' : '过期退款'} ${formatTime(refundAt)}`;
+    } else if (item.expiresAt) {
+      meta = `到期 ${formatDay(item.expiresAt)}`;
+    } else {
+      meta = `购买 ${formatTime(item.fulfilledAt || item.createdAt)}`;
+    }
     canRefund = item.status === 'user_refund_pending' || item.status === 'user_refunding';
   }
 
@@ -85,13 +97,15 @@ function mapOrder(item, tab, now) {
     meta,
     validRange,
     statusText,
-    payText: pay.toFixed(2),
+    payText: formatYuan(pay),
     ok,
     canRefund,
   };
 }
 
+const { shareBehavior } = require('../../../utils/share');
 Page({
+  behaviors: [shareBehavior],
   data: {
     tabs: TAB_ITEMS,
     activeTab: TAB.UNUSED,

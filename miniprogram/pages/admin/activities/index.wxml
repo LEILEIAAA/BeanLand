@@ -1,0 +1,31 @@
+<view class="container">
+  <view class="section-title">活动配置</view>
+  <view class="subtitle">管理活动上下架、名额与详情。下架后会员端不可见。</view>
+
+  <view class="btn btn-secondary create-btn" bindtap="goPageConfig">页面头部 / 日程配置</view>
+  <view class="btn btn-primary create-btn" bindtap="goCreate">+ 新建活动</view>
+
+  <page-loading wx:if="{{loading}}" tip="活动加载中" rows="{{4}}" />
+
+  <view class="subtitle" wx:elif="{{!list.length}}" style="margin-top: 24rpx;">暂无活动，点上方新建</view>
+
+  <block wx:else>
+    <block wx:for="{{list}}" wx:key="docId">
+      <view class="card">
+        <view class="card-topline">
+          <view>
+            <view class="card-title">{{item.name}}</view>
+            <view class="card-meta">{{item.startText}} · ¥{{item.priceText}} · 名额 {{item.seatLabel}}</view>
+          </view>
+          <view class="shelf-badge shelf-{{item.shelfTone}}">{{item.shelfLabel}}</view>
+        </view>
+        <view class="card-meta">状态：{{item.statusLabel}} · 排序 {{item.sortOrder}}（越小越前）</view>
+        <view class="row-actions">
+          <view class="btn btn-secondary act-btn" data-id="{{item.docId}}" bindtap="goEdit">编辑</view>
+          <view class="btn btn-secondary act-btn" data-id="{{item.docId}}" data-onshelf="{{item.onShelf}}" bindtap="toggleShelf">{{item.onShelf ? '下架' : '上架'}}</view>
+          <view class="btn btn-danger act-btn" data-id="{{item.docId}}" data-name="{{item.name}}" bindtap="removeItem">删除</view>
+        </view>
+      </view>
+    </block>
+  </block>
+</view>

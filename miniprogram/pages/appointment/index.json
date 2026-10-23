@@ -1,3 +1,5 @@
 {
-  "navigationBarTitleText": "预约开拼"
+  "navigationBarTitleText": "预约开拼",
+  "enableShareAppMessage": true,
+  "enableShareTimeline": true
 }

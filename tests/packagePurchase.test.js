@@ -298,6 +298,36 @@ test('opening-trio does not stack opening 8折', () => {
   assert.equal(weekday.promoActive, false);
 });
 
+test('1-2h solo/duo packages get opening 8折 when not skipped', () => {
+  const promo = { active: true, discountRate: 8, label: '开业七天', tip: '全场8折' };
+  const ids = ['solo-1h', 'solo-2h', 'duo-1h', 'duo-2h'];
+  ids.forEach((id) => {
+    const pkg = {
+      id,
+      weekendPrice: 50,
+      weekdayPrice: 40,
+      price: 50,
+    };
+    const weekend = resolvePackageForSale(pkg, promo, Date.UTC(2026, 6, 18, 4, 0, 0));
+    assert.equal(weekend.promoActive, true, `${id} weekend promo`);
+    assert.equal(weekend.price, 40, `${id} weekend 8折`);
+    const weekday = resolvePackageForSale(pkg, promo, Date.UTC(2026, 6, 17, 4, 0, 0));
+    assert.equal(weekday.promoActive, true, `${id} weekday promo`);
+    assert.equal(weekday.price, 32, `${id} weekday 8折`);
+  });
+});
+
+test('seed hourly packages participate in opening 8折 and tip is 全场8折', () => {
+  const seed = require('../miniprogram/data/seed');
+  const hourlyIds = ['solo-1h', 'solo-2h', 'duo-1h', 'duo-2h'];
+  hourlyIds.forEach((id) => {
+    const pkg = seed.packages.find((item) => item.id === id);
+    assert.ok(pkg, `missing ${id}`);
+    assert.equal(!!pkg.skipOpeningDiscount, false, `${id} should not skip`);
+  });
+  assert.equal(seed.store.packagePromo.tip, '全场8折');
+});
+
 test('isOpeningCouponBlocked when opening promo active', () => {
   const { isOpeningCouponBlocked } = require('../miniprogram/utils/packagePurchase');
   assert.equal(isOpeningCouponBlocked({ active: true, discountRate: 8 }), true);

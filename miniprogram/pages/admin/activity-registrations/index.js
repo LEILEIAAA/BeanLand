@@ -1,5 +1,10 @@
 const api = require('../../../utils/api');
 const { STATUS, STATUS_LABEL, PAY_CHANNEL } = require('../../../utils/activityRegistration');
+const {
+  ADMIN_ACTIVITY_REG_FILTER_TABS,
+  DEFAULT_ADMIN_ACTIVITY_REG_FILTER,
+} = require('../../../utils/adminActivityRegistrationFilter');
+const { formatYuan } = require('../../../utils/money');
 
 function formatPaidAt(ts) {
   const n = Number(ts || 0);
@@ -17,8 +22,9 @@ Page({
   data: {
     list: [],
     todayPaidCount: 0,
-    filterStatus: '',
-    loading: false,
+    filterTabs: ADMIN_ACTIVITY_REG_FILTER_TABS,
+    filterStatus: DEFAULT_ADMIN_ACTIVITY_REG_FILTER,
+    loading: true,
   },
   onShow() {
     this.loadList();
@@ -31,10 +37,17 @@ Page({
       });
       const list = ((res && res.list) || []).map((row) => ({
         ...row,
-        statusLabel: STATUS_LABEL[row.status] || row.status,
-        channelLabel: row.payChannel === PAY_CHANNEL.BALANCE ? '余额' : '微信',
+        statusLabel: row.isEffective
+          ? '已生效'
+          : STATUS_LABEL[row.status] || row.statusLabel || row.status,
+        channelLabel: row.payChannel === PAY_CHANNEL.BALANCE ? '余额' : '在线支付',
         paidAtLabel: formatPaidAt(row.paidAt || row.createdAt),
         canConfirmRefund: row.status === STATUS.REFUND_PENDING,
+        amountText: formatYuan(
+          row.amount != null
+            ? row.amount
+            : Number(row.payAmountFen || 0) / 100,
+        ),
       }));
       this.setData({
         list,
@@ -48,8 +61,9 @@ Page({
     }
   },
   setFilter(event) {
-    const status = event.currentTarget.dataset.status || '';
-    this.setData({ filterStatus: status }, () => this.loadList());
+    const status = event.currentTarget.dataset.status;
+    const next = status == null ? DEFAULT_ADMIN_ACTIVITY_REG_FILTER : String(status);
+    this.setData({ filterStatus: next }, () => this.loadList());
   },
   async confirmRefund(event) {
     const id = event.currentTarget.dataset.id;
@@ -59,11 +73,11 @@ Page({
       row && row.refundFeeFen != null && row.refundFeeFen !== ''
         ? Number(row.refundFeeFen)
         : Number((row && row.payAmountFen) || 0);
-    const amountText = `¥${(refundFen / 100).toFixed(2)}`;
+    const amountText = `¥${formatYuan(refundFen / 100)}`;
     const refundTip = `${amountText}原路退回，注意查收`;
     const confirm = await new Promise((resolve) => {
       wx.showModal({
-        title: '确认退款？',
+        title: '重试退款？',
         content: refundTip,
         success: (res) => resolve(!!res.confirm),
       });

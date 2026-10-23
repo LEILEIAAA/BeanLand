@@ -1,0 +1,22 @@
+{
+  "id": "20260913-200159",
+  "ok": true,
+  "results": [
+    {
+      "command": "powershell -NoProfile -Command \"Get-ChildItem 'assets\\cover-weekend-solo-locker-1h-*.png' | ForEach-Object { Write-Output ($_.Name + ' ' + $_.Length) }; if (-not (Test-Path 'assets\\cover-weekend-solo-locker-1h-1x1.png')) { exit 1 }; if (-not (Test-Path 'assets\\cover-weekend-solo-locker-1h-16x9.png')) { exit 1 }\"",
+      "ok": true,
+      "exitCode": 0,
+      "tail": "cover-weekend-solo-locker-1h-16x9.png 215828\ncover-weekend-solo-locker-1h-1x1.png 262016"
+    }
+  ],
+  "risk": {
+    "decision": "allow",
+    "actionDigest": "sha256-8e7ee5203722964f445c9ab7196c416c",
+    "findings": [],
+    "changedFiles": [
+      "assets/cover-weekend-solo-locker-1h-16x9.png",
+      "assets/cover-weekend-solo-locker-1h-1x1.png"
+    ],
+    "evaluatedAt": "2026-09-13T12:06:15.313Z"
+  }
+}

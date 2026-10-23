@@ -1,0 +1,42 @@
+{
+  "id": "20260717-065757",
+  "task": "会员页二级菜单重排，合并预约与活动报名为「我的行程」",
+  "startedAt": "2026-07-16T22:57:57.308Z",
+  "baselineCommit": "bd88e72",
+  "baselineDirty": [
+    ".nova/context/model.json",
+    "cloudbaserc.json",
+    "scripts/patch-activity-cancel-startAt.js",
+    "tests/seatSessionHistory.test.js"
+  ],
+  "inScope": [],
+  "offLimits": [],
+  "protocols": [],
+  "reads": [],
+  "memory": [],
+  "verify": [
+    "pnpm build"
+  ],
+  "steps": [
+    {
+      "id": 1,
+      "text": "更新 memberActions 顺序与合并入口",
+      "status": "pending"
+    },
+    {
+      "id": 2,
+      "text": "更新 memberActions 测试 RED-GREEN",
+      "status": "pending"
+    },
+    {
+      "id": 3,
+      "text": "新建 schedule 页双 Tab 合并预约/活动",
+      "status": "pending"
+    },
+    {
+      "id": 4,
+      "text": "路由与 app.json 切换，移除旧独立入口页",
+      "status": "pending"
+    }
+  ]
+}

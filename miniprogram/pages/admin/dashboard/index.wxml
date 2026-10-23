@@ -1,22 +1,31 @@
-<view class="container">
-  <view class="section-title">店主看板</view>
-  <view class="subtitle">开业期预约、会员储值与座位压力。指标看板后续接云。</view>
-
-  <view class="section">
-    <view class="btn btn-primary" bindtap="goCoupons">优惠券核销 / 发放</view>
-    <view class="btn btn-secondary" style="margin-top: 16rpx;" bindtap="goPackages">套餐核销</view>
-    <view class="btn btn-secondary" style="margin-top: 16rpx;" bindtap="goAppointments">预约管理</view>
-    <view class="btn btn-secondary" style="margin-top: 16rpx;" bindtap="goActivityRegs">活动报名管理</view>
-    <view class="btn btn-secondary" style="margin-top: 16rpx;" bindtap="goTimer">座位管理</view>
-    <view class="btn btn-secondary" style="margin-top: 16rpx;" bindtap="goTimerHistory">计时复盘</view>
+<view class="container dash">
+  <view class="dash-hero">
+    <view class="dash-hero-title">店主看板</view>
+    <view class="dash-hero-desc">日常开台结账，接待预约与活动；核销套餐券，复盘时查会员资金。</view>
   </view>
 
-  <view class="grid-two section">
-    <block wx:for="{{metrics}}" wx:key="label">
-      <view class="card">
-        <view class="card-meta">{{item.label}}</view>
-        <view class="price">{{item.value}}</view>
+  <block wx:for="{{sections}}" wx:key="key">
+    <view class="dash-section {{item.emphasis ? 'dash-section-emphasis' : ''}}">
+      <view class="dash-section-head">
+        <view class="dash-section-title">{{item.title}}</view>
+        <view wx:if="{{item.emphasis}}" class="dash-section-tag">常用</view>
       </view>
-    </block>
-  </view>
+      <view class="dash-grid">
+        <block wx:for="{{item.items}}" wx:for-item="entry" wx:key="key">
+          <view
+            class="dash-tile {{item.emphasis ? 'dash-tile-emphasis' : ''}}"
+            hover-class="dash-tile-hover"
+            hover-stay-time="80"
+            data-url="{{entry.url}}"
+            bindtap="goMenu"
+          >
+            <view class="dash-tile-label">
+              <text>{{entry.label}}</text>
+              <view wx:if="{{entry.badge}}" class="dash-badge">{{entry.badge}}</view>
+            </view>
+          </view>
+        </block>
+      </view>
+    </view>
+  </block>
 </view>

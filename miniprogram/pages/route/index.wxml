@@ -16,10 +16,10 @@
         show-compass="true"
         enable-3D="true"
       />
-      <view class="card-title">门店位置预览</view>
+      <view class="card-title">门店位置</view>
       <view class="card-meta">{{store.address}}</view>
       <view class="button-row">
-        <view class="btn btn-primary" bindtap="openMap">打开微信地图导航</view>
+        <view class="btn btn-primary" bindtap="openMap">打开地图导航</view>
         <view class="btn btn-secondary" bindtap="copyAddress">复制地址</view>
       </view>
       <view class="button-row">
@@ -27,11 +27,10 @@
       </view>
     </view>
     <view class="card">
-      <view class="card-title">到店路线</view>
-      <view class="card-meta">1. 到达新青年广场后，找到 A 座入口。</view>
-      <view class="card-meta">2. 乘坐电梯到顶楼。</view>
-      <view class="card-meta">3. 到楼后如果找不到，联系店主或询问前台 / 保安。</view>
-      <view class="card-meta">4. 停车、公交、地铁说明后续根据实际物料补充。</view>
+      <view class="card-title">到店指引</view>
+      <view class="card-meta">1. 到新青年广场后，走 A 座入口。</view>
+      <view class="card-meta">2. 乘电梯到顶楼，找 A幢 2617（Bean Land）。</view>
+      <view class="card-meta">3. 找不到别兜圈——点「拨打电话」，我们接你。</view>
     </view>
   </view>
 </view>

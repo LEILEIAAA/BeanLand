@@ -307,6 +307,8 @@ test('yuanToFen buildOutTradeNo and countPaidSince', () => {
   ];
   assert.equal(countPaidSince(list, dayStart), 1);
   assert.equal(STATUS_LABEL[STATUS.PAID], '已报名');
+  assert.equal(STATUS_LABEL[STATUS.REFUND_PENDING], '退款失败');
+  assert.equal(STATUS_LABEL[STATUS.CANCELLED], '已取消');
 });
 
 test('applyRefundBalances restores principal then bonus from snapshot', () => {

@@ -70,7 +70,9 @@ function seedListForTab(tab) {
     });
 }
 
+const { shareBehavior } = require('../../../utils/share');
 Page({
+  behaviors: [shareBehavior],
   data: {
     tabs: TAB_ITEMS,
     activeTab: TAB.UNUSED,

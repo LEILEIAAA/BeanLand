@@ -108,6 +108,7 @@ function assertPayAmountMatch(order, paidFen) {
 module.exports = {
   CHANNEL,
   STATUS,
+  ALLOWED_TRANSITIONS,
   yuanToFen,
   buildOutTradeNo,
   buildWechatRechargeDraft,

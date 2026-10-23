@@ -128,3 +128,12 @@
   font-weight: 800;
   letter-spacing: -1rpx;
 }
+
+.empty-tip {
+  margin-top: 24rpx;
+  padding: 96rpx 48rpx;
+  text-align: center;
+  color: #a8a29e;
+  font-size: 26rpx;
+  line-height: 1.6;
+}

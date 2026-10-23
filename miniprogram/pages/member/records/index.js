@@ -1,6 +1,6 @@
 const api = require('../../../utils/api');
 const seed = require('../../../data/seed');
-const { formatYuan2 } = require('../../../utils/money');
+const { formatYuan } = require('../../../utils/money');
 const { resolveTransactionTitle } = require('../../../utils/transactionTitle');
 
 function formatMeta(tx) {
@@ -10,7 +10,7 @@ function formatMeta(tx) {
     : '';
   let channel = tx.type || '';
   if (tx.channel === 'transfer_manual') channel = '转账代充';
-  else if (tx.channel === 'wechat_jsapi') channel = '微信支付';
+  else if (tx.channel === 'wechat_jsapi') channel = '在线支付';
   return [when, channel].filter(Boolean).join(' · ');
 }
 
@@ -26,19 +26,21 @@ function mapTransactions(list) {
       body: resolved.body,
       title: [resolved.typeLabel, resolved.body].filter(Boolean).join(' '),
       amount: Number(item.amount),
-      amountText: formatYuan2(item.amount),
+      amountText: formatYuan(item.amount),
       meta: formatMeta(item),
       balanceAfter,
-      balanceAfterText: formatYuan2(balanceAfter),
+      balanceAfterText: formatYuan(balanceAfter),
     };
   });
 }
 
+const { shareBehavior } = require('../../../utils/share');
 Page({
+  behaviors: [shareBehavior],
   data: {
-    totalBalance: '0.00',
-    principalBalance: '0.00',
-    bonusBalance: '0.00',
+    totalBalance: '0',
+    principalBalance: '0',
+    bonusBalance: '0',
     transactions: [],
     loading: true,
     emptyTip: '',
@@ -73,19 +75,19 @@ Page({
 
       this.setData({
         totalBalance: member
-          ? formatYuan2(member.totalBalance)
+          ? formatYuan(member.totalBalance)
           : api.ALLOW_SEED_FALLBACK
-            ? formatYuan2(seed.memberProfile.totalBalance)
+            ? formatYuan(seed.memberProfile.totalBalance)
             : '0.00',
         principalBalance: member
-          ? formatYuan2(member.principalBalance)
+          ? formatYuan(member.principalBalance)
           : api.ALLOW_SEED_FALLBACK
-            ? formatYuan2(seed.memberProfile.principalBalance)
+            ? formatYuan(seed.memberProfile.principalBalance)
             : '0.00',
         bonusBalance: member
-          ? formatYuan2(member.bonusBalance)
+          ? formatYuan(member.bonusBalance)
           : api.ALLOW_SEED_FALLBACK
-            ? formatYuan2(seed.memberProfile.bonusBalance)
+            ? formatYuan(seed.memberProfile.bonusBalance)
             : '0.00',
         transactions,
         emptyTip: cloudOk && !transactions.length ? '暂无流水，充值或消费后会出现在这里' : '',
@@ -98,9 +100,9 @@ Page({
       console.warn('[records] load failed', error);
       if (api.ALLOW_SEED_FALLBACK) {
         this.setData({
-          totalBalance: formatYuan2(seed.memberProfile.totalBalance),
-          principalBalance: formatYuan2(seed.memberProfile.principalBalance),
-          bonusBalance: formatYuan2(seed.memberProfile.bonusBalance),
+          totalBalance: formatYuan(seed.memberProfile.totalBalance),
+          principalBalance: formatYuan(seed.memberProfile.principalBalance),
+          bonusBalance: formatYuan(seed.memberProfile.bonusBalance),
           transactions: mapTransactions(seed.memberProfile.transactions),
           emptyTip: '',
         });

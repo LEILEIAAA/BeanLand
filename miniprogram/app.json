@@ -1,5 +1,6 @@
 {
   "cloud": true,
+  "__usePrivacyCheck__": true,
   "pages": [
     "pages/home/index",
     "pages/packages/index",
@@ -9,13 +10,16 @@
     "pages/route/index",
     "pages/member/index",
     "pages/member/register/index",
+    "pages/member/settings/index",
+    "pages/legal/agreement/index",
+    "pages/legal/privacy/index",
+    "pages/legal/refund/index",
     "pages/member/records/index",
     "pages/member/coupons/index",
     "pages/member/packages/index",
     "pages/member/stamps/index",
     "pages/member/works/index",
     "pages/member/appointments/index",
-    "pages/member/activity-registrations/index",
     "pages/member/seat-sessions/index",
     "pages/recharge/index",
     "pages/admin/dashboard/index",
@@ -25,7 +29,16 @@
     "pages/admin/timer-history/index",
     "pages/admin/recharge/index",
     "pages/admin/coupons/index",
-    "pages/admin/package-redeem/index"
+    "pages/admin/package-redeem/index",
+    "pages/admin/members/index",
+    "pages/admin/members/detail",
+    "pages/admin/transactions/index",
+    "pages/admin/packages/index",
+    "pages/admin/packages/edit",
+    "pages/admin/activities/index",
+    "pages/admin/activities/edit",
+    "pages/admin/activities/page-config",
+    "pages/admin/home-banners/index"
   ],
   "window": {
     "navigationBarTitleText": "Bean Land",
@@ -67,5 +80,8 @@
     ]
   },
   "style": "v2",
-  "sitemapLocation": "sitemap.json"
+  "sitemapLocation": "sitemap.json",
+  "usingComponents": {
+    "page-loading": "/components/page-loading/index"
+  }
 }

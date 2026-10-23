@@ -7,7 +7,7 @@
       duration="520"
       circular="{{true}}"
       indicator-dots="{{false}}"
-      current="{{heroIndex}}"
+      current="{{swiperCurrent}}"
       bindchange="onHeroChange"
     >
       <block wx:for="{{heroPhotos}}" wx:key="src">
@@ -95,9 +95,9 @@
             <text class="menu-from">周末价</text>
             <view class="menu-price">
               <text class="menu-yen">¥</text>
-              <text class="menu-val">{{item.weekendPrice || item.price}}</text>
+              <text class="menu-val">{{item.weekendPriceText}}</text>
             </view>
-            <text class="menu-weekday" wx:if="{{item.weekdayPrice}}">工作日 ¥{{item.weekdayPrice}}</text>
+            <text class="menu-weekday" wx:if="{{item.weekdayPriceText}}">工作日 ¥{{item.weekdayPriceText}}</text>
           </view>
         </view>
       </block>
@@ -122,6 +122,8 @@
               class="poster-cover"
               src="{{item.cover}}"
               mode="aspectFill"
+              data-index="{{index}}"
+              binderror="onActivityCoverError"
             />
             <view wx:else class="poster-cover poster-fallback"></view>
             <view class="poster-scrim"></view>
@@ -132,7 +134,7 @@
           <view class="poster-foot">
             <view class="poster-meta">#{{item.dropNo}} · {{item.capacity}} seats</view>
             <view class="poster-orb" style="background: {{item.accent}};">
-              <text class="poster-orb-price" style="color: {{item.orbInk}};">¥{{item.price}}</text>
+              <text class="poster-orb-price" style="color: {{item.orbInk}};">¥{{item.priceText}}</text>
             </view>
           </view>
         </view>
@@ -142,8 +144,8 @@
 
   <view class="profile-mask" wx:if="{{showProfileGuide}}" catchtouchmove="preventMove">
     <view class="profile-sheet">
-      <view class="profile-sheet-title">同步微信头像昵称</view>
-      <view class="profile-sheet-sub">已自动生成默认头像和 Bean artist 序号名；也可点一次换成微信资料。</view>
+      <view class="profile-sheet-title">同步头像昵称</view>
+      <view class="profile-sheet-sub">已自动生成默认头像和 Bean artist 序号名；也可点一次换成你的资料。</view>
       <button class="guide-avatar-btn" open-type="chooseAvatar" bindchooseavatar="onGuideChooseAvatar">
         <image class="guide-avatar" src="{{guideAvatarUrl}}" mode="aspectFill" binderror="onGuideAvatarError" />
         <view class="guide-avatar-tip">点按选择头像</view>
@@ -153,7 +155,7 @@
         class="guide-nickname"
         type="nickname"
         maxlength="32"
-        placeholder="点按可同步微信昵称"
+        placeholder="点按可同步昵称"
         bindblur="onGuideNicknameBlur"
       />
       <view class="button-row profile-sheet-actions">

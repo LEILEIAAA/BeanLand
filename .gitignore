@@ -16,3 +16,6 @@ __pycache__/
 *.log
 .temp/
 .tmp/
+
+# Local sharp install for tab icon generation
+scripts/.tab-icon-tmp/

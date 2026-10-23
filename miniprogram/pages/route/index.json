@@ -1,3 +1,5 @@
 {
-  "navigationBarTitleText": "到店路线"
+  "navigationBarTitleText": "到店路线",
+  "enableShareAppMessage": true,
+  "enableShareTimeline": true
 }

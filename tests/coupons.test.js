@@ -182,7 +182,7 @@ test('buildCouponName and formatBenefitText', () => {
   );
   assert.equal(
     buildCouponName(CATEGORY.BEST_WORK, BENEFIT_TYPE.HOURS, 3),
-    '最佳作品 · 赠送 3 小时',
+    '活动优惠 · 赠送 3 小时',
   );
   assert.equal(
     formatBenefitText({ benefitType: BENEFIT_TYPE.HOURS, benefitValue: 2 }),

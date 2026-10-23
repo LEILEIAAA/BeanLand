@@ -1,5 +1,5 @@
 <view class="container sub-page">
-  <view wx:if="{{loading}}" class="ss-hint">加载中…</view>
+  <page-loading wx:if="{{loading}}" tip="记录加载中" rows="{{4}}" />
 
   <block wx:elif="{{sessions.length}}">
     <view class="ss-list">
@@ -8,10 +8,14 @@
           <view class="ss-seats">{{item.tableCode}} · {{item.seatLabel || '—'}}</view>
           <view class="ss-status {{item.active ? 'active' : ''}}">{{item.statusLabel}}</view>
         </view>
-        <view class="ss-date">{{item.dateLabel}}</view>
-        <view class="ss-time" wx:if="{{!item.active}}">
-          <text class="ss-duration">时长 {{item.durationLabel}}</text>
-          <text wx:if="{{item.isOvertime}}" class="ss-overtime">超时 {{item.overtimeLabel}}</text>
+        <view class="ss-date">{{item.timeRangeLabel}}</view>
+        <view class="ss-time" wx:if="{{item.durationLabel}}">
+          <view class="ss-duration-row">
+            <view wx:if="{{item.active}}" class="icon-clock"></view>
+            <text wx:if="{{item.active}}" class="ss-duration">{{item.durationLabel}}</text>
+            <text wx:else class="ss-duration">时长 {{item.durationLabel}}</text>
+          </view>
+          <text wx:if="{{!item.active && item.isOvertime}}" class="ss-overtime">超时 {{item.overtimeLabel}}</text>
         </view>
         <view class="ss-foot" wx:if="{{item.packageName || item.amountLabel}}">
           <text wx:if="{{item.packageName}}" class="ss-pkg">{{item.packageName}}</text>

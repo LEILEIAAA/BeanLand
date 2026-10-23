@@ -123,7 +123,6 @@ picker {
   border-color: rgba(17, 24, 39, 0.12);
 }
 
-.selected-box,
 .preview-box {
   padding: 20rpx 24rpx;
   border-radius: 16rpx;
@@ -131,9 +130,6 @@ picker {
   color: #111827;
   font-size: 26rpx;
   line-height: 1.5;
-}
-
-.preview-box {
   font-weight: 700;
 }
 
@@ -196,9 +192,11 @@ picker {
 
 .empty-tip {
   margin-top: 48rpx;
+  padding: 48rpx 32rpx;
   text-align: center;
   color: #9ca3af;
   font-size: 26rpx;
+  line-height: 1.5;
 }
 
 .op-panel {

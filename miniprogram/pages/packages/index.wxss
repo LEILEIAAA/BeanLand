@@ -100,18 +100,25 @@
   z-index: 3;
   width: 200rpx;
   padding: 12rpx 0;
-  background: linear-gradient(90deg, #ff3d02 0%, #ff6a3d 100%);
-  box-shadow: 0 8rpx 20rpx rgba(255, 61, 2, 0.35);
   transform: rotate(45deg);
   text-align: center;
 }
 
-.pkg-ribbon.tone-deal {
+.pkg-ribbon.tone-orange {
+  background: linear-gradient(90deg, #ff3d02 0%, #ff6a3d 100%);
+  box-shadow: 0 8rpx 20rpx rgba(255, 61, 2, 0.35);
+}
+
+.pkg-ribbon.tone-orange .pkg-ribbon-text {
+  color: #fff;
+}
+
+.pkg-ribbon.tone-yellow {
   background: linear-gradient(90deg, #ffb80a 0%, #ffd35a 100%);
   box-shadow: 0 8rpx 20rpx rgba(255, 184, 10, 0.4);
 }
 
-.pkg-ribbon.tone-deal .pkg-ribbon-text {
+.pkg-ribbon.tone-yellow .pkg-ribbon-text {
   color: #18181b;
 }
 

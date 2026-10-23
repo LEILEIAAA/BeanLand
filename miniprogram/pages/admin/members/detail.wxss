@@ -1,0 +1,85 @@
+.card-topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 20rpx;
+  align-items: flex-start;
+  margin-bottom: 12rpx;
+}
+
+.status-badge {
+  padding: 10rpx 16rpx;
+  border-radius: 999rpx;
+  background: #ffedd5;
+  color: #9a3412;
+  font-size: 22rpx;
+  font-weight: 800;
+}
+
+.tx-title {
+  margin-top: 28rpx;
+  margin-bottom: 4rpx;
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #78716c;
+  letter-spacing: 0;
+}
+
+.filter-panel {
+  margin-top: 8rpx;
+  padding: 12rpx 14rpx;
+  border-radius: 20rpx;
+  background: #fff;
+  border: 1rpx solid rgba(28, 25, 23, 0.06);
+  box-shadow: 0 4rpx 20rpx rgba(28, 25, 23, 0.03);
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+
+.chip {
+  padding: 8rpx 18rpx;
+  border-radius: 999rpx;
+  background: #f5f5f4;
+  color: #57534e;
+  font-size: 22rpx;
+  font-weight: 700;
+  border: 1rpx solid transparent;
+  line-height: 1.2;
+}
+
+.chip.is-on {
+  color: #9a3412;
+  background: #ffedd5;
+  border-color: rgba(249, 115, 22, 0.35);
+}
+
+.card-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.amount {
+  font-size: 30rpx;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.amount.plus {
+  color: #15803d;
+}
+
+.amount.minus {
+  color: #b91c1c;
+}
+
+.empty-tip {
+  margin-top: 24rpx;
+  padding: 96rpx 48rpx;
+  text-align: center;
+  color: #a8a29e;
+  font-size: 26rpx;
+  line-height: 1.6;
+}

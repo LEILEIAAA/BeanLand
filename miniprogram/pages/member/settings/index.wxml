@@ -1,0 +1,92 @@
+<privacy-popup />
+<view class="container settings-page">
+  <view class="set-group-label">个人资料</view>
+  <view class="set-card">
+    <!-- 头像 -->
+    <view class="set-row">
+      <view class="set-row-label">头像</view>
+      <view class="set-row-value">
+        <image class="set-avatar" src="{{avatarUrl}}" mode="aspectFill" />
+        <text class="set-chevron">›</text>
+      </view>
+      <button
+        class="set-row-hit"
+        open-type="chooseAvatar"
+        bindchooseavatar="onChooseAvatar"
+        hover-class="none"
+      ></button>
+    </view>
+
+    <!-- 昵称 -->
+    <view class="set-row">
+      <view class="set-row-label">昵称</view>
+      <view class="set-row-value set-row-value-input">
+        <input
+          class="set-nickname-input"
+          type="nickname"
+          value="{{nickName}}"
+          maxlength="32"
+          placeholder="请输入昵称"
+          placeholder-class="set-nickname-placeholder"
+          bindblur="onNicknameBlur"
+          confirm-type="done"
+        />
+        <text class="set-chevron">›</text>
+      </view>
+    </view>
+
+    <!-- 会员号 -->
+    <view class="set-row">
+      <view class="set-row-label">会员号</view>
+      <view class="set-row-value">
+        <text class="set-text">{{memberNo || '—'}}</text>
+      </view>
+    </view>
+
+    <!-- 手机号 -->
+    <view class="set-row">
+      <view class="set-row-label">手机号</view>
+      <view class="set-row-value">
+        <text class="{{hasPhone ? 'set-text' : 'set-text muted'}}">{{hasPhone ? phoneMasked : '手机号快捷登录'}}</text>
+        <text class="set-chevron">›</text>
+      </view>
+      <button
+        class="set-row-hit"
+        open-type="getPhoneNumber"
+        bindgetphonenumber="onGetPhoneNumber"
+        loading="{{phoneBusy}}"
+        disabled="{{phoneBusy}}"
+        hover-class="none"
+      ></button>
+    </view>
+  </view>
+
+  <view class="set-group-label">关于</view>
+  <view class="set-card">
+    <view class="set-row">
+      <view class="set-row-label">联系客服</view>
+      <view class="set-row-value">
+        <text class="set-chevron">›</text>
+      </view>
+      <button class="set-row-hit" open-type="contact" hover-class="none"></button>
+    </view>
+    <view class="set-row tappable" bindtap="goAgreement">
+      <view class="set-row-label">用户协议</view>
+      <view class="set-row-value">
+        <text class="set-chevron">›</text>
+      </view>
+    </view>
+    <view class="set-row tappable" bindtap="goPrivacy">
+      <view class="set-row-label">隐私政策</view>
+      <view class="set-row-value">
+        <text class="set-chevron">›</text>
+      </view>
+    </view>
+    <view class="set-row tappable" bindtap="goRefund">
+      <view class="set-row-label">退款规则</view>
+      <view class="set-row-value">
+        <text class="set-chevron">›</text>
+      </view>
+    </view>
+  </view>
+</view>

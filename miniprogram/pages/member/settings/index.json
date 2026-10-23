@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "设置",
+  "usingComponents": {
+    "privacy-popup": "/components/privacy-popup/index"
+  },
+  "enableShareAppMessage": true,
+  "enableShareTimeline": true
+}

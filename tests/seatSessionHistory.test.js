@@ -2,9 +2,11 @@ const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
 const {
   formatDurationLabel,
+  formatActiveElapsedLabel,
   formatAmountLabel,
   mapAdminSessionRow,
   mapMemberSessionRow,
+  activeElapsedLabelFromSessions,
 } = require('../miniprogram/utils/seatSessionHistory');
 
 // 2026-07-16 14:30 UTC+8 => started
@@ -23,7 +25,7 @@ describe('formatDurationLabel', () => {
 
 describe('formatAmountLabel', () => {
   it('shows yuan for positive amount, empty otherwise', () => {
-    assert.equal(formatAmountLabel(88), '¥88.00');
+    assert.equal(formatAmountLabel(88), '¥88');
     assert.equal(formatAmountLabel(0), '');
     assert.equal(formatAmountLabel(null), '');
     assert.equal(formatAmountLabel(undefined), '');
@@ -47,14 +49,14 @@ describe('mapAdminSessionRow', () => {
       consumedAmount: 88,
     });
     assert.equal(row.id, 's1');
-    assert.equal(row.memberLabel, '小豆 · 尾号 8000');
+    assert.equal(row.memberLabel, '小豆 · 13800138000');
     assert.equal(row.seatLabel, 'F1-A1、F1-A2');
     assert.equal(row.dateLabel, '2026-07-16 14:30');
     assert.equal(row.durationLabel, '2 小时 25 分');
     assert.equal(row.overtimeLabel, '25 分钟');
     assert.equal(row.isOvertime, true);
     assert.equal(row.packageName, '双人畅玩');
-    assert.equal(row.amountLabel, '¥88.00');
+    assert.equal(row.amountLabel, '¥88');
   });
 
   it('degrades gracefully for legacy rows without snapshot/amount', () => {
@@ -95,23 +97,95 @@ describe('mapMemberSessionRow', () => {
     assert.equal(row.active, false);
     assert.equal(row.statusLabel, '已结束');
     assert.equal(row.durationLabel, '2 小时 25 分');
-    assert.equal(row.amountLabel, '¥88.00');
+    assert.equal(row.amountLabel, '¥88');
     assert.equal(row.seatLabel, 'F1-A1');
     assert.equal(row.memberLabel, undefined);
+    assert.equal(row.dateLabel, '2026-07-16 14:30');
+    assert.equal(row.endedLabel, '2026-07-16 16:55');
+    assert.equal(row.timeRangeLabel, '2026-07-16 14:30 - 16:55');
   });
 
-  it('marks active session without duration', () => {
-    const row = mapMemberSessionRow({
-      _id: 's3',
-      status: 'active',
-      tableCode: 'F1-A',
-      seatIds: ['F1-A1'],
-      startedAt,
-      totalMinutes: 0,
-      overtimeMinutes: 0,
-    });
+  it('marks active session with elapsed duration from startedAt', () => {
+    const now = startedAt + 45 * 60 * 1000;
+    const row = mapMemberSessionRow(
+      {
+        _id: 's3',
+        status: 'active',
+        tableCode: 'F1-A',
+        seatIds: ['F1-A1'],
+        startedAt,
+        totalMinutes: 0,
+        overtimeMinutes: 0,
+      },
+      now,
+    );
     assert.equal(row.active, true);
     assert.equal(row.statusLabel, '进行中');
-    assert.equal(row.durationLabel, '');
+    assert.equal(row.durationLabel, '已进行 45分钟');
+    assert.equal(row.endedLabel, '');
+    assert.equal(row.timeRangeLabel, '2026-07-16 14:30');
+  });
+
+  it('shows end date when session crosses midnight', () => {
+    const overnightEnd = startedAt + 12 * 60 * 60 * 1000; // 02:30 next day
+    const row = mapMemberSessionRow({
+      _id: 's5',
+      status: 'ended',
+      tableCode: 'F1-A',
+      seatIdsSnapshot: ['F1-A1'],
+      startedAt,
+      endedAt: overnightEnd,
+      totalMinutes: 720,
+      overtimeMinutes: 0,
+    });
+    assert.equal(row.timeRangeLabel, '2026-07-16 14:30 - 2026-07-17 02:30');
+  });
+
+  it('ignores Array.map index so elapsed is not stuck at 0', () => {
+    const started = Date.now() - 45 * 60 * 1000;
+    const row = mapMemberSessionRow(
+      {
+        _id: 's4',
+        status: 'active',
+        tableCode: 'F1-A',
+        seatIds: ['F1-A1'],
+        startedAt: started,
+      },
+      0,
+    );
+    assert.equal(row.durationLabel, '已进行 45分钟');
+  });
+});
+
+describe('formatActiveElapsedLabel', () => {
+  it('formats compact elapsed labels', () => {
+    assert.equal(formatActiveElapsedLabel(0), '已进行 0分钟');
+    assert.equal(formatActiveElapsedLabel(45), '已进行 45分钟');
+    assert.equal(formatActiveElapsedLabel(60), '已进行 1小时');
+    assert.equal(formatActiveElapsedLabel(145), '已进行 2小时25分');
+  });
+});
+
+describe('activeElapsedLabelFromSessions', () => {
+  it('returns label for newest active session, empty otherwise', () => {
+    const now = startedAt + 45 * 60 * 1000;
+    assert.equal(activeElapsedLabelFromSessions([], now), '');
+    assert.equal(
+      activeElapsedLabelFromSessions(
+        [{ status: 'ended', startedAt, totalMinutes: 30 }],
+        now,
+      ),
+      '',
+    );
+    assert.equal(
+      activeElapsedLabelFromSessions(
+        [
+          { status: 'ended', startedAt: startedAt + 1000, totalMinutes: 10 },
+          { status: 'active', startedAt },
+        ],
+        now,
+      ),
+      '已进行 45分钟',
+    );
   });
 });

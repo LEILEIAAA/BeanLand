@@ -19,7 +19,7 @@ const CATEGORY = {
 const CATEGORY_LABEL = {
   [CATEGORY.CHECKIN]: '打卡奖励',
   [CATEGORY.TEACHER]: '老师专属',
-  [CATEGORY.BEST_WORK]: '最佳作品',
+  [CATEGORY.BEST_WORK]: '活动优惠',
 };
 
 const BENEFIT_TYPE = {

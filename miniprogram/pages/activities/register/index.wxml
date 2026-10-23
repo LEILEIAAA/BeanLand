@@ -1,4 +1,6 @@
-<view class="container reg-page" wx:if="{{activity}}">
+<page-loading wx:if="{{loading}}" tip="活动加载中" rows="{{5}}" />
+
+<view class="container reg-page" wx:elif="{{activity}}">
   <view class="reg-hero">
     <view class="hero-bands" aria-hidden="true">
       <view class="band band-yellow"></view>
@@ -20,7 +22,7 @@
           <text class="reg-seat-label">名额</text>
         </view>
         <view class="reg-price-orb" style="background: {{look.accent}};">
-          <text class="reg-price" style="color: {{look.ink}};">¥{{activity.price}}</text>
+          <text class="reg-price" style="color: {{look.ink}};">¥{{activity.priceText}}</text>
         </view>
       </view>
     </view>
@@ -72,7 +74,7 @@
       <view class="list-row">
         <view class="list-main">
           <view class="list-title">我的报名</view>
-          <view class="list-meta">{{myRegistration.statusLabel}} · {{myRegistration.payChannel === 'balance' ? '余额' : '微信'}}</view>
+          <view class="list-meta">{{myRegistration.statusLabel}} · {{myRegistration.payChannel === 'balance' ? '余额' : '在线支付'}}</view>
         </view>
         <view class="status-chip ok">{{myRegistration.statusLabel}}</view>
       </view>
@@ -114,27 +116,27 @@
         class="pay-method {{payChannel === 'balance' ? 'selected' : ''}}"
         data-channel="balance"
         bindtap="selectPay"
-      >余额（¥{{balance}}）</view>
+      >余额（¥{{balanceText}}）</view>
       <view
         class="pay-method {{payChannel === 'wechat' ? 'selected' : ''}}"
         data-channel="wechat"
         bindtap="selectPay"
-      >微信支付</view>
+      >在线支付</view>
     </view>
 
     <view class="list-card" style="margin-bottom: 28rpx;" wx:if="{{quote}}">
       <view class="list-row">
         <view class="list-main">
           <view class="list-title">实付</view>
-          <view class="list-meta" wx:if="{{quote.couponAmount}}">已抵 ¥{{quote.couponAmount}}</view>
+          <view class="list-meta" wx:if="{{quote.couponAmount}}">已抵 ¥{{quote.couponAmountText}}</view>
           <view class="list-meta" wx:elif="{{!quote.needPayment}}">优惠券已全额抵扣</view>
         </view>
-        <view class="price">¥{{quote.payAmount}}</view>
+        <view class="price">¥{{quote.payAmountText}}</view>
       </view>
     </view>
 
     <view class="btn btn-primary {{paying ? 'btn-disabled' : ''}}" bindtap="confirmRegister">
-      {{paying ? '处理中…' : (payChannel === 'wechat' && quote.needPayment ? '微信支付报名' : (quote.needPayment ? '余额报名' : '确认报名'))}}
+      {{paying ? '处理中…' : (payChannel === 'wechat' && quote.needPayment ? '在线支付报名' : (quote.needPayment ? '余额报名' : '确认报名'))}}
     </view>
   </block>
 
@@ -143,4 +145,10 @@
       <view class="list-meta">当前不可报名（已满员或未开放）。</view>
     </view>
   </block>
+</view>
+
+<view class="container" wx:else>
+  <view class="empty-tip" style="margin-top: 96rpx; text-align: center; color: #9ca3af; font-size: 26rpx;">
+    活动不存在或已下架
+  </view>
 </view>

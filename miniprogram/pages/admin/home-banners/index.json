@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "首页轮播",
+  "usingComponents": {
+    "privacy-popup": "/components/privacy-popup/index"
+  }
+}

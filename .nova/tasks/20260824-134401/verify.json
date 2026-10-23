@@ -1,0 +1,22 @@
+{
+  "id": "20260824-134401",
+  "ok": true,
+  "results": [
+    {
+      "command": "python -c \"from pathlib import Path; p=Path(r'c:/Users/ry/Desktop/Bean/Bean/assets'); files=['cover-104-smart-board-1x1.png','cover-104-smart-board-16x9.png']; missing=[f for f in files if not (p/f).exists() or (p/f).stat().st_size<10000]; raise SystemExit('missing '+str(missing) if missing else 0)\"",
+      "ok": true,
+      "exitCode": 0,
+      "tail": ""
+    }
+  ],
+  "risk": {
+    "decision": "allow",
+    "actionDigest": "sha256-c86dc2e97f9f0eb724733b51f77e0d9d",
+    "findings": [],
+    "changedFiles": [
+      "assets/cover-104-smart-board-16x9.png",
+      "assets/cover-104-smart-board-1x1.png"
+    ],
+    "evaluatedAt": "2026-08-24T05:47:58.505Z"
+  }
+}

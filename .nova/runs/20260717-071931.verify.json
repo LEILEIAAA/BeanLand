@@ -1,0 +1,12 @@
+{
+  "id": "20260717-071931",
+  "ok": true,
+  "results": [
+    {
+      "command": "node --test tests/packagePurchase.test.js",
+      "ok": true,
+      "exitCode": 0,
+      "tail": "  duration_ms: 0.0678\n  type: 'test'\n  ...\n1..18\n# tests 18\n# suites 0\n# pass 18\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 101.6971"
+    }
+  ]
+}

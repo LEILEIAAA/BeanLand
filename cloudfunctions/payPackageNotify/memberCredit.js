@@ -354,7 +354,7 @@ async function recordPackageWechatConsume(db, {
     _openid: member._openid,
     type: 'consume',
     title: title || '套餐消费',
-    reason: title || '套餐微信支付',
+    reason: title || '套餐在线支付',
     amount: -spent,
     principalDelta: 0,
     bonusDelta: 0,

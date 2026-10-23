@@ -1,10 +1,10 @@
 <view class="container sub-page">
   <view class="hist-head">
-    <view class="hist-title">计时复盘</view>
-    <view class="hist-sub">已结束的到店计时，含时长、超时与消费</view>
+    <view class="hist-title">订单管理</view>
+    <view class="hist-sub">已结束的到店订单，含会员、座位、时长、超时与消费</view>
   </view>
 
-  <view wx:if="{{loading}}" class="hist-hint">加载中…</view>
+  <page-loading wx:if="{{loading}}" tip="订单加载中" rows="{{5}}" />
 
   <block wx:elif="{{sessions.length}}">
     <view class="hist-list">

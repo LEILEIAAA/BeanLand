@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "套餐配置",
+  "usingComponents": {
+    "admin-package-promo": "/components/admin-package-promo/index"
+  }
+}

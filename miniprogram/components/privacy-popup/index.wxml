@@ -1,0 +1,20 @@
+<view wx:if="{{visible}}" class="pp-mask" catchtap="noop">
+  <view class="pp-card" catchtap="noop">
+    <view class="pp-title">隐私保护提示</view>
+    <view class="pp-body">
+      感谢你使用 Bean Land。为向你提供会员、充值、活动报名、作品与店主配置等服务，我们会在你授权后收集头像、昵称、手机号，以及你选中的照片（相册/相机）。请阅读并同意
+      <text class="pp-link" catchtap="openContract">《隐私保护指引》</text>
+      后继续。
+    </view>
+    <view class="pp-actions">
+      <button class="pp-btn pp-reject" bindtap="onDisagree" hover-class="none">拒绝</button>
+      <button
+        class="pp-btn pp-agree"
+        id="pp-agree-btn"
+        open-type="agreePrivacyAuthorization"
+        bindagreeprivacyauthorization="onAgree"
+        hover-class="none"
+      >同意并继续</button>
+    </view>
+  </view>
+</view>

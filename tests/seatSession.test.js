@@ -244,6 +244,8 @@ describe('calcSessionTime / buildEndSessionFields', () => {
       now: startedAt,
     });
     assert.deepEqual(session.seatIds, ['F1-A1', 'F1-A2']);
+    // 开台即写快照，避免结束清空 seatIds 后历史丢座
+    assert.deepEqual(session.seatIdsSnapshot, ['F1-A1', 'F1-A2']);
     const onTime = buildEndSessionFields(session, expectedEndAt);
     assert.equal(onTime.status, 'ended');
     assert.equal(onTime.totalMinutes, 120);
@@ -254,6 +256,17 @@ describe('calcSessionTime / buildEndSessionFields', () => {
     const late = buildEndSessionFields(session, expectedEndAt + 25 * 60 * 1000);
     assert.equal(late.totalMinutes, 145);
     assert.equal(late.overtimeMinutes, 25);
+  });
+
+  it('keeps existing seatIdsSnapshot when ending with empty seatIds', () => {
+    const endedLike = {
+      seatIds: [],
+      seatIdsSnapshot: ['F1-A1'],
+      startedAt,
+      durationMinutes: 120,
+    };
+    const fields = buildEndSessionFields(endedLike, expectedEndAt);
+    assert.deepEqual(fields.seatIdsSnapshot, ['F1-A1']);
   });
 
   it('carries package consumption fields onto start record', () => {

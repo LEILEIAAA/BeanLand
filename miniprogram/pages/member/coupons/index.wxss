@@ -33,9 +33,3 @@
   opacity: 0.55;
 }
 
-.empty-tip {
-  margin-top: 48rpx;
-  text-align: center;
-  color: #9ca3af;
-  font-size: 26rpx;
-}

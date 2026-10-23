@@ -12,7 +12,7 @@
           class="field-input field-input-flex"
           type="number"
           maxlength="11"
-          placeholder="11 位手机号"
+          placeholder="手机号或尾号（至少4位）"
           value="{{phone}}"
           bindinput="onPhoneInput"
         />
@@ -23,18 +23,14 @@
     <block wx:for="{{members}}" wx:key="_id">
       <view class="member-row {{selectedId === item._id ? 'active' : ''}}" data-id="{{item._id}}" bindtap="onPickMember">
         <view class="list-title">{{item.nickName || '未命名'}} · {{item.phone}}</view>
-        <view class="list-meta">余额 ¥{{item.totalBalance}} · {{item.tier}}</view>
+        <view class="list-meta">余额 ¥{{item.totalBalanceText}} · {{item.tier}}</view>
       </view>
     </block>
-
-    <view class="field" wx:if="{{selectedLabel}}">
-      <view class="field-label">当前选中</view>
-      <view class="selected-box">{{selectedLabel}}</view>
-    </view>
   </view>
 
   <view wx:if="{{selectedId}}">
-    <view class="list-card" wx:if="{{orders.length}}">
+    <page-loading wx:if="{{loadingOrders}}" tip="套餐加载中" rows="{{3}}" compact />
+    <view class="list-card" wx:elif="{{orders.length}}">
       <block wx:for="{{orders}}" wx:key="id">
         <view class="list-row">
           <view class="list-main">
@@ -53,6 +49,6 @@
         </view>
       </block>
     </view>
-    <view class="empty-tip" wx:elif="{{!loadingOrders}}">该会员暂无可核销套餐</view>
+    <view class="empty-tip" wx:else>该会员暂无可核销套餐</view>
   </view>
 </view>

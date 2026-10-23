@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>配件收费标准</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=ZCOOL+QingKe+HuangYou&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --sky: #8dcae9;
+      --ink: #1a1a1a;
+      --mute: #5c5c5c;
+      --line: #ececec;
+      --yellow: #efd05b;
+      --pink: #e38aa8;
+      --green: #20a258;
+      --red: #dd5441;
+    }
+
+    body {
+      width: 210mm;
+      height: 297mm;
+      background: #fff;
+      color: var(--ink);
+      font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .deco {
+      position: absolute;
+      z-index: 1;
+      pointer-events: none;
+      object-fit: contain;
+    }
+    .deco-row {
+      left: 0;
+      right: 0;
+      bottom: 1.5mm;
+      top: auto;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      width: auto;
+      z-index: 3;
+      overflow: visible;
+    }
+    .deco-row img {
+      height: 26.8mm;
+      width: auto;
+      aspect-ratio: 716 / 453;
+      object-fit: contain;
+      display: block;
+      flex: 0 0 auto;
+      flex-shrink: 0;
+      margin: 0 -0.3mm;
+    }
+    .deco-group { display: none; }
+    .deco-carrot {
+      top: 10mm;
+      right: 12mm;
+      left: auto;
+      bottom: auto;
+      width: 63mm;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .dot {
+      position: absolute;
+      border-radius: 50%;
+      z-index: 1;
+    }
+    .d1 { width: 8mm; height: 8mm; background: var(--sky); top: 18mm; left: 58mm; }
+    .d2 { width: 5mm; height: 5mm; background: var(--yellow); top: 26mm; left: 70mm; }
+
+    .sheet {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      padding: 14mm 17mm 18mm;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .kicker {
+      font-size: 3.4mm;
+      font-weight: 700;
+      letter-spacing: .4em;
+      color: var(--sky);
+    }
+
+    h1 {
+      margin-top: 4mm;
+      font-size: 11.5mm;
+      font-weight: 900;
+      letter-spacing: .06em;
+      line-height: 1.15;
+      max-width: 128mm;
+    }
+
+    .stack {
+      margin-top: 16mm;
+      border-top: 1px solid var(--line);
+      max-width: 118mm;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 30mm 1fr;
+      gap: 6mm;
+      padding: 8.8mm 0;
+      border-bottom: 1px solid var(--line);
+      align-items: center;
+    }
+
+    .lab {
+      display: flex;
+      align-items: center;
+      gap: 3mm;
+      font-size: 5.8mm;
+      font-weight: 900;
+      letter-spacing: .06em;
+    }
+
+    .chip {
+      width: 6.2mm;
+      height: 6.2mm;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .row p,
+    .copy .main {
+      font-size: 7.2mm;
+      font-weight: 700;
+      line-height: 1.35;
+      white-space: nowrap;
+    }
+
+    .copy .hint {
+      margin-top: 2.2mm;
+      font-size: 4.8mm;
+      font-weight: 500;
+      color: var(--mute);
+      white-space: nowrap;
+    }
+
+    .n { font-weight: 900; }
+
+    .price {
+      display: flex;
+      align-items: baseline;
+      gap: 2.5mm;
+      font-family: "ZCOOL QingKe HuangYou", "Noto Sans SC", sans-serif;
+      font-size: 15mm;
+      line-height: 1;
+    }
+
+    .price i {
+      font-family: "Noto Sans SC", sans-serif;
+      font-style: normal;
+      font-size: 5mm;
+      font-weight: 900;
+      color: var(--red);
+    }
+
+    .price b {
+      font-family: "Noto Sans SC", sans-serif;
+      font-size: 5.2mm;
+      font-weight: 900;
+      letter-spacing: .04em;
+      color: var(--ink);
+      margin-left: 4mm;
+    }
+
+    .foot {
+      margin-top: 6mm;
+      padding: 0;
+      border-top: none;
+      font-size: 4.4mm;
+      font-weight: 500;
+      line-height: 1;
+      white-space: nowrap;
+      color: var(--ink);
+      letter-spacing: .01em;
+    }
+
+    .row:last-child {
+      border-bottom: none;
+    }
+
+    @media screen {
+      html {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #f3f3f3;
+      }
+      body { flex-shrink: 0; box-shadow: 0 18px 50px rgba(0,0,0,.08); }
+    }
+
+    @media print {
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      @page { size: A4 portrait; margin: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="deco deco-row">
+    <img src="deco-bunny-lift.png" alt="" />
+    <img src="deco-bunny-lift.png" alt="" />
+    <img src="deco-bunny-lift.png" alt="" />
+    <img src="deco-bunny-lift.png" alt="" />
+    <img src="deco-bunny-lift.png" alt="" />
+  </div>
+  <img class="deco deco-carrot" src="deco-pegboard.png" alt="" />
+  <span class="dot d1"></span>
+  <span class="dot d2"></span>
+
+  <div class="sheet">
+    <p class="kicker">到店须知</p>
+    <h1>配件收费标准</h1>
+
+    <div class="stack">
+      <div class="row">
+        <div class="lab"><span class="chip" style="background:#efd05b"></span>赠</div>
+        <p>每人 1 个，当天领取</p>
+      </div>
+      <div class="row">
+        <div class="lab"><span class="chip" style="background:#e38aa8"></span>加赠</div>
+        <div class="copy">
+          <p class="main">核销后评价，加赠 1 个</p>
+          <p class="hint">团购平台 · 美团 / 抖音 / 大众点评</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="lab"><span class="chip" style="background:#e38aa8"></span>加赠</div>
+        <div class="copy">
+          <p class="main">店铺评价，每条加赠 1 个</p>
+          <p class="hint">美团 / 抖音 / 大众点评 · 无需消费</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="lab"><span class="chip" style="background:#20a258"></span>评价</div>
+        <p>3 张图 · 50 字 · 出示领取</p>
+      </div>
+      <div class="row">
+        <div class="lab"><span class="chip" style="background:#8dcae9"></span>购买</div>
+        <div class="price">1.5<i>元 / 个</i><b>款式不限</b></div>
+      </div>
+    </div>
+
+    <p class="foot">以店内现货为准。当天领取，不累计、不转赠。同一评价不重复加赠。</p>
+  </div>
+  <script>
+    (function () {
+      const rect = document.body.getBoundingClientRect();
+      const w = rect.width, h = rect.height;
+      function fit() {
+        const s = Math.min(window.innerWidth / w, window.innerHeight / h, 1);
+        document.body.style.transform = "scale(" + s + ")";
+        document.body.style.transformOrigin = "top left";
+        document.body.style.position = "absolute";
+        document.body.style.left = ((window.innerWidth - w * s) / 2) + "px";
+        document.body.style.top = ((window.innerHeight - h * s) / 2) + "px";
+      }
+      fit();
+      window.addEventListener("resize", fit);
+    })();
+  </script>
+</body>
+</html>

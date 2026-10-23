@@ -1,3 +1,5 @@
+const { isDefaultNickName } = require('./wxProfile');
+
 function normalizePhone(phone) {
   let digits = String(phone || '')
     .replace(/[０-９]/g, (digit) => String.fromCharCode(digit.charCodeAt(0) - 0xfee0))
@@ -33,10 +35,15 @@ function maskPhone(phone) {
   return `${digits.slice(0, 3)}****${digits.slice(7)}`;
 }
 
-/** 昵称 + 手机号齐即可充值引导；头像另算注册完成 */
+/** 昵称已选用：非空且非 Bean artist 默认名；手机号齐即可充值引导；头像另算注册完成 */
+function hasChosenNickName(nickName) {
+  const name = String(nickName || '').trim();
+  if (!name) return false;
+  return !isDefaultNickName(name);
+}
+
 function isProfileComplete(member) {
-  const nickName = String((member && member.nickName) || '').trim();
-  return !!(nickName && isValidPhone(member && member.phone));
+  return !!(hasChosenNickName(member && member.nickName) && isValidPhone(member && member.phone));
 }
 
 const DEFAULT_AVATAR_MARKERS = [
@@ -59,6 +66,60 @@ function isRegistrationComplete(member, defaultAvatar) {
     hasChosenAvatar(member && member.avatarUrl, defaultAvatar) &&
     isProfileComplete(member)
   );
+}
+
+const REGISTER_STEP_LABELS = [
+  { key: 'avatar', label: '头像' },
+  { key: 'nickName', label: '昵称' },
+  { key: 'phone', label: '手机号' },
+];
+
+/** 注册页进度与底栏文案（与三项完成判定同源） */
+function buildRegisterProgress(member, defaultAvatar) {
+  const hasAvatar = hasChosenAvatar(member && member.avatarUrl, defaultAvatar);
+  const hasNickName = hasChosenNickName(member && member.nickName);
+  const hasPhone = isValidPhone(member && member.phone);
+  const flags = { avatar: hasAvatar, nickName: hasNickName, phone: hasPhone };
+  const missingLabels = REGISTER_STEP_LABELS.filter((step) => !flags[step.key]).map(
+    (step) => step.label,
+  );
+  const doneCount = REGISTER_STEP_LABELS.length - missingLabels.length;
+  const registrationComplete = missingLabels.length === 0;
+  const finishHintText = registrationComplete
+    ? '已完成 3/3'
+    : `还需完善：${missingLabels.join('、')}`;
+  return {
+    hasAvatar,
+    hasNickName,
+    hasPhone,
+    missingLabels,
+    doneCount,
+    registrationComplete,
+    finishButtonText: '确认注册',
+    finishHintText,
+    finishToast: registrationComplete ? '' : finishHintText,
+  };
+}
+
+/**
+ * Only accept WeChat nickname fill (full replace), reject char-by-char typing.
+ * @returns {{ accept: boolean, value: string, reason: string }}
+ */
+function resolveWechatNicknameInput(previousValue, nextValue) {
+  const prev = String(previousValue || '');
+  const next = String(nextValue || '').trim();
+  if (!next) {
+    return { accept: true, value: '', reason: '' };
+  }
+  if (!hasChosenNickName(next)) {
+    return { accept: false, value: '', reason: 'default' };
+  }
+  const isTyping =
+    next.length === prev.length + 1 && (prev === '' || next.startsWith(prev));
+  if (isTyping) {
+    return { accept: false, value: '', reason: 'typing' };
+  }
+  return { accept: true, value: next, reason: '' };
 }
 
 function canRecharge(member) {
@@ -93,7 +154,10 @@ module.exports = {
   maskPhone,
   isProfileComplete,
   hasChosenAvatar,
+  hasChosenNickName,
   isRegistrationComplete,
+  buildRegisterProgress,
+  resolveWechatNicknameInput,
   canRecharge,
   phoneAuthFailMessage,
 };

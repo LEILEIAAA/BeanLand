@@ -31,11 +31,38 @@ const USER_LIST_STATUSES = [
 const STATUS_LABEL = {
   [STATUS.PAID]: '已报名',
   [STATUS.CANCELLED]: '已取消',
-  [STATUS.REFUND_PENDING]: '待退款',
+  [STATUS.REFUND_PENDING]: '退款失败',
   [STATUS.REFUNDED]: '已退款',
   [STATUS.EXPIRED]: '已过期',
   [STATUS.FAILED]: '失败',
 };
+
+/** Admin「已取消」筛：含余额取消、微信已退、微信退款失败待重试 */
+const ADMIN_CANCELLED_STATUSES = [
+  STATUS.CANCELLED,
+  STATUS.REFUNDED,
+  STATUS.REFUND_PENDING,
+];
+
+function resolveAdminListStatusFilter(status) {
+  const key = status == null ? '' : String(status);
+  if (!key) return null;
+  if (key === 'cancelled') {
+    return { op: 'in', values: ADMIN_CANCELLED_STATUSES.slice() };
+  }
+  if (key === 'effective') {
+    return { op: 'eq', value: STATUS.PAID, refine: 'effective' };
+  }
+  return { op: 'eq', value: key };
+}
+
+/** 已支付且活动开场时间已到 → 管理侧「已生效」（票务制，无核销态） */
+function isActivityRegistrationEffective(registration, startAt, now = Date.now()) {
+  if (!registration || registration.status !== STATUS.PAID) return false;
+  const start = Number(startAt || 0);
+  if (!(start > 0)) return false;
+  return Number(now || Date.now()) >= start;
+}
 
 const CANCEL_TIER = {
   FULL: 'full',
@@ -535,6 +562,9 @@ module.exports = {
   ACTIVE_STATUSES,
   USER_LIST_STATUSES,
   STATUS_LABEL,
+  ADMIN_CANCELLED_STATUSES,
+  resolveAdminListStatusFilter,
+  isActivityRegistrationEffective,
   CANCEL_TIER,
   FREE_CANCEL_HOURS,
   LATE_CANCEL_FEE_RATE,

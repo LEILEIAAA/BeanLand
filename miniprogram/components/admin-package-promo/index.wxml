@@ -1,0 +1,57 @@
+<view class="card promo-card">
+  <view class="promo-head">
+    <view class="promo-title">开业折扣设置</view>
+    <view
+      class="promo-toggle {{active ? 'is-on' : ''}}"
+      catchtap="onToggle"
+      hover-class="none"
+    >
+      <view class="promo-toggle-knob"></view>
+    </view>
+  </view>
+  <view class="promo-hint">对未勾选「不参与开业折扣」的套餐按此折扣结算。改完后点下方保存。</view>
+
+  <!-- formEpoch 变化才重建 input，避免受控回写导致输入/开关抖动 -->
+  <block wx:if="{{formEpoch >= 0}}">
+    <view class="promo-row">
+      <view class="promo-item flex1">
+        <view class="promo-label">折扣（8 = 8折）</view>
+        <input
+          class="field-input"
+          type="digit"
+          placeholder="8"
+          value="{{rate}}"
+          data-field="discountRate"
+          bindinput="onInput"
+          bindblur="onBlur"
+        />
+      </view>
+      <view class="promo-item flex1">
+        <view class="promo-label">标签文案</view>
+        <input
+          class="field-input"
+          placeholder="如：开业七天"
+          value="{{label}}"
+          data-field="label"
+          bindinput="onInput"
+          bindblur="onBlur"
+        />
+      </view>
+    </view>
+    <view class="promo-item">
+      <view class="promo-label">提示文案</view>
+      <input
+        class="field-input"
+        placeholder="如：全场8折"
+        value="{{tip}}"
+        data-field="tip"
+        bindinput="onInput"
+        bindblur="onBlur"
+      />
+    </view>
+  </block>
+
+  <view class="btn btn-secondary promo-save {{saving ? 'is-disabled' : ''}}" catchtap="onSave">
+    {{saving ? '保存中…' : '保存折扣设置'}}
+  </view>
+</view>

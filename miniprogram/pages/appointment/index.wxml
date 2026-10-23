@@ -65,8 +65,8 @@
     </view>
   </block>
 
-  <!-- C 端登记 -->
-  <block wx:else>
+  <!-- C 端登记：未完成注册不展示可提交表单 -->
+  <block wx:elif="{{memberReady}}">
     <view class="form-hero">
       <view class="form-title">预约开拼</view>
       <view class="form-sub">登记意向后由店主确认排座，不占座</view>
@@ -120,7 +120,7 @@
               class="input nickname-sync-input"
               type="nickname"
               maxlength="32"
-              placeholder="点按可同步微信昵称"
+              placeholder="点按可同步昵称"
               bindblur="onNicknameBlur"
             />
           </block>
@@ -168,12 +168,19 @@
           <view class="success-value">{{summary.peopleCount}} 人</view>
         </view>
       </view>
-      <view class="card-meta" style="margin-top: 16rpx;">店主确认排座后会通知你，可在「我的预约」查看状态。</view>
+      <view class="card-meta" style="margin-top: 16rpx;">店主确认排座后会通知你，前往我的预约查看。</view>
     </view>
 
     <view class="form-spacer"></view>
     <view class="form-foot" wx:if="{{!summary}}">
       <view class="btn btn-primary {{submitting ? 'is-disabled' : ''}}" bindtap="submit">提交预约</view>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view class="form-hero">
+      <view class="form-title">预约开拼</view>
+      <view class="form-sub">需先完成会员注册（头像、昵称、手机号）</view>
     </view>
   </block>
 </view>

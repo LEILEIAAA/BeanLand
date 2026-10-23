@@ -1,4 +1,5 @@
 const cloud = require('wx-server-sdk');
+const { escapeRegExp, buildPhoneSearchPattern } = require('./memberSearch');
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
@@ -7,10 +8,6 @@ const _ = db.command;
 async function assertAdmin(openid) {
   const result = await db.collection('admins').where({ openid }).limit(1).get();
   return !!(result.data && result.data.length);
-}
-
-function escapeRegExp(text) {
-  return String(text || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 exports.main = async (event) => {
@@ -38,7 +35,10 @@ exports.main = async (event) => {
     found = await db
       .collection('members')
       .where({
-        phone: db.RegExp({ regexp: `^${safe}`, options: 'i' }),
+        phone: db.RegExp({
+          regexp: buildPhoneSearchPattern(keyword),
+          options: 'i',
+        }),
       })
       .limit(20)
       .get();

@@ -1,7 +1,13 @@
 const api = require('../../../utils/api');
 const { formatWorkDate, normalizeCaption } = require('../../../utils/worksView');
+const {
+  isMediaPickCancel,
+  describeMediaPickError,
+} = require('../../../utils/mediaPickError');
 
+const { shareBehavior } = require('../../../utils/share');
 Page({
+  behaviors: [shareBehavior],
   data: {
     works: [],
     loading: true,
@@ -31,21 +37,35 @@ Page({
     const urls = this.data.works.map((w) => w.imageFileID).filter(Boolean);
     wx.previewImage({ current: file, urls });
   },
-  async onUpload() {
+  onUpload() {
+    // chooseMedia 必须同步跟手；前面不能 await。
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sourceType: ['album', 'camera'],
+      success: (choose) => {
+        this.uploadChosenWork(choose);
+      },
+      fail: (error) => {
+        if (isMediaPickCancel(error)) return;
+        console.warn('[works] chooseMedia failed', error);
+        wx.showToast({ title: describeMediaPickError(error), icon: 'none', duration: 2500 });
+      },
+    });
+  },
+  async uploadChosenWork(choose) {
+    const file = choose && choose.tempFiles && choose.tempFiles[0];
+    if (!file || !file.tempFilePath) return;
+    wx.showLoading({ title: '上传中', mask: true });
     try {
-      const choose = await wx.chooseMedia({
-        count: 1,
-        mediaType: ['image'],
-        sourceType: ['album', 'camera'],
-      });
-      const file = choose.tempFiles && choose.tempFiles[0];
-      if (!file || !file.tempFilePath) return;
-
-      wx.showLoading({ title: '上传中', mask: true });
       const cloudPath = `works/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
-      const up = await wx.cloud.uploadFile({
-        cloudPath,
-        filePath: file.tempFilePath,
+      const up = await new Promise((resolve, reject) => {
+        wx.cloud.uploadFile({
+          cloudPath,
+          filePath: file.tempFilePath,
+          success: resolve,
+          fail: reject,
+        });
       });
       const res = await api.createWork({
         imageFileID: up.fileID,
@@ -60,9 +80,8 @@ Page({
       this.load();
     } catch (error) {
       wx.hideLoading();
-      if (error && error.errMsg && /cancel/i.test(error.errMsg)) return;
       console.warn('[works] upload failed', error);
-      wx.showToast({ title: '上传失败', icon: 'none' });
+      wx.showToast({ title: describeMediaPickError(error, 'upload'), icon: 'none' });
     }
   },
   onDelete(event) {
