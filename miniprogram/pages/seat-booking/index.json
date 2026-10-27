@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "选座预约",
+  "navigationBarBackgroundColor": "#f4efe6",
+  "navigationBarTextStyle": "black",
+  "backgroundColor": "#f4efe6",
+  "enableShareAppMessage": true,
+  "enableShareTimeline": true
+}

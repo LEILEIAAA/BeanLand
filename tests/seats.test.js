@@ -14,19 +14,19 @@ const {
 const seed = require('../miniprogram/data/seed');
 
 describe('shop floor layout seed', () => {
-  it('matches F1/F2 zone codes: 6 zones / 32 seats as F*-A1..C6', () => {
+  it('matches F1/F2 zone codes: 6 zones / 35 seats (F2 左墙 3+3 / 大桌 8 / 右墙 3+4)', () => {
     const byCode = Object.fromEntries(seed.tables.map((t) => [t.code, t]));
     const expected = [
       ['F1-A', 'F1一楼·左墙', 6],
       ['F1-B', 'F1一楼·窗边', 2],
       ['F1-C', 'F1一楼·长桌', 6],
       ['F2-A', 'F2二楼·左墙', 6],
-      ['F2-B', 'F2二楼·右墙', 6],
-      ['F2-C', 'F2二楼·长桌', 6],
+      ['F2-B', 'F2二楼·右墙', 7],
+      ['F2-C', 'F2二楼·长桌', 8],
     ];
 
     assert.equal(seed.tables.length, 6);
-    assert.equal(seed.seats.length, 32);
+    assert.equal(seed.seats.length, 35);
 
     for (const [code, area, capacity] of expected) {
       assert.ok(byCode[code], `missing table ${code}`);
@@ -45,7 +45,7 @@ describe('shop floor layout seed', () => {
     );
     assert.deepEqual(
       seed.seats.filter((s) => s.tableCode === 'F2-C').map((s) => s.id),
-      ['F2-C1', 'F2-C2', 'F2-C3', 'F2-C4', 'F2-C5', 'F2-C6'],
+      ['F2-C1', 'F2-C2', 'F2-C3', 'F2-C4', 'F2-C5', 'F2-C6', 'F2-C7', 'F2-C8'],
     );
   });
 

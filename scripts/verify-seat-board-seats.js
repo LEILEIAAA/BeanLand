@@ -78,7 +78,7 @@ console.log(
   'sample',
   seats.slice(0, 3).map((s) => `${s.id}/${s.tableCode}/idx=${s.index}`),
 );
-if (seats.length !== 32) {
+if (seats.length !== 35) {
   process.exitCode = 1;
-  console.error('EXPECTED 32 seats');
+  console.error('EXPECTED 35 seats');
 }

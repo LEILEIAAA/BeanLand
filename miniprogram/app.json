@@ -7,6 +7,7 @@
     "pages/activities/index",
     "pages/activities/register/index",
     "pages/appointment/index",
+    "pages/seat-booking/index",
     "pages/route/index",
     "pages/member/index",
     "pages/member/register/index",

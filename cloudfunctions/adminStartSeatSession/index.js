@@ -41,8 +41,8 @@ const FALLBACK_TABLES = [
   { code: 'F1-B', area: 'F1一楼·窗边', capacity: 2, bookable: true },
   { code: 'F1-C', area: 'F1一楼·长桌', capacity: 6, bookable: true },
   { code: 'F2-A', area: 'F2二楼·左墙', capacity: 6, bookable: true },
-  { code: 'F2-B', area: 'F2二楼·右墙', capacity: 6, bookable: true },
-  { code: 'F2-C', area: 'F2二楼·长桌', capacity: 6, bookable: true },
+  { code: 'F2-B', area: 'F2二楼·右墙', capacity: 7, bookable: true },
+  { code: 'F2-C', area: 'F2二楼·长桌', capacity: 8, bookable: true },
 ];
 
 function fallbackSeatsById() {

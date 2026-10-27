@@ -540,6 +540,26 @@ async function getActivityPageConfig() {
   };
 }
 
+async function getSeatBookingBoard(payload) {
+  const result = await callFunction('getSeatBookingBoard', payload || {});
+  return (result && result.result) || result;
+}
+
+async function createSeatBooking(payload) {
+  const result = await callFunction('createSeatBooking', payload || {});
+  return (result && result.result) || result;
+}
+
+async function listMySeatBookings(payload) {
+  const result = await callFunction('listMySeatBookings', payload || {});
+  return (result && result.result) || result;
+}
+
+async function cancelSeatBooking(payload) {
+  const result = await callFunction('cancelSeatBooking', payload || {});
+  return (result && result.result) || result;
+}
+
 module.exports = {
   ALLOW_SEED_FALLBACK,
   buildOccupancyId,
@@ -604,4 +624,8 @@ module.exports = {
   getHomeBanners,
   adminSaveActivityPageConfig,
   getActivityPageConfig,
+  getSeatBookingBoard,
+  createSeatBooking,
+  listMySeatBookings,
+  cancelSeatBooking,
 };

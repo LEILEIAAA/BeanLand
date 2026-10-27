@@ -4,6 +4,38 @@
   "functionRoot": "cloudfunctions",
   "functions": [
     {
+      "name": "createSeatBooking",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "getSeatBookingBoard",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "listMySeatBookings",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
+      "name": "cancelSeatBooking",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 20,
+      "memorySize": 256,
+      "installDependency": true
+    },
+    {
       "name": "adminConfirmActivityRefund",
       "runtime": "Nodejs16.13",
       "handler": "index.main",

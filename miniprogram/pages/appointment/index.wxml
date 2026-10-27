@@ -72,6 +72,14 @@
       <view class="form-sub">登记意向后由店主确认排座，不占座</view>
     </view>
 
+    <view class="newmap-entry" style="display:flex;align-items:center;justify-content:space-between;background:#2a2420;color:#fff;border-radius:20rpx;padding:24rpx 28rpx;margin-bottom:20rpx;" bindtap="goSeatBooking">
+      <view>
+        <view style="font-size:28rpx;font-weight:600;">地图选座预约（新版）</view>
+        <view style="font-size:22rpx;opacity:.8;margin-top:6rpx;">按座位图直接选座·全天畅玩或自选时段</view>
+      </view>
+      <view style="font-size:36rpx;opacity:.7;">›</view>
+    </view>
+
     <view class="card form-card">
       <view class="form-item">
         <view class="label">预约日期</view>

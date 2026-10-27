@@ -551,6 +551,10 @@ Page({
     }
   },
 
+  goSeatBooking() {
+    wx.navigateTo({ url: '/pages/seat-booking/index' });
+  },
+
   submit() {
     if (this.data.submitting) return;
     if (this.data.mode === 'assign') {

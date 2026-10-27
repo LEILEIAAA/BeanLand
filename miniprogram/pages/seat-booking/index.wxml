@@ -1,0 +1,210 @@
+<view class="page">
+  <view class="month-title">{{monthTitle}}</view>
+
+  <scroll-view class="date-strip" scroll-x enable-flex>
+    <view
+      wx:for="{{dateStrip}}"
+      wx:key="iso"
+      class="date-chip {{item.iso === selectedDate ? 'date-chip--active' : ''}} {{item.isRest ? 'date-chip--rest' : ''}}"
+      data-iso="{{item.iso}}"
+      bindtap="selectDate"
+    >
+      <text class="date-chip__wd">{{item.weekdayLabel}}</text>
+      <text class="date-chip__md">{{item.monthDay}}</text>
+      <text wx:if="{{item.isRest}}" class="date-chip__rest">店休</text>
+      <text wx:elif="{{item.isToday}}" class="date-chip__today">今天</text>
+    </view>
+  </scroll-view>
+
+  <!-- 楼层切换 -->
+  <view class="floor-tabs">
+    <view
+      wx:for="{{floors}}"
+      wx:key="key"
+      class="floor-tab {{item.key === floorKey ? 'floor-tab--active' : ''}}"
+      data-key="{{item.key}}"
+      bindtap="selectFloor"
+    >
+      <text class="floor-tab__label">{{item.label}}</text>
+      <text class="floor-tab__sub">{{item.subtitle}}</text>
+    </view>
+  </view>
+
+  <view class="legend">
+    <view class="legend__item"><text class="dot dot--available"></text>有空闲</view>
+    <view class="legend__item"><text class="dot dot--full"></text>已约满</view>
+    <view class="legend__item"><text class="dot dot--selected"></text>选择中</view>
+  </view>
+
+  <!-- 房间平面图：有底图的楼层铺手绘俯视图 + 透明热区；没有底图的楼层用色块画 -->
+  <view class="room">
+    <view
+      class="room__canvas {{floorView.image ? 'room__canvas--image' : ''}}"
+      style="padding-bottom:{{floorView.aspect}}%;"
+    >
+      <image
+        wx:if="{{floorView.image}}"
+        class="room__bg"
+        src="{{floorView.image}}"
+        mode="scaleToFill"
+      />
+
+      <block wx:if="{{!floorView.image}}">
+        <view
+          wx:for="{{floorView.decor}}"
+          wx:key="key"
+          class="decor decor--{{item.tone}}"
+          style="left:{{item.x}}%;top:{{item.y}}%;width:{{item.w}}%;height:{{item.h}}%;"
+        >{{item.label}}</view>
+
+        <view
+          wx:for="{{floorView.tables}}"
+          wx:key="code"
+          class="tbl"
+          style="left:{{item.x}}%;top:{{item.y}}%;width:{{item.w}}%;height:{{item.h}}%;"
+        ><text class="tbl__name">{{item.name}}</text></view>
+      </block>
+
+      <view
+        wx:for="{{floorView.seats}}"
+        wx:key="id"
+        class="seat seat--{{item.status}} {{floorView.image ? 'seat--ghost' : ''}}"
+        style="left:{{item.x}}%;top:{{item.y}}%;width:{{item.w}}%;height:{{item.h}}%;"
+        data-id="{{item.id}}"
+        data-status="{{item.status}}"
+        bindtap="onSeatTap"
+      >
+        <text class="seat__no">{{item.index}}</text>
+        <image
+          wx:if="{{floorView.image}}"
+          class="seat__mark seat__mark--{{item.mat}}"
+          src="/assets/map/seat-mark-{{item.status}}.png"
+          mode="aspectFit"
+        />
+      </view>
+    </view>
+    <view class="room__tag">{{floorView.label}} · {{floorView.subtitle}}</view>
+  </view>
+
+  <view class="hint">点桌垫或椅子选座·可多选·虚线兔子=空位 橙圈=选择中 绿勾=已约满</view>
+</view>
+
+<!-- 选座栏 -->
+<view wx:if="{{selectedSeatIds.length && !sheetOpen && !success}}" class="select-bar">
+  <view class="select-bar__info">
+    <view class="select-bar__count">已选 {{selectedSeatIds.length}} 座</view>
+    <view class="select-bar__seats">{{selectedLabel}}</view>
+  </view>
+  <view class="select-bar__actions">
+    <view class="select-bar__clear" bindtap="clearSelection">清空</view>
+    <button class="btn-primary select-bar__next" bindtap="openSessionSheet">选择时段</button>
+  </view>
+</view>
+
+<!-- 时段弹层 -->
+<view wx:if="{{sheetOpen}}" class="mask" bindtap="closeSheet"></view>
+<view class="sheet {{sheetOpen ? 'sheet--open' : ''}}" catchtap="noop">
+  <view class="sheet__head">
+    <view>
+      <view class="sheet__title">已选 {{selectedSeatIds.length}} 座 · {{floorView.label}}</view>
+      <view class="sheet__sub">{{selectedLabel}} · 请选择场次</view>
+    </view>
+    <view class="sheet__close" bindtap="closeSheet">✕</view>
+  </view>
+
+  <view class="overview">
+    <view class="overview__head">
+      <text>今日概况</text>
+      <text class="overview__span">{{businessHours.open}} - {{businessHours.close}}</text>
+    </view>
+    <view class="timeline">
+      <view wx:for="{{timeline}}" wx:key="slot" class="tl-cell tl-cell--{{item.state}}">{{item.startLabel}}</view>
+    </view>
+    <view class="tl-legend">
+      <text><text class="dot dot--free"></text>空闲</text>
+      <text><text class="dot dot--booked"></text>已占用</text>
+      <text><text class="dot dot--ended"></text>已结束</text>
+    </view>
+  </view>
+
+  <view class="sessions">
+    <view class="sessions__title">预约时段</view>
+
+    <view
+      class="session {{sessionType === SESSION_ALL_DAY ? 'session--active' : ''}} {{!allDayAvailable ? 'session--disabled' : ''}}"
+      data-type="{{SESSION_ALL_DAY}}"
+      bindtap="chooseSession"
+    >
+      <view class="session__main">
+        <view class="session__name">全天畅玩不限时</view>
+        <view class="session__desc">{{allDaySpan ? allDaySpan : businessHours.open + '-' + businessHours.close}} 不限时畅玩，锁定打烊前全部时段</view>
+      </view>
+      <view class="radio {{sessionType === SESSION_ALL_DAY ? 'radio--on' : ''}}"></view>
+    </view>
+
+    <view
+      class="session {{sessionType === SESSION_CUSTOM ? 'session--active' : ''}}"
+      data-type="{{SESSION_CUSTOM}}"
+      bindtap="chooseSession"
+    >
+      <view class="session__main">
+        <view class="session__name">自选时段</view>
+        <view class="session__desc">按小时起订，点选连续时段</view>
+      </view>
+      <view class="radio {{sessionType === SESSION_CUSTOM ? 'radio--on' : ''}}"></view>
+    </view>
+
+    <view wx:if="{{sessionType === SESSION_CUSTOM}}" class="hour-grid">
+      <view
+        wx:for="{{hourCells}}"
+        wx:key="slot"
+        class="hour {{item.selected ? 'hour--on' : ''}} {{!item.selectable ? 'hour--off' : ''}}"
+        data-index="{{item.index}}"
+        bindtap="onHourTap"
+      >{{item.startLabel}}</view>
+    </view>
+  </view>
+
+  <view class="sheet__foot">
+    <view class="sheet__summary">
+      <view class="sheet__summary-main">{{selectedDate}} · {{selectedSeatIds.length}} 座</view>
+      <view class="sheet__summary-sub">{{sessionLabel ? sessionLabel : '请选择场次'}}</view>
+    </view>
+    <button class="btn-primary {{!canSubmit || submitting ? 'btn-primary--off' : ''}}" disabled="{{!canSubmit || submitting}}" bindtap="submit">立即预约</button>
+  </view>
+</view>
+
+<!-- 预约成功 -->
+<view wx:if="{{success}}" class="mask mask--solid">
+  <view class="result">
+    <view class="result__check">✓</view>
+    <view class="result__title">预约成功</view>
+    <view class="result__tip">请凭核销码到店核销</view>
+
+    <view wx:if="{{success.preview}}" class="result__preview">预览模式：云函数未部署，此预约未真正入库（地图占用为本地模拟）</view>
+
+    <view class="ticket">
+      <view class="ticket__store">{{success.storeName}}</view>
+      <view class="ticket__label">核销码</view>
+      <view class="ticket__code">{{success.code}}</view>
+      <view class="ticket__copy" bindtap="copyCode">点击复制核销码</view>
+    </view>
+
+    <view class="info">
+      <view class="info__row"><text>预约状态</text><text class="info__val info__val--green">{{success.statusLabel}}</text></view>
+      <view class="info__row"><text>楼层</text><text class="info__val">{{success.floorLabel}}</text></view>
+      <view class="info__row"><text>座位</text><text class="info__val">{{success.seatLabel}}（{{success.seatCount}} 座）</text></view>
+      <view class="info__row"><text>预约日期</text><text class="info__val">{{success.dateIso}}</text></view>
+      <view class="info__row"><text>预约时段</text><text class="info__val">{{success.sessionLabel}}</text></view>
+      <view wx:if="{{success.orderNo}}" class="info__row"><text>订单编号</text><text class="info__val">{{success.orderNo}}</text></view>
+      <view wx:if="{{success.phone}}" class="info__row"><text>联系电话</text><text class="info__val">{{success.phone}}</text></view>
+    </view>
+
+    <view class="result__note">请在预约时间内到店，并向工作人员出示上方核销码完成核销。</view>
+
+    <view class="result__actions">
+      <button class="btn-ghost" bindtap="cancelBooking">取消预约</button>
+      <button class="btn-primary" bindtap="closeSuccess">完成</button>
+    </view>
+  </view>
+</view>
